@@ -9,9 +9,11 @@ import com.bekvon.bukkit.residence.permissions.PermissionGroup;
 import com.bekvon.bukkit.residence.permissions.PermissionManager.ResPerm;
 import net.Zrips.CMILib.Colors.CMIChatColor;
 import net.Zrips.CMILib.Container.PageInfo;
+import net.Zrips.CMILib.Items.CMIMC;
 import net.Zrips.CMILib.Items.CMIMaterial;
 import net.Zrips.CMILib.Locale.LC;
 import net.Zrips.CMILib.RawMessages.RawMessage;
+import net.Zrips.CMILib.Version.Version;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -23,6 +25,7 @@ import org.bukkit.entity.Player;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 public class FlagPermissions {
 
@@ -30,6 +33,11 @@ public class FlagPermissions {
     protected static ArrayList<String> validPlayerFlags = new ArrayList<>();
     protected static ArrayList<String> validAreaFlags = new ArrayList<>();
     protected static HashMap<String, Set<String>> validFlagGroups = new HashMap<>();
+
+    private List<String> CMDWhiteList = new ArrayList<>();
+    private List<String> CMDBlackList = new ArrayList<>();
+    private boolean inherit = false;
+
     final static Map<Material, Flags> matUseFlagList = new EnumMap<>(Material.class);
     protected Map<UUID, String> cachedPlayerNameUUIDs = new ConcurrentHashMap<UUID, String>();
     protected Map<String, Map<String, Boolean>> playerFlags = new ConcurrentHashMap<String, Map<String, Boolean>>();
@@ -54,6 +62,7 @@ public class FlagPermissions {
         public String getName() {
             return name().toLowerCase();
         }
+
     }
 
     public static void addMaterialToUseFlag(Material mat, Flags flag) {
@@ -196,6 +205,9 @@ public class FlagPermissions {
 
         addMaterialToUseFlag(CMIMaterial.CRAFTING_TABLE.getMaterial(), Flags.table);
 
+        if (Version.isCurrentEqualOrHigher(Version.v1_21_R1))
+            addMaterialToUseFlag(CMIMaterial.CRAFTER.getMaterial(), Flags.table);
+
         for (CMIMaterial one : CMIMaterial.values()) {
             if (one.getMaterial() == null)
                 continue;
@@ -212,6 +224,9 @@ public class FlagPermissions {
             if (one.isShulkerBox())
                 matUseFlagList.put(one.getMaterial(), Flags.container);
 
+            if (one.equals(CMIMaterial.DECORATED_POT))
+                matUseFlagList.put(one.getMaterial(), Flags.container);
+
             if (one.isButton())
                 matUseFlagList.put(one.getMaterial(), Flags.button);
 
@@ -221,6 +236,18 @@ public class FlagPermissions {
 
             if (one.isPotted())
                 matUseFlagList.put(one.getMaterial(), Flags.flowerpot);
+
+            if (one.containsCriteria(CMIMC.CAKE))
+                addMaterialToUseFlag(one.getMaterial(), Flags.cake);
+
+            if (Version.isCurrentEqualOrHigher(Version.v1_17_R1)) {
+                if (one.isCandle())
+                    addMaterialToUseFlag(one.getMaterial(), Flags.use);
+
+                if (one.containsCriteria(CMIMC.CANDLECAKE))
+                    addMaterialToUseFlag(one.getMaterial(), Flags.cake);
+            }
+
         }
 
         if (CMIMaterial.DAYLIGHT_DETECTOR.getMaterial() != null)
@@ -231,7 +258,6 @@ public class FlagPermissions {
 
         addMaterialToUseFlag(Material.LEVER, Flags.lever);
         addMaterialToUseFlag(Material.BREWING_STAND, Flags.brew);
-        addMaterialToUseFlag(Material.CAKE, Flags.cake);
         addMaterialToUseFlag(Material.NOTE_BLOCK, Flags.note);
         addMaterialToUseFlag(Material.DRAGON_EGG, Flags.egg);
         addMaterialToUseFlag(CMIMaterial.COMMAND_BLOCK.getMaterial(), Flags.commandblock);
@@ -250,22 +276,46 @@ public class FlagPermissions {
         addMaterialToUseFlag(Material.FURNACE, Flags.container);
         addMaterialToUseFlag(CMIMaterial.LEGACY_BURNING_FURNACE.getMaterial(), Flags.container);
 
-        addMaterialToUseFlag(CMIMaterial.BARREL.getMaterial(), Flags.container);
-        addMaterialToUseFlag(CMIMaterial.BLAST_FURNACE.getMaterial(), Flags.container);
-        addMaterialToUseFlag(CMIMaterial.CARTOGRAPHY_TABLE.getMaterial(), Flags.container);
-        addMaterialToUseFlag(CMIMaterial.FLETCHING_TABLE.getMaterial(), Flags.container);
-        addMaterialToUseFlag(CMIMaterial.GRINDSTONE.getMaterial(), Flags.container);
+        if (Version.isCurrentEqualOrHigher(Version.v1_14_R1)) {
+            addMaterialToUseFlag(CMIMaterial.LECTERN.getMaterial(), Flags.use);
 
-        addMaterialToUseFlag(CMIMaterial.LECTERN.getMaterial(), Flags.use);
+            addMaterialToUseFlag(CMIMaterial.BARREL.getMaterial(), Flags.container);
+            addMaterialToUseFlag(CMIMaterial.BLAST_FURNACE.getMaterial(), Flags.container);
+            addMaterialToUseFlag(CMIMaterial.CARTOGRAPHY_TABLE.getMaterial(), Flags.container);
+            addMaterialToUseFlag(CMIMaterial.FLETCHING_TABLE.getMaterial(), Flags.container);
+            addMaterialToUseFlag(CMIMaterial.GRINDSTONE.getMaterial(), Flags.container);
 
-        addMaterialToUseFlag(CMIMaterial.LOOM.getMaterial(), Flags.container);
-        addMaterialToUseFlag(CMIMaterial.SMITHING_TABLE.getMaterial(), Flags.container);
-        addMaterialToUseFlag(CMIMaterial.SMOKER.getMaterial(), Flags.container);
-        addMaterialToUseFlag(CMIMaterial.COMPOSTER.getMaterial(), Flags.container);
-        addMaterialToUseFlag(CMIMaterial.STONECUTTER.getMaterial(), Flags.container);
+            addMaterialToUseFlag(CMIMaterial.LOOM.getMaterial(), Flags.container);
+            addMaterialToUseFlag(CMIMaterial.SMITHING_TABLE.getMaterial(), Flags.container);
+            addMaterialToUseFlag(CMIMaterial.SMOKER.getMaterial(), Flags.container);
+            addMaterialToUseFlag(CMIMaterial.COMPOSTER.getMaterial(), Flags.container);
+            addMaterialToUseFlag(CMIMaterial.STONECUTTER.getMaterial(), Flags.container);
+
+            addMaterialToUseFlag(CMIMaterial.CAMPFIRE.getMaterial(), Flags.use);
+        }
+
+        if (Version.isCurrentEqualOrHigher(Version.v1_16_R1)) {
+            addMaterialToUseFlag(CMIMaterial.SOUL_CAMPFIRE.getMaterial(), Flags.use);
+        }
+
+        if (Version.isCurrentEqualOrHigher(Version.v1_20_R1)) {
+            addMaterialToUseFlag(CMIMaterial.CHISELED_BOOKSHELF.getMaterial(), Flags.container);
+        }
 
         addMaterialToUseFlag(Material.DISPENSER, Flags.container);
 //	addMaterialToUseFlag(CMIMaterial.CAKE.getMaterial(), Flags.cake);
+    }
+
+    public void parseCommandLimits(ConfigurationSection node) {
+        if (node.isList("WhiteList")) {
+            CMDWhiteList = node.getStringList("WhiteList").stream().map(str -> str.replace(" ", "_").replaceAll("^/+", "")).collect(Collectors.toList());
+        }
+        if (node.isList("BlackList")) {
+            CMDBlackList = node.getStringList("BlackList").stream().map(str -> str.replace(" ", "_").replaceAll("^/+", "")).collect(Collectors.toList());
+        }
+        if (node.isBoolean("Inherit")) {
+            inherit = node.getBoolean("Inherit");
+        }
     }
 
     public static FlagPermissions parseFromConfigNode(String name, ConfigurationSection node) {
@@ -491,7 +541,7 @@ public class FlagPermissions {
             return FlagState.TRUE;
         } else if (flagstate.equalsIgnoreCase("false") || flagstate.equalsIgnoreCase("f")) {
             return FlagState.FALSE;
-        } else if (flagstate.equalsIgnoreCase("remove") || flagstate.equalsIgnoreCase("r")) {
+        } else if (flagstate.equalsIgnoreCase("remove") || flagstate.equalsIgnoreCase("r") || flagstate.equalsIgnoreCase("neither")) {
             return FlagState.NEITHER;
         } else {
             return FlagState.INVALID;
@@ -1026,27 +1076,37 @@ public class FlagPermissions {
 
     @Deprecated
     public Set<String> getposibleFlags() {
-        return getAllPosibleFlags();
+        return getAllPossibleFlags();
     }
 
-    public static Set<String> getAllPosibleFlags() {
+    public static Set<String> getAllPossibleFlags() {
         Set<String> t = new HashSet<String>();
         t.addAll(FlagPermissions.validFlags);
         t.addAll(FlagPermissions.validPlayerFlags);
         return t;
     }
 
+    @Deprecated
     public static ArrayList<String> getPosibleAreaFlags() {
+        return getPossibleAreaFlags();
+    }
+
+    public static ArrayList<String> getPossibleAreaFlags() {
         return FlagPermissions.validAreaFlags;
     }
 
+    @Deprecated
     public List<String> getPosibleFlags(Player player, boolean residence, boolean resadmin) {
+        return getPossibleFlags(player, residence, resadmin);
+    }
+
+    public List<String> getPossibleFlags(Player player, boolean residence, boolean resadmin) {
         Set<String> flags = new HashSet<String>();
         for (Entry<String, Boolean> one : Residence.getInstance().getPermissionManager().getAllFlags().getFlags().entrySet()) {
             if (!one.getValue() && !resadmin && !ResPerm.flag_$1.hasSetPermission(player, one.getKey().toLowerCase()))
                 continue;
 
-            if (!residence && !getAllPosibleFlags().contains(one.getKey()))
+            if (!residence && !getAllPossibleFlags().contains(one.getKey()))
                 continue;
 
             String fname = one.getKey();
@@ -1498,5 +1558,17 @@ public class FlagPermissions {
 
     public Map<String, Map<String, Boolean>> getPlayerFlags() {
         return playerFlags;
+    }
+
+    public List<String> getCMDWhiteList() {
+        return CMDWhiteList;
+    }
+
+    public List<String> getCMDBlackList() {
+        return CMDBlackList;
+    }
+
+    public boolean isInheritCMDLimits() {
+        return inherit;
     }
 }

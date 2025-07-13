@@ -46,12 +46,10 @@ public class PermissionGroup {
 //    protected Map<String, Boolean> rentedDefaultFlags;
     protected Map<String, Map<String, Boolean>> groupDefaultFlags;
     protected Map<String, Boolean> residenceDefaultFlags;
-    
-    
+
     protected Map<String, Map<String, FlagPermissions>> groupperms;
     protected Map<String, FlagPermissions> worldperms;
-    
-    
+
     protected boolean messageperms = false;
     protected String defaultEnterMessage = null;
     protected String defaultLeaveMessage = null;
@@ -81,10 +79,10 @@ public class PermissionGroup {
 //	rentedDefaultFlags = new HashMap<String, Boolean>();
         residenceDefaultFlags = new HashMap<String, Boolean>();
         groupDefaultFlags = new HashMap<String, Map<String, Boolean>>();
-        
+
         worldperms = new HashMap<>();
         groupperms = new HashMap<>();
-        
+
         groupname = name;
     }
 
@@ -134,25 +132,24 @@ public class PermissionGroup {
         if (limits.contains("Residence.MinEastWest"))
             xmin = limits.getInt("Residence.MinEastWest", 0);
 
-        xmin = getXmin() > getXmax() ? getXmax() : getXmin();
+        xmin = Math.min(getMinX(), getMaxX());
 
         if (limits.contains("Residence.MaxUpDown"))
             ymax = limits.getInt("Residence.MaxUpDown", 0);
         if (limits.contains("Residence.MinUpDown"))
             ymin = limits.getInt("Residence.MinUpDown", 0);
-        ymin = ymin > ymax ? ymax : ymin;
+        ymin = Math.min(ymin, ymax);
 
         if (Residence.getInstance().getConfigManager().isSelectionIgnoreY()) {
-            ymin = CMIWorld.getMinHeight(Bukkit.getWorlds().get(0));
             // This needs to be 256 to include entire height where 255 and block 0
-            ymax = CMIWorld.getMaxHeight(Bukkit.getWorlds().get(0));
+            ymax = CMIWorld.getMaxHeight(Bukkit.getWorlds().get(0)) + Math.abs(CMIWorld.getMinHeight(Bukkit.getWorlds().get(0)));
         }
 
         if (limits.contains("Residence.MaxNorthSouth"))
             zmax = limits.getInt("Residence.MaxNorthSouth", 0);
         if (limits.contains("Residence.MinNorthSouth"))
             zmin = limits.getInt("Residence.MinNorthSouth", 0);
-        zmin = zmin > zmax ? zmax : zmin;
+        zmin = Math.min(zmin, zmax);
 
         if (limits.contains("Residence.MinHeight"))
             minHeight = limits.getInt("Residence.MinHeight", 0);
@@ -170,33 +167,40 @@ public class PermissionGroup {
             subzonedepth = limits.getInt("Residence.SubzoneDepth", 0);
 
         if (limits.contains("Residence.SubzoneMaxEastWest"))
-            Subzonexmax = limits.getInt("Residence.SubzoneMaxEastWest", getXmax());
+            Subzonexmax = limits.getInt("Residence.SubzoneMaxEastWest", getMaxX());
         else
-            Subzonexmax = getXmax();
-        Subzonexmax = getXmax() < Subzonexmax ? getXmax() : Subzonexmax;
+            Subzonexmax = getMaxX();
+        Subzonexmax = Math.min(getMaxX(), Subzonexmax);
 
         if (limits.contains("Residence.SubzoneMinEastWest"))
             Subzonexmin = limits.getInt("Residence.SubzoneMinEastWest", 0);
-        Subzonexmin = Subzonexmin > Subzonexmax ? Subzonexmax : Subzonexmin;
+        Subzonexmin = Math.min(Subzonexmin, Subzonexmax);
 
         if (limits.contains("Residence.SubzoneMaxUpDown"))
             Subzoneymax = limits.getInt("Residence.SubzoneMaxUpDown", ymax);
         else
-            Subzoneymax = getYmax();
+            Subzoneymax = getMaxYSize();
 
-        Subzoneymax = ymax < Subzoneymax ? ymax : Subzoneymax;
+        Subzoneymax = Math.min(ymax, Subzoneymax);
         if (limits.contains("Residence.SubzoneMinUpDown"))
             Subzoneymin = limits.getInt("Residence.SubzoneMinUpDown", 0);
-        Subzoneymin = Subzoneymin > Subzoneymax ? Subzoneymax : Subzoneymin;
+        Subzoneymin = Math.min(Subzoneymin, Subzoneymax);
 
         if (limits.contains("Residence.SubzoneMaxNorthSouth"))
             Subzonezmax = limits.getInt("Residence.SubzoneMaxNorthSouth", zmax);
         else
-            Subzonezmax = getZmax();
-        Subzonezmax = zmax < Subzonezmax ? zmax : Subzonezmax;
+            Subzonezmax = getMaxZ();
+
+        if (Residence.getInstance().getConfigManager().isSelectionIgnoreYInSubzone()) {
+            // This needs to be 256 to include entire height where 255 and block 0
+            Subzonezmax = CMIWorld.getMaxHeight(Bukkit.getWorlds().get(0)) + Math.abs(CMIWorld.getMinHeight(Bukkit.getWorlds().get(0)));
+        }
+
+        Subzonezmax = Math.min(zmax, Subzonezmax);
+
         if (limits.contains("Residence.SubzoneMinNorthSouth"))
             Subzonezmin = limits.getInt("Residence.SubzoneMinNorthSouth", 0);
-        Subzonezmin = Subzonezmin > Subzonezmax ? Subzonezmax : Subzonezmin;
+        Subzonezmin = Math.min(Subzonezmin, Subzonezmax);
 
         if (limits.contains("Messaging.CanChange"))
             messageperms = limits.getBoolean("Messaging.CanChange", false);
@@ -325,8 +329,17 @@ public class PermissionGroup {
         return xmax;
     }
 
-    public int getMaxY() {
+    public int getMaxYSize() {
         return ymax;
+    }
+
+    public int getMinYSize() {
+        return ymin;
+    }
+
+    @Deprecated
+    public int getMaxY() {
+        return getMaxYSize();
     }
 
     public int getMaxZ() {
@@ -337,8 +350,9 @@ public class PermissionGroup {
         return xmin;
     }
 
+    @Deprecated
     public int getMinY() {
-        return ymin;
+        return getMinYSize();
     }
 
     public int getMinZ() {
@@ -369,12 +383,22 @@ public class PermissionGroup {
         return Subzonezmin;
     }
 
+    @Deprecated
     public int getMinHeight() {
+        return getLowestYAllowed();
+    }
+
+    public int getLowestYAllowed() {
         return minHeight;
     }
 
-    public int getMaxHeight() {
+    public int getHighestYAllowed() {
         return maxHeight;
+    }
+
+    @Deprecated
+    public int getMaxHeight() {
+        return getHighestYAllowed();
     }
 
     public int getMaxZones() {
@@ -406,10 +430,14 @@ public class PermissionGroup {
     }
 
     public String getDefaultEnterMessage() {
+        if (defaultEnterMessage == null)
+            return "";
         return defaultEnterMessage;
     }
 
     public String getDefaultLeaveMessage() {
+        if (defaultLeaveMessage == null)
+            return "";
         return defaultLeaveMessage;
     }
 
@@ -514,7 +542,7 @@ public class PermissionGroup {
 
     public void printLimits(CommandSender player, OfflinePlayer target, boolean resadmin) {
 
-        ResidencePlayer rPlayer = Residence.getInstance().getPlayerManager().getResidencePlayer(target.getName());
+        ResidencePlayer rPlayer = Residence.getInstance().getPlayerManager().getResidencePlayer(target);
         rPlayer.getGroup(true);
         PermissionGroup group = rPlayer.getGroup();
 
@@ -574,12 +602,12 @@ public class PermissionGroup {
 
     @Deprecated
     public int getYmin() {
-        return ymin;
+        return getMinYSize();
     }
 
     @Deprecated
     public int getYmax() {
-        return ymax;
+        return getMaxYSize();
     }
 
     @Deprecated

@@ -55,6 +55,8 @@ public class FileCleanUp {
 
                 if (player == null) {
                     skipped++;
+                    if (plugin.getConfigManager().isAutoCleanDetailsOnUnknown())
+                        Bukkit.getConsoleSender().sendMessage("Skipping " + res.getName() + " residence owned by " + res.getOwner() + " (" + res.getOwnerUUID() + ")");
                     continue;
                 }
 
@@ -62,6 +64,9 @@ public class FileCleanUp {
                     continue;
 
                 if (res.getOwner().equalsIgnoreCase("server land") || res.getOwner().equalsIgnoreCase(plugin.getServerLandName()))
+                    continue;
+
+                if (res.getOwner().equalsIgnoreCase(plugin.getConfigManager().getAutoCleanUserName()))
                     continue;
 
                 long lastPlayed = player.getLastPlayed();
@@ -74,7 +79,14 @@ public class FileCleanUp {
 
                 ResidencePlayer rPlayer = plugin.getPlayerManager().getResidencePlayer(player.getUniqueId());
 
-                plugin.getResidenceManager().removeResidence(rPlayer, oneName.getValue(), true, plugin.getConfigManager().isAutoCleanUpRegenerate());
+                if (plugin.getConfigManager().isAutoCleanTrasnferToUser() && !res.getOwner().equalsIgnoreCase(plugin.getConfigManager().getAutoCleanUserName())) {
+                    res.getPermissions().setOwner(plugin.getConfigManager().getAutoCleanUserName(), true);
+                    if (plugin.getRentManager().isForRent(res))
+                        plugin.getRentManager().removeRentable(res);
+                    if (plugin.getTransactionManager().isForSale(res))
+                        plugin.getTransactionManager().removeFromSale(res);
+                } else
+                    plugin.getResidenceManager().removeResidence(rPlayer, oneName.getValue(), true, plugin.getConfigManager().isAutoCleanUpRegenerate());
                 i++;
             }
         } catch (Throwable e) {

@@ -18,36 +18,36 @@ public class show implements cmd {
     @Override
     @CommandAnnotation(simple = true, priority = 3300)
     public Boolean perform(Residence plugin, CommandSender sender, String[] args, boolean resadmin) {
-	if (!(sender instanceof Player))
-	    return false;
+        if (!(sender instanceof Player))
+            return false;
 
-	Player player = (Player) sender;
+        Player player = (Player) sender;
 
-	ClaimedResidence res = null;
+        ClaimedResidence res = null;
 
-	if (args.length == 1) {
-	    res = plugin.getResidenceManager().getByName(args[0]);
-	} else {
-	    res = plugin.getResidenceManager().getByLoc(player.getLocation());
-	}
+        if (args.length == 1) {
+            res = plugin.getResidenceManager().getByName(args[0]);
+        } else {
+            res = plugin.getResidenceManager().getByLoc(player.getLocation());
+        }
 
-	if (res == null) {
-	    plugin.msg(sender, lm.Invalid_Residence);
-	    return true;
-	}
+        if (res == null) {
+            plugin.msg(sender, lm.Invalid_Residence);
+            return true;
+        }
 
-	Visualizer v = new Visualizer(player);
-	v.setAreas(res.getAreaArray());
-	plugin.getSelectionManager().showBounds(player, v);
+        Visualizer v = new Visualizer(player);
+        v.setAreas(res.getAreaArray());
+        plugin.getSelectionManager().showBounds(player, v);
 
-	return true;
+        return true;
     }
 
     @Override
     public void getLocale() {
-	ConfigReader c = Residence.getInstance().getLocaleManager().getLocaleConfig();
-	c.get("Description", "Show residence boundaries");
-	c.get("Info", Arrays.asList("&eUsage: &6/res show <residence>"));
-	LocaleManager.addTabCompleteMain(this, "[residence]");
+        ConfigReader c = Residence.getInstance().getLocaleManager().getLocaleConfig();
+        c.get("Description", "Show residence boundaries");
+        c.get("Info", Arrays.asList("&eUsage: &6/res show <residence>"));
+        LocaleManager.addTabCompleteMain(this, "[residence]");
     }
 }

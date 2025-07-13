@@ -10,8 +10,13 @@ import com.bekvon.bukkit.residence.protection.FlagPermissions;
 import com.griefcraft.lwc.LWC;
 import com.griefcraft.scripting.event.*;
 import net.Zrips.CMILib.Container.CMILocation;
+import net.Zrips.CMILib.Container.CMIWorld;
+import net.Zrips.CMILib.Version.Schedulers.CMIScheduler;
 import net.Zrips.CMILib.Version.Version;
-import org.bukkit.*;
+import org.bukkit.ChunkSnapshot;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
@@ -23,92 +28,90 @@ import java.util.List;
 public class ResidenceLWCListener implements com.griefcraft.scripting.Module {
 
     public static void register(Plugin plugin) {
-	LWC.getInstance().getModuleLoader().registerModule(plugin, new ResidenceLWCListener());
+        LWC.getInstance().getModuleLoader().registerModule(plugin, new ResidenceLWCListener());
     }
 
     public static void removeLwcFromResidence(final Player player, final ClaimedResidence res) {
-	if (Version.isCurrentLower(Version.v1_13_R1))
-	    return;
+        if (Version.isCurrentLower(Version.v1_13_R1))
+            return;
 
-	Bukkit.getScheduler().runTaskAsynchronously(Residence.getInstance(), new Runnable() {
-	    @Override
-	    public void run() {
-		long time = System.currentTimeMillis();
-		LWC lwc = LWC.getInstance();
-		if (lwc == null)
-		    return;
-		if (res == null)
-		    return;
-		int i = 0;
+        CMIScheduler.runTaskAsynchronously(Residence.getInstance(), () -> {
+            long time = System.currentTimeMillis();
+            LWC lwc = LWC.getInstance();
+            if (lwc == null)
+                return;
+            if (res == null)
+                return;
+            int i = 0;
 
-		com.griefcraft.cache.ProtectionCache cache = lwc.getProtectionCache();
+            com.griefcraft.cache.ProtectionCache cache = lwc.getProtectionCache();
 
-		List<Material> list = Residence.getInstance().getConfigManager().getLwcMatList();
+            List<Material> list = Residence.getInstance().getConfigManager().getLwcMatList();
 
-		List<Block> block = new ArrayList<Block>();
+            List<Block> block = new ArrayList<Block>();
 
-		try {
-		    ChunkSnapshot chunkSnapshot = null;
-		    int chunkX = 0;
-		    int chunkZ = 0;
-		    for (CuboidArea area : res.getAreaArray()) {
-			Location low = area.getLowLocation();
-			Location high = area.getHighLocation();
-			World world = low.getWorld();
-			for (int x = low.getBlockX(); x <= high.getBlockX(); x++) {
-			    for (int z = low.getBlockZ(); z <= high.getBlockZ(); z++) {
-				int hy = world.getHighestBlockYAt(x, z);
-				if (high.getBlockY() < hy)
-				    hy = high.getBlockY();
-				int cx = Math.abs(x % 16);
-				int cz = Math.abs(z % 16);
-				if (chunkSnapshot == null || x >> 4 != chunkX || z >> 4 != chunkZ) {
-				    if (!world.getBlockAt(x, 0, z).getChunk().isLoaded()) {
-					world.getBlockAt(x, 0, z).getChunk().load();
-					chunkSnapshot = world.getBlockAt(x, 0, z).getChunk().getChunkSnapshot(false, false, false);
-					world.getBlockAt(x, 0, z).getChunk().unload();
-				    } else {
-					chunkSnapshot = world.getBlockAt(x, 0, z).getChunk().getChunkSnapshot();
-				    }
-				    chunkX = x >> 4;
-				    chunkZ = z >> 4;
-				}
+            try {
+                ChunkSnapshot chunkSnapshot = null;
+                int chunkX = 0;
+                int chunkZ = 0;
+                for (CuboidArea area : res.getAreaArray()) {
+                    Location low = area.getLowLocation();
+                    Location high = area.getHighLocation();
+                    World world = low.getWorld();
+                    for (int x = low.getBlockX(); x <= high.getBlockX(); x++) {
+                        for (int z = low.getBlockZ(); z <= high.getBlockZ(); z++) {
+                            int hy = world.getHighestBlockYAt(x, z);
+                            if (high.getBlockY() < hy)
+                                hy = high.getBlockY();
+                            int cx = Math.abs(x % 16);
+                            int cz = Math.abs(z % 16);
+                            if (chunkSnapshot == null || x >> 4 != chunkX || z >> 4 != chunkZ) {
+                                if (!world.getBlockAt(x, 0, z).getChunk().isLoaded()) {
+                                    world.getBlockAt(x, 0, z).getChunk().load();
+                                    chunkSnapshot = world.getBlockAt(x, 0, z).getChunk().getChunkSnapshot(false, false, false);
+                                    world.getBlockAt(x, 0, z).getChunk().unload();
+                                } else {
+                                    chunkSnapshot = world.getBlockAt(x, 0, z).getChunk().getChunkSnapshot();
+                                }
+                                chunkX = x >> 4;
+                                chunkZ = z >> 4;
+                            }
 
-				if (Version.isCurrentEqualOrHigher(Version.v1_13_R1)) {
-				    for (int y = low.getBlockY(); y <= hy; y++) {
-					BlockData type = chunkSnapshot.getBlockData(cx, y, cz);
-					if (!list.contains(type.getMaterial()))
-					    continue;
-					block.add(world.getBlockAt(x, y, z));
-				    }
-				} else {
-				    for (int y = low.getBlockY(); y <= hy; y++) {
-					Material type = CMILocation.getBlockTypeSafe(new Location(world, x, y, z));
-					if (!list.contains(type))
-					    continue;
-					block.add(world.getBlockAt(x, y, z));
-				    }
-				}
-			    }
-			}
-		    }
-		} catch (Exception e) {
-		    e.printStackTrace();
-		}
+                            int minY = Math.max(low.getBlockY(), CMIWorld.getMinHeight(area.getWorld()));
 
-		for (Block b : block) {
-		    com.griefcraft.model.Protection prot = cache.getProtection(b);
-		    if (prot == null)
-			continue;
-		    prot.remove();
-		    i++;
-		}
+                            if (Version.isCurrentEqualOrHigher(Version.v1_13_R1)) {
+                                for (int y = minY; y <= hy; y++) {
+                                    BlockData type = chunkSnapshot.getBlockData(cx, y, cz);
+                                    if (!list.contains(type.getMaterial()))
+                                        continue;
+                                    block.add(world.getBlockAt(x, y, z));
+                                }
+                            } else {
+                                for (int y = minY; y <= hy; y++) {
+                                    Material type = CMILocation.getBlockTypeSafe(new Location(world, x, y, z));
+                                    if (!list.contains(type))
+                                        continue;
+                                    block.add(world.getBlockAt(x, y, z));
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
-		if (i > 0)
-		    Residence.getInstance().msg(player, lm.Residence_LwcRemoved, i, System.currentTimeMillis() - time);
-		return;
-	    }
-	});
+            for (Block b : block) {
+                com.griefcraft.model.Protection prot = cache.getProtection(b);
+                if (prot == null)
+                    continue;
+                prot.remove();
+                i++;
+            }
+
+            if (i > 0)
+                Residence.getInstance().msg(player, lm.Residence_LwcRemoved, i, System.currentTimeMillis() - time);
+        });
     }
 
     @Override
@@ -149,13 +152,13 @@ public class ResidenceLWCListener implements com.griefcraft.scripting.Module {
 
     @Override
     public void onRegisterProtection(LWCProtectionRegisterEvent event) {
-	Player player = event.getPlayer();
-	FlagPermissions perms = Residence.getInstance().getPermsByLocForPlayer(event.getBlock().getLocation(), player);
-	boolean hasuse = perms.playerHas(player, Flags.use, true);
-	if (!perms.playerHas(player, Flags.container, hasuse) && !ResPerm.bypass_container.hasPermission(player, 10000L)) {
-	    event.setCancelled(true);
-	    Residence.getInstance().msg(player, lm.Flag_Deny, Flags.container);
-	}
+        Player player = event.getPlayer();
+        FlagPermissions perms = Residence.getInstance().getPermsByLocForPlayer(event.getBlock().getLocation(), player);
+        boolean hasuse = perms.playerHas(player, Flags.use, true);
+        if (!perms.playerHas(player, Flags.container, hasuse) && !ResPerm.bypass_container.hasPermission(player, 10000L)) {
+            event.setCancelled(true);
+            Residence.getInstance().msg(player, lm.Flag_Deny, Flags.container);
+        }
     }
 
     @Override

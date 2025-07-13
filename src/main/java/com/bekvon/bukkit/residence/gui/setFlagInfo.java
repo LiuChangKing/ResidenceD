@@ -8,11 +8,12 @@ import com.bekvon.bukkit.residence.protection.FlagPermissions;
 import com.bekvon.bukkit.residence.protection.FlagPermissions.FlagCombo;
 import com.bekvon.bukkit.residence.protection.FlagPermissions.FlagState;
 import com.bekvon.bukkit.residence.protection.ResidencePermissions;
+import net.Zrips.CMILib.Container.CMIText;
+import net.Zrips.CMILib.Enchants.CMIEnchantEnum;
 import net.Zrips.CMILib.GUI.CMIGuiButton;
 import net.Zrips.CMILib.GUI.GUIManager.GUIClickType;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -90,7 +91,7 @@ public class setFlagInfo {
     private void recalculateResidence() {
 	buttons.clear();
 
-	List<String> flags = residence.getPermissions().getPosibleFlags(player, true, this.admin);
+	List<String> flags = residence.getPermissions().getPossibleFlags(player, true, this.admin);
 
 	Map<String, Boolean> resFlags = new HashMap<String, Boolean>();
 	Map<String, Object> TempPermMap = new LinkedHashMap<String, Object>();
@@ -150,7 +151,7 @@ public class setFlagInfo {
 			command = "false";
 			break;
 		    case RightShift:
-		    case LeftShift:
+		    case LeftShift: 
 		    case MiddleMouse:
 			command = "remove";
 			break;
@@ -172,7 +173,6 @@ public class setFlagInfo {
 		}
 	    };
 	    button.hideItemFlags();
-
 	    buttons.add(button);
 	    i++;
 	}
@@ -185,7 +185,7 @@ public class setFlagInfo {
 	    globalFlags.put(oneFlag.toString(), oneFlag.isEnabled());
 	}
 
-	List<String> flags = residence.getPermissions().getPosibleFlags(player, false, this.admin);
+	List<String> flags = residence.getPermissions().getPossibleFlags(player, false, this.admin);
 
 	Map<String, Boolean> resFlags = new HashMap<String, Boolean>();
 
@@ -196,9 +196,9 @@ public class setFlagInfo {
 
 	if (targetPlayer != null) {
 
-	    Set<String> PosibleResPFlags = FlagPermissions.getAllPosibleFlags();
+	    Set<String> possibleResPFlags = FlagPermissions.getAllPossibleFlags();
 	    Map<String, Boolean> temp = new HashMap<String, Boolean>();
-	    for (String one : PosibleResPFlags) {
+	    for (String one : possibleResPFlags) {
 		if (globalFlags.containsKey(one))
 		    temp.put(one, globalFlags.get(one));
 	    }
@@ -265,7 +265,7 @@ public class setFlagInfo {
 		    updateLooks();
 		}
 
-		@Override
+		@Override 
 		public void updateLooks() {
 		    this.setItem(updateLook(one.getKey()));
 		    hideItemFlags();
@@ -316,11 +316,11 @@ public class setFlagInfo {
 	if (state == FlagState.TRUE) {
 	    ItemMeta im = miscInfo.getItemMeta();
 	    if (im != null) {
-		im.addEnchant(Enchantment.LUCK, 1, true);
+		im.addEnchant(CMIEnchantEnum.LUCK_OF_THE_SEA.getEnchantment(), 1, true);
 		miscInfo.setItemMeta(im);
 	    }
 	} else
-	    miscInfo.removeEnchantment(Enchantment.LUCK);
+	    miscInfo.removeEnchantment(CMIEnchantEnum.LUCK_OF_THE_SEA.getEnchantment());
 
 	Flags flag = Flags.getFlag(flagName);
 	if (flag != null)
@@ -333,8 +333,8 @@ public class setFlagInfo {
 	// Can it be null?
 	if (MiscInfoMeta == null)
 	    return miscInfo;
-	MiscInfoMeta.setDisplayName(ChatColor.GREEN + flagName);
-	List<String> lore = new ArrayList<String>();
+	MiscInfoMeta.setDisplayName(lm.Gui_Flag_NameColor.getMessage() + CMIText.firstToUpperCase(flagName));
+	List<String> lore = new ArrayList<String>(); 
 	String variable = "";
 	switch (state) {
 	case FALSE:

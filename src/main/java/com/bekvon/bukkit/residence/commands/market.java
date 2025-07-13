@@ -2,10 +2,7 @@ package com.bekvon.bukkit.residence.commands;
 
 import com.bekvon.bukkit.residence.LocaleManager;
 import com.bekvon.bukkit.residence.Residence;
-import com.bekvon.bukkit.residence.containers.CommandAnnotation;
-import com.bekvon.bukkit.residence.containers.ResidencePlayer;
-import com.bekvon.bukkit.residence.containers.cmd;
-import com.bekvon.bukkit.residence.containers.lm;
+import com.bekvon.bukkit.residence.containers.*;
 import com.bekvon.bukkit.residence.permissions.PermissionManager.ResPerm;
 import com.bekvon.bukkit.residence.protection.ClaimedResidence;
 import com.bekvon.bukkit.residence.signsStuff.Signs;
@@ -73,7 +70,7 @@ public class market implements cmd {
             }
 
             if (res.isRented()) {
-                if (resadmin || plugin.isResAdminOn(player) || ResPerm.market_evict.hasPermission(player)) {
+                if (resadmin || ResAdmin.isResAdmin(player) || ResPerm.market_evict.hasPermission(player)) {
                     plugin.UnrentConfirm.put(player.getName(), res.getName());
                     plugin.msg(sender, lm.Rent_EvictConfirm, res.getName());
                 } else if (plugin.getRentManager().getRentingPlayer(res).equalsIgnoreCase(sender.getName())) {
@@ -296,9 +293,17 @@ public class market implements cmd {
             plugin.msg(player, lm.Invalid_Cost);
             return true;
         }
+        if (cost <= 0) {
+            plugin.msg(player, lm.Invalid_Cost);
+            return true;
+        }
         try {
             days = Integer.parseInt(args[3]);
         } catch (Exception ex) {
+            plugin.msg(player, lm.Invalid_Days);
+            return true;
+        }
+        if (days <= 0) {
             plugin.msg(player, lm.Invalid_Days);
             return true;
         }

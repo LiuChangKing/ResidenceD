@@ -2,7 +2,6 @@ package com.bekvon.bukkit.residence.vaultinterface;
 
 import com.bekvon.bukkit.residence.economy.EconomyInterface;
 import com.bekvon.bukkit.residence.permissions.PermissionsInterface;
-import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.OfflinePlayer;
@@ -14,7 +13,7 @@ public class ResidenceVaultAdapter implements EconomyInterface, PermissionsInter
 
     public static Permission permissions = null;
     public static Economy economy = null;
-    public static Chat chat = null;
+//    public static Chat chat = null;
 
     public boolean permissionsOK() {
         if (permissions != null && !permissions.getName().equalsIgnoreCase("SuperPerms")) {
@@ -27,14 +26,9 @@ public class ResidenceVaultAdapter implements EconomyInterface, PermissionsInter
         return economy != null;
     }
 
-    public boolean chatOK() {
-        return chat != null;
-    }
-
     public ResidenceVaultAdapter(Server s) {
         setupPermissions(s);
         setupEconomy(s);
-        setupChat(s);
     }
 
     private static boolean setupPermissions(Server s) {
@@ -43,14 +37,6 @@ public class ResidenceVaultAdapter implements EconomyInterface, PermissionsInter
             permissions = permissionProvider.getProvider();
         }
         return (permissions != null);
-    }
-
-    private static boolean setupChat(Server s) {
-        RegisteredServiceProvider<Chat> chatProvider = s.getServicesManager().getRegistration(Chat.class);
-        if (chatProvider != null) {
-            chat = chatProvider.getProvider();
-        }
-        return (chat != null);
     }
 
     private static boolean setupEconomy(Server s) {
@@ -110,24 +96,32 @@ public class ResidenceVaultAdapter implements EconomyInterface, PermissionsInter
     @SuppressWarnings("deprecation")
     @Override
     public boolean canAfford(String playerName, double amount) {
+        if (amount < 0)
+            return false;
         return economy.has(playerName, amount);
     }
 
     @SuppressWarnings("deprecation")
     @Override
     public boolean add(String playerName, double amount) {
+        if (amount < 0)
+            return false;
         return economy.depositPlayer(playerName, amount).transactionSuccess();
     }
 
     @SuppressWarnings("deprecation")
     @Override
     public boolean subtract(String playerName, double amount) {
+        if (amount < 0)
+            return false;
         return economy.withdrawPlayer(playerName, amount).transactionSuccess();
     }
 
     @SuppressWarnings("deprecation")
     @Override
     public boolean transfer(String playerFrom, String playerTo, double amount) {
+        if (amount < 0)
+            return false;
         if (economy.withdrawPlayer(playerFrom, amount).transactionSuccess()) {
             if (economy.depositPlayer(playerTo, amount).transactionSuccess()) {
                 return true;
@@ -148,13 +142,6 @@ public class ResidenceVaultAdapter implements EconomyInterface, PermissionsInter
     public String getPermissionsName() {
         if (permissions != null) {
             return permissions.getName();
-        }
-        return "";
-    }
-
-    public String getChatName() {
-        if (chat != null) {
-            return chat.getName();
         }
         return "";
     }

@@ -1,6 +1,5 @@
 package com.bekvon.bukkit.residence.gui;
 
-import com.Zrips.CMI.CMI;
 import com.bekvon.bukkit.residence.Residence;
 import com.bekvon.bukkit.residence.containers.lm;
 import com.bekvon.bukkit.residence.protection.ClaimedResidence;
@@ -13,7 +12,7 @@ import net.Zrips.CMILib.GUI.GUIManager.GUIRows;
 import net.Zrips.CMILib.Items.CMIAsyncHead;
 import net.Zrips.CMILib.Items.CMIItemStack;
 import net.Zrips.CMILib.Items.CMIMaterial;
-import org.bukkit.Bukkit;
+import net.Zrips.CMILib.Version.Schedulers.CMIScheduler;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -51,15 +50,13 @@ public class FlagUtil {
                 CMIAsyncHead ahead = new CMIAsyncHead() {
                     @Override
                     public void afterAsyncUpdate(ItemStack item) {
-                        Bukkit.getScheduler().runTask(CMI.getInstance(), () -> {
-                            flagData.addFlagButton(oneFlag.toLowerCase(), item);
-                        });
+                        CMIScheduler.runTask(plugin, () -> flagData.addFlagButton(oneFlag.toLowerCase(), item));
                     }
                 };
 
                 CMIItemStack i = CMILib.getInstance().getItemManager().getItem(value, ahead);
 
-                if (i == null)
+                if (i == null || i.getType() == null)
                     i = new CMIItemStack(CMIMaterial.STONE);
 
                 ItemStack item = i.getItemStack();

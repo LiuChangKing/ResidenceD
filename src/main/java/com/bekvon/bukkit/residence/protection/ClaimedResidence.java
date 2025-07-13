@@ -12,24 +12,25 @@ import com.bekvon.bukkit.residence.event.*;
 import com.bekvon.bukkit.residence.event.ResidenceDeleteEvent.DeleteCause;
 import com.bekvon.bukkit.residence.itemlist.ItemList.ListType;
 import com.bekvon.bukkit.residence.itemlist.ResidenceItemList;
-import com.bekvon.bukkit.residence.listeners.ResidencePlayerListener;
 import com.bekvon.bukkit.residence.permissions.PermissionGroup;
 import com.bekvon.bukkit.residence.permissions.PermissionManager.ResPerm;
 import com.bekvon.bukkit.residence.protection.FlagPermissions.FlagCombo;
 import com.bekvon.bukkit.residence.raid.ResidenceRaid;
 import com.bekvon.bukkit.residence.shopStuff.ShopVote;
 import com.bekvon.bukkit.residence.signsStuff.Signs;
-import com.bekvon.bukkit.residence.utils.Utils;
+import com.bekvon.bukkit.residence.utils.*;
 import net.Zrips.CMILib.Colors.CMIChatColor;
-import net.Zrips.CMILib.Container.CMIWorld;
 import net.Zrips.CMILib.Container.PageInfo;
-import net.Zrips.CMILib.Items.CMIMaterial;
-import net.Zrips.CMILib.Logs.CMIDebug;
+import net.Zrips.CMILib.Locale.LC;
 import net.Zrips.CMILib.RawMessages.RawMessage;
 import net.Zrips.CMILib.TitleMessages.CMITitleMessage;
-import org.bukkit.*;
-import org.bukkit.World.Environment;
-import org.bukkit.block.Block;
+import net.Zrips.CMILib.Version.Schedulers.CMIScheduler;
+import net.Zrips.CMILib.Version.Teleporters.CMITeleporter;
+import net.Zrips.CMILib.Version.Version;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -38,6 +39,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.CompletableFuture;
 
 public class ClaimedResidence {
 
@@ -48,11 +50,10 @@ public class ClaimedResidence {
     protected ResidencePermissions perms;
     protected ResidenceBank bank;
     protected double BlockSellPrice = 0.0;
-    protected Vector tpLoc;
-    protected Vector PitchYaw;
-    protected World world;
-    protected String enterMessage;
-    protected String leaveMessage;
+    public Vector tpLoc;
+    public Vector PitchYaw;
+    protected String enterMessage = null;
+    protected String leaveMessage = null;
     protected String ShopDesc = null;
     protected String ChatPrefix = "";
     protected CMIChatColor ChannelColor = CMIChatColor.WHITE;
@@ -241,10 +242,12 @@ public class ClaimedResidence {
             Residence.getInstance().msg(player, lm.Area_ToSmallX, area.getXSize(), group.getMinX());
             return false;
         }
+
         if (area.getYSize() < group.getMinY()) {
             Residence.getInstance().msg(player, lm.Area_ToSmallY, area.getYSize(), group.getMinY());
             return false;
         }
+
         if (area.getZSize() < group.getMinZ()) {
             Residence.getInstance().msg(player, lm.Area_ToSmallZ, area.getZSize(), group.getMinZ());
             return false;
@@ -279,14 +282,17 @@ public class ClaimedResidence {
             return true;
         ResidencePlayer rPlayer = Residence.getInstance().getPlayerManager().getResidencePlayer(player);
         PermissionGroup group = rPlayer.getGroup();
+
         if (area.getXSize() > rPlayer.getMaxX()) {
             Residence.getInstance().msg(player, lm.Area_ToBigX, area.getXSize(), rPlayer.getMaxX());
             return false;
         }
-        if (area.getYSize() > group.getMaxY() + (-group.getMinY())) {
+
+        if (!Residence.getInstance().getConfigManager().isSelectionIgnoreY() && area.getYSize() > group.getMaxY()) {
             Residence.getInstance().msg(player, lm.Area_ToBigY, area.getYSize(), group.getMaxY());
             return false;
         }
+
         if (area.getZSize() > rPlayer.getMaxZ()) {
             Residence.getInstance().msg(player, lm.Area_ToBigZ, area.getZSize(), rPlayer.getMaxZ());
             return false;
@@ -331,6 +337,14 @@ public class ClaimedResidence {
             return false;
         }
 
+        if (Math.abs(area.getLowVector().getBlockX()) > 30000000 || Math.abs(area.getHighVector().getBlockX()) > 30000000 ||
+            Math.abs(area.getLowVector().getBlockZ()) > 30000000 || Math.abs(area.getHighVector().getBlockZ()) > 30000000) {
+            if (player != null) {
+                Residence.getInstance().msg(player, lm.Invalid_Area);
+            }
+            return false;
+        }
+
         String NName = name;
         name = name.toLowerCase();
 
@@ -363,6 +377,7 @@ public class ClaimedResidence {
             }
             return false;
         }
+
         if (getParent() == null) {
             String collideResidence = Residence.getInstance().getResidenceManager().checkAreaCollision(area, this);
             ClaimedResidence cRes = Residence.getInstance().getResidenceManager().getByName(collideResidence);
@@ -483,9 +498,9 @@ public class ClaimedResidence {
         if (resevent.isCancelled())
             return false;
 
-        Residence.getInstance().getResidenceManager().removeChunkList(this.getName());
+        Residence.getInstance().getResidenceManager().removeChunkList(this);
         areas.put(name, area);
-        Residence.getInstance().getResidenceManager().calculateChunks(this.getName());
+        Residence.getInstance().getResidenceManager().calculateChunks(this);
         return true;
     }
 
@@ -660,10 +675,10 @@ public class ClaimedResidence {
             }
         }
 
-        Residence.getInstance().getResidenceManager().removeChunkList(this.getName());
-        areas.remove(name);
+        Residence.getInstance().getResidenceManager().removeChunkList(this);
         areas.put(name, newarea);
-        Residence.getInstance().getResidenceManager().calculateChunks(this.getName());
+        Residence.getInstance().getResidenceManager().calculateChunks(this);
+
         if (player != null)
             Residence.getInstance().msg(player, lm.Area_Update);
         return true;
@@ -931,16 +946,7 @@ public class ClaimedResidence {
     }
 
     public CuboidArea[] getAreaArray() {
-
         return areas.values().toArray(new CuboidArea[0]);
-
-//        CuboidArea[] temp = new CuboidArea[areas.size()];
-//        int i = 0;
-//        for (CuboidArea area : areas.values()) {
-//            temp[i] = area;
-//            i++;
-//        }
-//        return temp;
     }
 
     public Map<String, CuboidArea> getAreaMap() {
@@ -978,9 +984,6 @@ public class ClaimedResidence {
     public void setEnterLeaveMessage(CommandSender sender, String message, boolean enter, boolean resadmin) {
         if (message != null) {
             message = message.replace("%subtitle%", "\\n");
-            if (message.equals("")) {
-                message = null;
-            }
         }
 
         if (sender instanceof Player) {
@@ -1001,159 +1004,6 @@ public class ClaimedResidence {
             this.setLeaveMessage(message);
         }
         Residence.getInstance().msg(sender, lm.Residence_MessageChange);
-    }
-
-    public Location getMiddleFreeLoc(Location insideLoc, Player player) {
-        if (insideLoc == null)
-            return null;
-        CuboidArea area = this.getAreaByLoc(insideLoc);
-        if (area == null) {
-            return insideLoc;
-        }
-
-        int y = area.getHighVector().getBlockY();
-        int lowY = area.getLowVector().getBlockY();
-
-        int x = area.getLowVector().getBlockX() + area.getXSize() / 2;
-        int z = area.getLowVector().getBlockZ() + area.getZSize() / 2;
-
-        Location newLoc = new Location(area.getWorld(), x + 0.5, y, z + 0.5);
-        boolean found = false;
-        int it = 1;
-        int maxIt = newLoc.getBlockY() + 1;
-
-        try {
-            insideLoc.getChunk().setForceLoaded(true);
-        } catch (Throwable e) {
-        }
-
-        try {
-            while (it < maxIt) {
-                it++;
-
-                if (newLoc.getBlockY() < lowY)
-                    break;
-
-                newLoc.add(0, -1, 0);
-
-                Block block = newLoc.getBlock();
-                Block block2 = newLoc.clone().add(0, 1, 0).getBlock();
-                Block block3 = newLoc.clone().add(0, -1, 0).getBlock();
-                if (ResidencePlayerListener.isEmptyBlock(block) && ResidencePlayerListener.isEmptyBlock(block2)
-                    && !ResidencePlayerListener.isEmptyBlock(block3)) {
-                    found = true;
-                    break;
-                }
-            }
-        } catch (Throwable e) {
-        }
-
-        try {
-            insideLoc.getChunk().setForceLoaded(false);
-        } catch (Throwable e) {
-        }
-
-        if (found) {
-            if (player != null) {
-                newLoc.setPitch(player.getLocation().getPitch());
-                newLoc.setYaw(player.getLocation().getYaw());
-            }
-            return newLoc;
-        }
-        return getOutsideFreeLoc(insideLoc, player);
-    }
-
-    public Location getOutsideFreeLoc(Location insideLoc, Player player) {
-        CuboidArea area = this.getAreaByLoc(insideLoc);
-        if (area == null) {
-            return player.getWorld().getSpawnLocation();
-        }
-
-        List<RandomLoc> randomLocList = new ArrayList<RandomLoc>();
-
-        for (int z = -1; z < area.getZSize() + 2; z++) {
-            randomLocList.add(new RandomLoc(area.getLowVector().getX(), 0, area.getLowVector().getZ() + z));
-            randomLocList.add(new RandomLoc(area.getLowVector().getX() + area.getXSize(), 0, area.getLowVector().getZ() + z));
-        }
-
-        for (int x = -1; x < area.getXSize() + 2; x++) {
-            randomLocList.add(new RandomLoc(area.getLowVector().getX() + x, 0, area.getLowVector().getZ()));
-            randomLocList.add(new RandomLoc(area.getLowVector().getX() + x, 0, area.getLowVector().getZ() + area.getZSize()));
-        }
-
-        Location loc = insideLoc.clone();
-
-        boolean admin = ResPerm.admin_tp.hasPermission(player);
-
-        boolean found = false;
-        int it = 0;
-        int maxIt = 15;
-        while (!found && it < maxIt) {
-            it++;
-
-            Random ran = new Random(System.currentTimeMillis());
-            if (randomLocList.isEmpty())
-                break;
-            int check = ran.nextInt(randomLocList.size());
-            RandomLoc place = randomLocList.get(check);
-            randomLocList.remove(check);
-            double x = place.getX();
-            double z = place.getZ();
-
-            loc.setX(x);
-            loc.setZ(z);
-            loc.setY(area.getHighVector().getBlockY());
-
-            int max = area.getHighVector().getBlockY();
-            max = loc.getWorld().getEnvironment() == Environment.NETHER ? 100 : max;
-
-            for (int i = max; i > area.getLowVector().getY(); i--) {
-                loc.setY(i);
-                Block block = loc.getBlock();
-                Block block2 = loc.clone().add(0, 1, 0).getBlock();
-                Block block3 = loc.clone().add(0, -1, 0).getBlock();
-                if (!ResidencePlayerListener.isEmptyBlock(block3) && ResidencePlayerListener.isEmptyBlock(block)
-                    && ResidencePlayerListener.isEmptyBlock(block2)) {
-                    break;
-                }
-            }
-
-            if (!ResidencePlayerListener.isEmptyBlock(loc.getBlock()))
-                continue;
-
-            if (loc.clone().add(0, -1, 0).getBlock().getState().getType() == Material.LAVA)
-                continue;
-
-            if (loc.clone().add(0, -1, 0).getBlock().getState().getType() == Material.WATER)
-                continue;
-
-            ClaimedResidence res = Residence.getInstance().getResidenceManager().getByLoc(loc);
-            if (res != null && player != null && (!res.getPermissions().playerHas(player, Flags.tp, FlagCombo.TrueOrNone) || !res.getPermissions().playerHas(player, Flags.move, FlagCombo.TrueOrNone))
-                && !admin)
-                continue;
-
-            found = true;
-            loc.add(0.5, 0.1, 0.5);
-
-            // In case empty space is on opposite side
-            if (Residence.getInstance().getResidenceManager().getByLoc(loc) == this) {
-                loc.add(-1, 0, -1);
-            }
-
-            break;
-        }
-
-        if (!found) {
-            if (Residence.getInstance().getConfigManager().getKickLocation() != null)
-                return Residence.getInstance().getConfigManager().getKickLocation();
-            // Fail safe for kick out location
-            return player.getWorld().getSpawnLocation();
-        }
-        if (player != null) {
-            loc.setPitch(player.getLocation().getPitch());
-            loc.setYaw(player.getLocation().getYaw());
-        }
-        return loc;
     }
 
     public CuboidArea getMainArea() {
@@ -1275,31 +1125,38 @@ public class ClaimedResidence {
         return count;
     }
 
-//    public Location getTeleportLocation() {
-//	return getTeleportLocation(null);
-//    }
-
+    @Deprecated
     public Location getTeleportLocation(Player player) {
-        if (tpLoc == null) {
+        return getTeleportLocation(player, true);
+    }
+
+    public Location getTeleportLocation(Player player, boolean toSpawnOnFail) {
+
+        if (tpLoc == null || this.getMainArea() != null && !this.containsLoc(new Location(this.getMainArea().getWorld(), tpLoc.getX(), tpLoc.getY(), tpLoc.getZ()))) {
+
             if (this.getMainArea() == null)
                 return null;
-            Location low = this.getMainArea().getLowLocation();
-            Location high = this.getMainArea().getHighLocation();
-            Location t = new Location(low.getWorld(), (low.getBlockX() + high.getBlockX()) / 2,
+            Vector low = this.getMainArea().getLowVector();
+            Vector high = this.getMainArea().getHighVector();
+
+            Location t = new Location(this.getMainArea().getWorld(), (low.getBlockX() + high.getBlockX()) / 2,
                 (low.getBlockY() + high.getBlockY()) / 2, (low.getBlockZ() + high.getBlockZ()) / 2);
-            tpLoc = this.getMiddleFreeLoc(t, player).toVector();
+            tpLoc = t.toVector();
         }
 
-        if (tpLoc != null) {
-            Location loc = tpLoc.toLocation(this.getMainArea().getLowLocation().getWorld());
-            if (PitchYaw != null) {
-                loc.setPitch((float) PitchYaw.getX());
-                loc.setYaw((float) PitchYaw.getY());
-            }
-            return loc;
-        }
+        if (tpLoc == null)
+            return null;
 
-        return null;
+        Location loc = tpLoc.toLocation(this.getMainArea().getLowLocation().getWorld());
+        if (PitchYaw != null) {
+            loc.setPitch((float) PitchYaw.getX());
+            loc.setYaw((float) PitchYaw.getY());
+        }
+        return loc;
+    }
+
+    public CompletableFuture<Location> getTeleportLocationASYNC(Player player, boolean toSpawnOnFail) {
+        return LocationUtil.getTeleportLocationASYNC(this, player, toSpawnOnFail);
     }
 
     public void setTpLoc(Player player, boolean resadmin) {
@@ -1312,60 +1169,22 @@ public class ClaimedResidence {
             return;
         }
 
-        world = player.getWorld();
         tpLoc = player.getLocation().toVector();
         PitchYaw = new Vector(player.getLocation().getPitch(), player.getLocation().getYaw(), 0);
         Residence.getInstance().msg(player, lm.Residence_SetTeleportLocation);
     }
 
-    public int isSafeTp(Player player) {
-        if (player.getAllowFlight())
-            return 0;
+    public void tpToResidence(final Player reqPlayer, final Player targetPlayer, final boolean resadmin) {
 
-        if (player.getGameMode() == GameMode.CREATIVE)
-            return 0;
-
-        if (Utils.isSpectator(player.getGameMode()))
-            return 0;
-
-        if (tpLoc == null)
-            return 0;
-
-        Location tempLoc = this.getTeleportLocation(player).clone();
-
-        int fallDistance = 0;
-        for (int i = (int) tempLoc.getY(); i >= CMIWorld.getMinHeight(tempLoc.getWorld()); i--) {
-            if (i == 0) {
-                fallDistance = 555;
-                break;
-            }
-            tempLoc.setY(i);
-            Block block = tempLoc.getBlock();
-            if (ResidencePlayerListener.isEmptyBlock(block)) {
-                fallDistance++;
-            } else {
-
-                if (CMIMaterial.get(block).isLava()) {
-                    fallDistance = 556;
-                }
-
-                break;
-            }
-        }
-        return fallDistance;
-    }
-
-    public void tpToResidence(Player reqPlayer, final Player targetPlayer, boolean resadmin) {
-
-        boolean isAdmin = Residence.getInstance().isResAdminOn(reqPlayer);
+        boolean isAdmin = ResAdmin.isResAdmin(reqPlayer) || resadmin;
 
         if (this.getRaid().isRaidInitialized()) {
-            if (this.getRaid().isAttacker(targetPlayer) || this.getRaid().isDefender(targetPlayer) && !ConfigManager.RaidDefenderTeleport || !resadmin) {
+            if (this.getRaid().isAttacker(targetPlayer) || this.getRaid().isDefender(targetPlayer) && !ConfigManager.RaidDefenderTeleport || !isAdmin) {
                 Residence.getInstance().msg(reqPlayer, lm.Raid_cantDo);
                 return;
             }
         } else {
-            if (!resadmin && !isAdmin && !ResPerm.bypass_tp.hasPermission(reqPlayer, 10000L) && !ResPerm.admin_tp.hasPermission(reqPlayer, 10000L)
+            if (!isAdmin && !ResPerm.bypass_tp.hasPermission(reqPlayer, 10000L) && !ResPerm.admin_tp.hasPermission(reqPlayer, 10000L)
                 && (!this.isOwner(targetPlayer) || this.isOwner(targetPlayer) && Residence.getInstance().getConfigManager().isCanTeleportIncludeOwner())) {
                 ResidencePlayer rPlayer = Residence.getInstance().getPlayerManager().getResidencePlayer(reqPlayer);
                 PermissionGroup group = rPlayer.getGroup();
@@ -1388,106 +1207,164 @@ public class ClaimedResidence {
             }
         }
 
-        ClaimedResidence old = Residence.getInstance().getTeleportMap().get(targetPlayer.getName());
+        SafeLocationCache old = Residence.getInstance().getTeleportMap().get(targetPlayer.getUniqueId());
 
         if (Bukkit.getWorld(this.getPermissions().getWorldName()) == null)
             return;
 
-        if (old == null || !old.equals(this)) {
-            int distance = isSafeTp(reqPlayer);
-            if (distance > 6) {
-                if (distance == 556)
-                    Residence.getInstance().msg(reqPlayer, lm.General_TeleportConfirmLava, distance);
-                else if (distance == 555)
-                    Residence.getInstance().msg(reqPlayer, lm.General_TeleportConfirmVoid, distance);
-                else
-                    Residence.getInstance().msg(reqPlayer, lm.General_TeleportConfirm, distance);
-                Residence.getInstance().getTeleportMap().put(reqPlayer.getName(), this);
+        if (old == null || !old.getResidence().equals(this)) {
+            CompletableFuture<LocationCheck> future = LocationUtil.isSafeTeleportASYNC(this, reqPlayer);
+            future.thenAccept(result -> {
+                validityCheck(reqPlayer, targetPlayer, resadmin, result);
                 return;
-            }
+            });
+
+            return;
         }
 
+        continueTeleport(reqPlayer, targetPlayer, resadmin);
+        Residence.getInstance().getTeleportMap().remove(targetPlayer.getUniqueId());
+    }
+
+    private void validityCheck(Player reqPlayer, final Player targetPlayer, boolean resadmin, LocationCheck result) {
+        SafeLocationCache safety = new SafeLocationCache(this);
+        safety.setValidity(result);
+        Residence.getInstance().getTeleportMap().put(reqPlayer.getUniqueId(), safety);
+
+        if (result.getValidity().equals(LocationValidity.Valid)) {
+            continueTeleport(reqPlayer, targetPlayer, resadmin);
+            return;
+        }
+
+        if (result.getValidity().equals(LocationValidity.Lava))
+            lm.General_TeleportConfirmLava.sendMessage(reqPlayer, result.getFallDistance());
+        else if (result.getValidity().equals(LocationValidity.Void))
+            lm.General_TeleportConfirmVoid.sendMessage(reqPlayer, result.getFallDistance());
+        else
+            lm.General_TeleportConfirm.sendMessage(reqPlayer, result.getFallDistance());
+    }
+
+    private void continueTeleport(Player reqPlayer, final Player targetPlayer, boolean isAdmin) {
         boolean bypassDelay = ResPerm.tpdelaybypass.hasPermission(targetPlayer);
 
-        if (Residence.getInstance().getConfigManager().getTeleportDelay() > 0 && !isAdmin && !resadmin && !bypassDelay) {
-            Residence.getInstance().msg(reqPlayer, lm.General_TeleportStarted, this.getName(),
-                Residence.getInstance().getConfigManager().getTeleportDelay());
+        if (Residence.getInstance().getConfigManager().getTeleportDelay() > 0 && !isAdmin && !bypassDelay) {
+            Residence.getInstance().msg(reqPlayer, lm.General_TeleportStarted, this.getName(), Residence.getInstance().getConfigManager().getTeleportDelay());
             if (Residence.getInstance().getConfigManager().isTeleportTitleMessage())
                 TpTimer(reqPlayer, Residence.getInstance().getConfigManager().getTeleportDelay());
-            Residence.getInstance().getTeleportDelayMap().add(reqPlayer.getName());
         }
 
-        Location loc = this.getTeleportLocation(targetPlayer);
+        CompletableFuture<Location> future = this.getTeleportLocationASYNC(targetPlayer, false);
 
-        if (Residence.getInstance().getConfigManager().getTeleportDelay() > 0 && !isAdmin && !bypassDelay)
-            performDelaydTp(loc, targetPlayer, reqPlayer, true);
-        else
-            performInstantTp(loc, targetPlayer, reqPlayer, true);
+        future.thenAccept(loc -> {
+            finalizeTP(loc, reqPlayer, targetPlayer, isAdmin, bypassDelay);
+        });
+    }
+
+    private void finalizeTP(Location loc, Player reqPlayer, Player targetPlayer, boolean isAdmin, boolean bypassDelay) {
+
+        if (loc == null) {
+            Residence.getInstance().msg(reqPlayer, lm.Invalid_Location);
+            return;
+        }
+
+        if (Math.abs(loc.getBlockX()) > 30000000 || Math.abs(loc.getBlockZ()) > 30000000) {
+            Residence.getInstance().msg(reqPlayer, lm.Invalid_Area);
+            return;
+        }
+
+        CMIScheduler.runTask(Residence.getInstance(), () -> {
+            if (Residence.getInstance().getConfigManager().getTeleportDelay() > 0 && !isAdmin && !bypassDelay)
+                performDelaydTp(loc, targetPlayer, reqPlayer, true);
+            else
+                performInstantTp(loc, targetPlayer, reqPlayer, true);
+        });
     }
 
     public void TpTimer(final Player player, final int t) {
-        CMITitleMessage.send(player, Residence.getInstance().msg(lm.General_TeleportTitle),
-            Residence.getInstance().msg(lm.General_TeleportTitleTime, t));
-        Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Residence.getInstance(), new Runnable() {
-            @Override
-            public void run() {
-                if (!Residence.getInstance().getTeleportDelayMap().contains(player.getName()))
-                    return;
-                if (t > 1)
-                    TpTimer(player, t - 1);
-            }
-        }, 20L);
+
+        DelayTeleport old = Teleporting.getOrCreateTeleportDelay(player.getUniqueId());
+        if (old.getMessageTask() != null)
+            old.getMessageTask().cancel();
+
+        old.setRemainingTime(t);
+        old.setMessageTask(CMIScheduler.scheduleSyncRepeatingTask(Residence.getInstance(), () -> {
+            CMITitleMessage.send(player, Residence.getInstance().msg(lm.General_TeleportTitle), Residence.getInstance().msg(lm.General_TeleportTitleTime, old.getRemainingTime()));
+            old.lowerRemainingTime();
+            if (old.getRemainingTime() < 0)
+                old.getMessageTask().cancel();
+        }, 1L, 20L));
     }
 
-    public void performDelaydTp(final Location targloc, final Player targetPlayer, Player reqPlayer,
-        final boolean near) {
+    public void performDelaydTp(final Location targloc, final Player targetPlayer, Player reqPlayer, final boolean near) {
+        if (targetPlayer == null || targloc == null)
+            return;
+
         ResidenceTPEvent tpevent = new ResidenceTPEvent(this, targloc, targetPlayer, reqPlayer);
         Residence.getInstance().getServ().getPluginManager().callEvent(tpevent);
         if (tpevent.isCancelled())
             return;
 
-        Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Residence.getInstance(), new Runnable() {
-            @Override
-            public void run() {
-                if (targloc == null || targetPlayer == null || !targetPlayer.isOnline())
-                    return;
-                if (!Residence.getInstance().getTeleportDelayMap().contains(targetPlayer.getName())
-                    && Residence.getInstance().getConfigManager().getTeleportDelay() > 0)
-                    return;
-                else if (Residence.getInstance().getTeleportDelayMap().contains(targetPlayer.getName()))
-                    Residence.getInstance().getTeleportDelayMap().remove(targetPlayer.getName());
-                targetPlayer.closeInventory();
-                targetPlayer.teleport(targloc);
-                if (near)
-                    Residence.getInstance().msg(targetPlayer, lm.Residence_TeleportNear);
-                else
-                    Residence.getInstance().msg(targetPlayer, lm.General_TeleportSuccess);
+        DelayTeleport tpDelayRecord = Teleporting.getOrCreateTeleportDelay(targetPlayer.getUniqueId());
+        if (tpDelayRecord.getTeleportTask() != null)
+            tpDelayRecord.getTeleportTask().cancel();
+
+        tpDelayRecord.setTeleportTask(CMIScheduler.runAtLocationLater(Residence.getInstance(), targloc, () -> {
+            if (!targetPlayer.isOnline())
                 return;
-            }
-        }, Residence.getInstance().getConfigManager().getTeleportDelay() * 20L);
+
+            if (!Teleporting.isUnderTeleportDelay(targetPlayer.getUniqueId()) && Residence.getInstance().getConfigManager().getTeleportDelay() > 0)
+                return;
+            Teleporting.cancelTeleportDelay(targetPlayer.getUniqueId());
+
+            targetPlayer.closeInventory();
+            CMITeleporter.teleportAsync(targetPlayer, targloc);
+            if (near)
+                Residence.getInstance().msg(targetPlayer, lm.Residence_TeleportNear);
+            else
+                Residence.getInstance().msg(targetPlayer, lm.General_TeleportSuccess);
+
+        }, Residence.getInstance().getConfigManager().getTeleportDelay() * 20L));
+
     }
 
     private void performInstantTp(final Location targloc, final Player targetPlayer, Player reqPlayer,
         final boolean near) {
         ResidenceTPEvent tpevent = new ResidenceTPEvent(this, targloc, targetPlayer, reqPlayer);
         Residence.getInstance().getServ().getPluginManager().callEvent(tpevent);
-        if (!tpevent.isCancelled()) {
-            targetPlayer.closeInventory();
+        if (tpevent.isCancelled())
+            return;
 
-            try {
+        targetPlayer.closeInventory();
+
+        try {
+            if (!Version.isFolia())
                 targloc.getChunk().load();
-            } catch (Throwable e) {
-            }
-
-            boolean teleported = targetPlayer.teleport(targloc);
-
-            if (teleported) {
-                if (near)
-                    Residence.getInstance().msg(targetPlayer, lm.Residence_TeleportNear);
-                else
-                    Residence.getInstance().msg(targetPlayer, lm.General_TeleportSuccess);
-            }
+        } catch (Throwable e) {
         }
+
+        if (Version.isAsyncProcessing()) {
+
+            CompletableFuture<Boolean> future = CMITeleporter.teleportAsync(targetPlayer, targloc);
+            future.thenAccept(result -> {
+                if (result) {
+                    if (near)
+                        Residence.getInstance().msg(targetPlayer, lm.Residence_TeleportNear);
+                    else
+                        Residence.getInstance().msg(targetPlayer, lm.General_TeleportSuccess);
+                }
+            });
+            return;
+        }
+
+        boolean teleported = targetPlayer.teleport(targloc);
+        if (!teleported)
+            return;
+
+        if (near)
+            Residence.getInstance().msg(targetPlayer, lm.Residence_TeleportNear);
+        else
+            Residence.getInstance().msg(targetPlayer, lm.General_TeleportSuccess);
+
     }
 
     public String getAreaIDbyLoc(Location loc) {
@@ -1507,9 +1384,9 @@ public class ClaimedResidence {
     }
 
     public void removeArea(String id) {
-        Residence.getInstance().getResidenceManager().removeChunkList(this.getName());
+        Residence.getInstance().getResidenceManager().removeChunkList(this);
         areas.remove(id);
-        Residence.getInstance().getResidenceManager().calculateChunks(this.getName());
+        Residence.getInstance().getResidenceManager().calculateChunks(this);
     }
 
     public void removeArea(Player player, String id, boolean resadmin) {
@@ -1564,7 +1441,7 @@ public class ClaimedResidence {
 
         try {
             if (Residence.getInstance().getConfigManager().isNewSaveMechanic()) {
-                if (enterMessage != null && leaveMessage != null) {
+                if (enterMessage != null || leaveMessage != null) {
                     MinimizeMessages min = Residence.getInstance().getResidenceManager().addMessageToTempCache(this.getWorld(), enterMessage,
                         leaveMessage);
                     if (min == null) {
@@ -1573,7 +1450,7 @@ public class ClaimedResidence {
                         if (leaveMessage != null)
                             root.put("LeaveMessage", leaveMessage);
                     } else {
-                        if (min.getId() > 1)
+                        if (min.getId() > 0)
                             root.put("Messages", min.getId());
                     }
                 }
@@ -1709,8 +1586,7 @@ public class ClaimedResidence {
     }
 
     @SuppressWarnings("unchecked")
-    public static ClaimedResidence load(String worldName, Map<String, Object> root, ClaimedResidence parent,
-        Residence plugin) throws Exception {
+    public static ClaimedResidence load(String worldName, Map<String, Object> root, ClaimedResidence parent, Residence plugin) throws Exception {
         ClaimedResidence res = new ClaimedResidence();
         if (root == null)
             throw new Exception("Null residence!");
@@ -1837,14 +1713,13 @@ public class ClaimedResidence {
 
             // Defaulting to first one if not present
             if (defaultGroup != null) {
-                if (res.enterMessage == null)
-                    res.enterMessage = defaultGroup.getDefaultEnterMessage();
+                if (res.enterMessage == null) {
+                    res.enterMessage = defaultGroup.getDefaultEnterMessage().replace("\n", "\\n").replace("%subtitle%", "\\n");
+                }
                 if (res.leaveMessage == null)
-                    res.leaveMessage = defaultGroup.getDefaultLeaveMessage();
+                    res.leaveMessage = defaultGroup.getDefaultLeaveMessage().replace("\n", "\\n").replace("%subtitle%", "\\n");
             }
         }
-
-        CMIDebug.c(res.enterMessage, res.leaveMessage);
 
         res.parent = parent;
 
@@ -1912,9 +1787,13 @@ public class ClaimedResidence {
     }
 
     public boolean renameSubzone(Player player, String oldName, String newName, boolean resadmin) {
+        return this.renameSubzone((CommandSender) player, oldName, newName, resadmin);
+    }
+
+    public boolean renameSubzone(CommandSender sender, String oldName, String newName, boolean resadmin) {
 
         if (!Residence.getInstance().validName(newName)) {
-            Residence.getInstance().msg(player, lm.Invalid_NameCharacters);
+            Residence.getInstance().msg(sender, lm.Invalid_NameCharacters);
             return false;
         }
         if (oldName == null)
@@ -1927,24 +1806,22 @@ public class ClaimedResidence {
 
         ClaimedResidence res = subzones.get(oldName);
         if (res == null) {
-            if (player != null)
-                Residence.getInstance().msg(player, lm.Invalid_Subzone);
+            Residence.getInstance().msg(sender, lm.Invalid_Subzone);
             return false;
         }
-        if (player != null && !res.getPermissions().hasResidencePermission(player, true) && !resadmin) {
-            Residence.getInstance().msg(player, lm.General_NoPermission);
+        if (sender != null && !res.getPermissions().hasResidencePermission(sender, true) && !resadmin) {
+            Residence.getInstance().msg(sender, lm.General_NoPermission);
             return false;
         }
         if (subzones.containsKey(newName)) {
-            if (player != null)
-                Residence.getInstance().msg(player, lm.Subzone_Exists, newName);
+            Residence.getInstance().msg(sender, lm.Subzone_Exists, newName);
             return false;
         }
         res.setName(newN);
         subzones.put(newName, res);
         subzones.remove(oldName);
-        if (player != null)
-            Residence.getInstance().msg(player, lm.Subzone_Rename, oldName, newName);
+
+        Residence.getInstance().msg(sender, lm.Subzone_Rename, oldName, newName);
         return true;
     }
 
@@ -2032,7 +1909,7 @@ public class ClaimedResidence {
 
     public boolean isOwner(String name) {
         Player player = Bukkit.getPlayer(name);
-        if (player != null)
+        if (player != null && player.getName().equalsIgnoreCase(name))
             return isOwner(player);
         return perms.getOwner().equalsIgnoreCase(name);
     }
@@ -2136,7 +2013,12 @@ public class ClaimedResidence {
         return within;
     }
 
+    @Deprecated
     public List<ShopVote> GetShopVotes() {
+        return getAllShopVotes();
+    }
+
+    public List<ShopVote> getAllShopVotes() {
         return ShopVoteList;
     }
 
@@ -2161,15 +2043,47 @@ public class ClaimedResidence {
     }
 
     public boolean kickFromResidence(Player player) {
-        if (!this.containsLoc(player.getLocation()))
-            return false;
+
+        // We might be kicking player who is near residence but not inside of it
+        //if (!this.containsLoc(player.getLocation()))
+        //    return false;
+
         Location loc = Residence.getInstance().getConfigManager().getKickLocation();
         player.closeInventory();
-        if (loc != null) {
-            return player.teleport(loc);
+
+        if (loc == null) {
+            CompletableFuture<Location> future = LocationUtil.getOutsideFreeLocASYNC(this, player, true);
+
+            future.thenAccept(loc1 -> {
+
+                if (loc1 == null) {
+                    LC.info_IncorrectLocation.getLocale();
+                    return;
+                }
+
+                loc1.add(0, 0.4, 0);
+
+                CMITeleporter.teleportAsync(player, loc1).thenApply(success -> {
+                    if (success)
+                        Residence.getInstance().msg(player, lm.Residence_Kicked);
+                    else
+                        Residence.getInstance().msg(player, lm.General_TeleportCanceled);
+                    return null;
+                });
+            });
+            return true;
         }
-        return player.teleport(getOutsideFreeLoc(player.getLocation(), player));
+
+        CMITeleporter.teleportAsync(player, loc).thenApply(success -> {
+            if (success)
+                Residence.getInstance().msg(player, lm.Residence_Kicked);
+            else
+                Residence.getInstance().msg(player, lm.General_TeleportCanceled);
+            return null;
+        });
+        return true;
     }
+
 //    public Town getTown() {
 //	return town;
 //    }
@@ -2200,11 +2114,11 @@ public class ClaimedResidence {
     }
 
     public double getWorthByOwner() {
-        return (int) ((getTotalSize() * getOwnerGroup().getCostPerBlock()) * 100) / 100D;
+        return (long) ((getTotalSize() * getOwnerGroup().getCostPerBlock()) * 100L) / 100D;
     }
 
     public double getWorth() {
-        return (int) ((getTotalSize() * getBlockSellPrice()) * 100) / 100.0;
+        return (long) ((getTotalSize() * getBlockSellPrice()) * 100L) / 100D;
     }
 
     public void showBounds(Player player, boolean showOneTime) {
@@ -2273,5 +2187,9 @@ public class ClaimedResidence {
             }
         }
         return trusted;
+    }
+
+    public static ClaimedResidence getByName(String landName) {
+        return Residence.getInstance().getResidenceManager().getByName(landName);
     }
 }

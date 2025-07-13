@@ -3,6 +3,7 @@ package com.bekvon.bukkit.residence.protection;
 import com.bekvon.bukkit.residence.Residence;
 import com.bekvon.bukkit.residence.permissions.PermissionGroup;
 import com.bekvon.bukkit.residence.protection.ResidenceManager.ChunkRef;
+import net.Zrips.CMILib.Container.CMINumber;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -140,9 +141,9 @@ public class CuboidArea {
         int zsize = (highPoints.getBlockZ() - lowPoints.getBlockZ()) + 1;
         if (!Residence.getInstance().getConfigManager().isNoCostForYBlocks()) {
             int ysize = (highPoints.getBlockY() - lowPoints.getBlockY()) + 1;
-            return xsize * ysize * zsize;
+            return CMINumber.abs(xsize * ysize * zsize);
         }
-        return xsize * zsize;
+        return CMINumber.abs(xsize * zsize);
     }
 
     public int getXSize() {
@@ -286,6 +287,6 @@ public class CuboidArea {
     }
 
     public double getCost(PermissionGroup group) {
-        return (int) (getSize() * group.getCostPerBlock() * 100) / 100D;
+        return (long) (getSize() * group.getCostPerBlock() * 100) / 100D;
     }
 }

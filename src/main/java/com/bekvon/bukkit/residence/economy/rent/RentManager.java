@@ -2,6 +2,7 @@ package com.bekvon.bukkit.residence.economy.rent;
 
 import com.bekvon.bukkit.residence.Residence;
 import com.bekvon.bukkit.residence.api.MarketRentInterface;
+import com.bekvon.bukkit.residence.containers.ResAdmin;
 import com.bekvon.bukkit.residence.containers.ResidencePlayer;
 import com.bekvon.bukkit.residence.containers.Visualizer;
 import com.bekvon.bukkit.residence.containers.lm;
@@ -175,6 +176,8 @@ public class RentManager implements MarketRentInterface {
 
     public void setForRent(Player player, ClaimedResidence res, int amount, int days, boolean AllowRenewing, boolean StayInMarket, boolean AllowAutoPay,
         boolean resadmin) {
+        if (amount < 0)
+            return;
 
         if (res == null) {
             plugin.msg(player, lm.Invalid_Residence);
@@ -499,8 +502,7 @@ public class RentManager implements MarketRentInterface {
 
     @Override
     public void removeFromRent(String landName) {
-        ClaimedResidence res = plugin.getResidenceManager().getByName(landName);
-        removeFromRent(res);
+        removeFromRent(ClaimedResidence.getByName(landName));
     }
 
     public void removeFromRent(ClaimedResidence res) {
@@ -509,22 +511,25 @@ public class RentManager implements MarketRentInterface {
 
     @Override
     public void removeRentable(String landName) {
-        ClaimedResidence res = plugin.getResidenceManager().getByName(landName);
-        removeRentable(res);
+        removeRentable(ClaimedResidence.getByName(landName));
     }
 
     public void removeRentable(ClaimedResidence res) {
+        removeRentable(res, true);
+    }
+
+    public void removeRentable(ClaimedResidence res, boolean removeSigns) {
         if (res == null)
             return;
         removeFromRent(res);
         rentableLand.remove(res);
-        plugin.getSignUtil().removeSign(res);
+        if (removeSigns)
+            plugin.getSignUtil().removeSign(res);
     }
 
     @Override
     public boolean isForRent(String landName) {
-        ClaimedResidence res = plugin.getResidenceManager().getByName(landName);
-        return isForRent(res);
+        return isForRent(ClaimedResidence.getByName(landName));
     }
 
     public boolean isForRent(ClaimedResidence res) {
@@ -854,7 +859,7 @@ public class RentManager implements MarketRentInterface {
             if (rented != null) {
                 plugin.msg(player, lm.Residence_RentedBy, rented.player);
 
-                if (rented.player.equals(player.getName()) || res.isOwner(player) || plugin.isResAdminOn(player))
+                if (rented.player.equals(player.getName()) || res.isOwner(player) || ResAdmin.isResAdmin(player))
                     player.sendMessage((rented.AutoPay ? plugin.msg(lm.Rent_AutoPayTurnedOn) : plugin.msg(lm.Rent_AutoPayTurnedOff))
                         + "\n");
                 plugin.msg(player, lm.Rent_Expire, GetTime.getTime(rented.endTime));

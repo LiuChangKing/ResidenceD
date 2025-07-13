@@ -6,9 +6,9 @@ import com.bekvon.bukkit.residence.containers.ResidencePlayer;
 import com.bekvon.bukkit.residence.containers.lm;
 import com.bekvon.bukkit.residence.listeners.ResidenceBlockListener;
 import com.bekvon.bukkit.residence.protection.ClaimedResidence;
+import com.bekvon.bukkit.residence.protection.ResidencePermissions;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.protection.Interaction;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.protection.ProtectionModule;
-import net.Zrips.CMILib.Logs.CMIDebug;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -40,7 +40,6 @@ public class SlimeFunResidenceModule implements ProtectionModule {
 
         switch (action) {
         case INTERACT_BLOCK:
-            CMIDebug.d(action);
             ClaimedResidence res = residence.getResidenceManager().getByLoc(loc);
             if (res != null) {
                 boolean allow = res.getPermissions().playerHas(ResidencePlayer.get(op.getUniqueId()), Flags.container, false);
@@ -53,7 +52,10 @@ public class SlimeFunResidenceModule implements ProtectionModule {
             Player player = Bukkit.getPlayer(op.getUniqueId());
             if (player == null)
                 return false;
-            return ResidenceBlockListener.canBreakBlock(player, loc.getBlock(), true);
+            ResidencePermissions.setEventCallsSuspended(true);
+            boolean result = ResidenceBlockListener.canBreakBlock(player, loc, true);
+            ResidencePermissions.setEventCallsSuspended(false);
+            return result;
         default:
             break;
         }

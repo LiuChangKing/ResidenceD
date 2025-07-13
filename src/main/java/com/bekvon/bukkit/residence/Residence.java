@@ -7,12 +7,10 @@ import com.bekvon.bukkit.residence.allNms.v1_13Events;
 import com.bekvon.bukkit.residence.allNms.v1_8Events;
 import com.bekvon.bukkit.residence.allNms.v1_9Events;
 import com.bekvon.bukkit.residence.api.*;
+import com.bekvon.bukkit.residence.bigDoors.BigDoorsManager;
 import com.bekvon.bukkit.residence.chat.ChatManager;
 import com.bekvon.bukkit.residence.commands.padd;
-import com.bekvon.bukkit.residence.containers.Flags;
-import com.bekvon.bukkit.residence.containers.MinimizeFlags;
-import com.bekvon.bukkit.residence.containers.MinimizeMessages;
-import com.bekvon.bukkit.residence.containers.lm;
+import com.bekvon.bukkit.residence.containers.*;
 import com.bekvon.bukkit.residence.dynmap.DynMapListeners;
 import com.bekvon.bukkit.residence.dynmap.DynMapManager;
 import com.bekvon.bukkit.residence.economy.*;
@@ -22,6 +20,8 @@ import com.bekvon.bukkit.residence.itemlist.WorldItemManager;
 import com.bekvon.bukkit.residence.listeners.*;
 import com.bekvon.bukkit.residence.permissions.PermissionManager;
 import com.bekvon.bukkit.residence.persistance.YMLSaveHelper;
+import com.bekvon.bukkit.residence.pl3xmap.Pl3xMapListeners;
+import com.bekvon.bukkit.residence.pl3xmap.Pl3xMapManager;
 import com.bekvon.bukkit.residence.protection.*;
 import com.bekvon.bukkit.residence.protection.FlagPermissions.FlagCombo;
 import com.bekvon.bukkit.residence.raid.ResidenceRaidListener;
@@ -43,7 +43,10 @@ import fr.crafter.tickleman.realplugin.RealPlugin;
 import net.Zrips.CMILib.Colors.CMIChatColor;
 import net.Zrips.CMILib.Items.CMIMaterial;
 import net.Zrips.CMILib.Util.CMIVersionChecker;
+import net.Zrips.CMILib.Version.Schedulers.CMIScheduler;
+import net.Zrips.CMILib.Version.Schedulers.CMITask;
 import net.Zrips.CMILib.Version.Version;
+import net.pl3x.map.core.Pl3xMap;
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -53,6 +56,8 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.dynmap.DynmapAPI;
+import org.kingdoms.main.Kingdoms;
+import org.kingdoms.manager.game.GameManagement;
 
 import java.io.*;
 import java.lang.reflect.Method;
@@ -70,6 +75,7 @@ import java.util.logging.Logger;
  * @author Gary Smoak - bekvon
  * 
  */
+
 public class Residence extends JavaPlugin {
 
     private static Residence instance;
@@ -91,13 +97,8 @@ public class Residence extends JavaPlugin {
     protected ResidencePlayerListener plistener;
     protected ResidenceEntityListener elistener;
 
-    protected ResidenceFixesListener flistener;
-    protected ResidenceRaidListener slistener;
-
     protected ResidenceCommandListener commandManager;
 
-    protected SpigotListener spigotlistener;
-    protected ShopListener shlistener;
     protected TransactionManager tmanager;
     protected PermissionListManager pmanager;
     protected LeaseManager leasemanager;
@@ -115,6 +116,7 @@ public class Residence extends JavaPlugin {
 //    private TownManager townManager;
     protected RandomTp RandomTpManager;
     protected DynMapManager DynManager;
+    protected Pl3xMapManager Pl3xManager;
     protected Sorting SortingManager;
     protected AutoSelection AutoSelectionManager;
     protected WESchematicManager SchematicManager;
@@ -129,25 +131,23 @@ public class Residence extends JavaPlugin {
 
     protected boolean firstenable = true;
     protected EconomyInterface economy;
-    private int saveVersion = 1;
     public File dataFolder;
-    protected int leaseBukkitId = -1;
-    protected int rentBukkitId = -1;
-    protected int healBukkitId = -1;
-    protected int feedBukkitId = -1;
-    protected int effectRemoveBukkitId = -1;
-
-    protected int DespawnMobsBukkitId = -1;
+    protected CMITask leaseBukkitId = null;
+    protected CMITask rentBukkitId = null;
+    protected CMITask healBukkitId = null;
+    protected CMITask feedBukkitId = null;
+    protected CMITask effectRemoveBukkitId = null;
+    protected CMITask despawnMobsBukkitId = null;
+    protected CMITask autosaveBukkitId = null;
 
     private boolean SlimeFun = false;
+    private boolean BigDoors = false;
     private boolean lwc = false;
     Metrics metrics = null;
 
-    protected int autosaveBukkitId = -1;
     protected boolean initsuccess = false;
     public Map<String, String> deleteConfirm;
     public Map<String, String> UnrentConfirm = new HashMap<String, String>();
-    public List<String> resadminToggle;
     private ConcurrentHashMap<String, OfflinePlayer> OfflinePlayerList = new ConcurrentHashMap<String, OfflinePlayer>();
     private Map<UUID, OfflinePlayer> cachedPlayerNameUUIDs = new HashMap<UUID, OfflinePlayer>();
     private Map<UUID, String> cachedPlayerNames = new HashMap<UUID, String>();
@@ -160,8 +160,7 @@ public class Residence extends JavaPlugin {
     private UUID TempUserUUID = UUID.fromString("ffffffff-ffff-ffff-ffff-ffffffffffff");
 
     public HashMap<String, Long> rtMap = new HashMap<String, Long>();
-    public List<String> teleportDelayMap = new ArrayList<String>();
-    public HashMap<String, ClaimedResidence> teleportMap = new HashMap<String, ClaimedResidence>();
+    public HashMap<UUID, SafeLocationCache> teleportMap = new HashMap<UUID, SafeLocationCache>();
 
     private Placeholder Placeholder;
     private boolean PlaceholderAPIEnabled = false;
@@ -172,12 +171,8 @@ public class Residence extends JavaPlugin {
         return spigotPlatform;
     }
 
-    public HashMap<String, ClaimedResidence> getTeleportMap() {
+    public HashMap<UUID, SafeLocationCache> getTeleportMap() {
         return teleportMap;
-    }
-
-    public List<String> getTeleportDelayMap() {
-        return teleportDelayMap;
     }
 
     public HashMap<String, Long> getRandomTeleportMap() {
@@ -244,72 +239,40 @@ public class Residence extends JavaPlugin {
     }
     // API end
 
-    private Runnable doHeals = new Runnable() {
-        @Override
-        public void run() {
-            plistener.doHeals();
+    private Runnable doHeals = () -> plistener.doHeals();
+
+    private Runnable doFeed = () -> plistener.feed();
+
+    private Runnable removeBadEffects = () -> plistener.badEffects();
+
+    private Runnable DespawnMobs = () -> plistener.DespawnMobs();
+
+    private Runnable rentExpire = () -> {
+        rentmanager.checkCurrentRents();
+        if (getConfigManager().showIntervalMessages()) {
+            Bukkit.getConsoleSender().sendMessage(getPrefix() + " - Rent Expirations checked!");
         }
     };
 
-    private Runnable doFeed = new Runnable() {
-        @Override
-        public void run() {
-            plistener.feed();
+    private Runnable leaseExpire = () -> {
+        leasemanager.doExpirations();
+        if (getConfigManager().showIntervalMessages()) {
+            Bukkit.getConsoleSender().sendMessage(getPrefix() + " - Lease Expirations checked!");
         }
     };
 
-    private Runnable removeBadEffects = new Runnable() {
-        @Override
-        public void run() {
-            plistener.badEffects();
-        }
-    };
+    private Runnable autoSave = () -> {
+        if (!initsuccess)
+            return;
 
-    private Runnable DespawnMobs = new Runnable() {
-        @Override
-        public void run() {
-            plistener.DespawnMobs();
-        }
-    };
-
-    private Runnable rentExpire = new Runnable() {
-        @Override
-        public void run() {
-            rentmanager.checkCurrentRents();
-            if (getConfigManager().showIntervalMessages()) {
-                Bukkit.getConsoleSender().sendMessage(getPrefix() + " - Rent Expirations checked!");
-            }
-        }
-    };
-    private Runnable leaseExpire = new Runnable() {
-        @Override
-        public void run() {
-            leasemanager.doExpirations();
-            if (getConfigManager().showIntervalMessages()) {
-                Bukkit.getConsoleSender().sendMessage(getPrefix() + " - Lease Expirations checked!");
-            }
-        }
-    };
-    private Runnable autoSave = new Runnable() {
-        @Override
-        public void run() {
+        CMIScheduler.runTaskAsynchronously(this, () -> {
             try {
-                if (initsuccess) {
-                    Bukkit.getScheduler().runTaskAsynchronously(Residence.this, new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                saveYml();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    });
-                }
-            } catch (Exception ex) {
-                Logger.getLogger("Minecraft").log(Level.SEVERE, getPrefix() + " SEVERE SAVE ERROR", ex);
+                saveYml();
+            } catch (Throwable e) {
+                Logger.getLogger("Minecraft").log(Level.SEVERE, getPrefix() + " SEVERE SAVE ERROR", e);
+                e.printStackTrace();
             }
-        }
+        });
     };
 
     public void reloadPlugin() {
@@ -320,16 +283,22 @@ public class Residence extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        server.getScheduler().cancelTask(autosaveBukkitId);
-        server.getScheduler().cancelTask(healBukkitId);
-        server.getScheduler().cancelTask(feedBukkitId);
-        server.getScheduler().cancelTask(effectRemoveBukkitId);
-
-        server.getScheduler().cancelTask(DespawnMobsBukkitId);
+        if (autosaveBukkitId != null)
+            autosaveBukkitId.cancel();
+        if (healBukkitId != null)
+            healBukkitId.cancel();
+        if (feedBukkitId != null)
+            feedBukkitId.cancel();
+        if (effectRemoveBukkitId != null)
+            effectRemoveBukkitId.cancel();
+        if (despawnMobsBukkitId != null)
+            despawnMobsBukkitId.cancel();
 
         this.getPermissionManager().stopCacheClearScheduler();
 
         this.getSelectionManager().onDisable();
+
+        this.getShopSignUtilManager().forceSaveIfPending();
 
         if (this.metrics != null)
             try {
@@ -337,11 +306,11 @@ public class Residence extends JavaPlugin {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        if (getConfigManager().useLeases()) {
-            server.getScheduler().cancelTask(leaseBukkitId);
+        if (getConfigManager().useLeases() && leaseBukkitId != null) {
+            leaseBukkitId.cancel();
         }
-        if (getConfigManager().enabledRentSystem()) {
-            server.getScheduler().cancelTask(rentBukkitId);
+        if (getConfigManager().enabledRentSystem() && rentBukkitId != null) {
+            rentBukkitId.cancel();
         }
 
         if (getDynManager() != null && getDynManager().getMarkerSet() != null)
@@ -366,7 +335,6 @@ public class Residence extends JavaPlugin {
 
             initsuccess = false;
             deleteConfirm = new HashMap<String, String>();
-            resadminToggle = new ArrayList<String>();
             server = this.getServer();
             dataFolder = this.getDataFolder();
 
@@ -383,7 +351,7 @@ public class Residence extends JavaPlugin {
             }
 
             if (!new File(dataFolder, "groups.yml").isFile() && !new File(dataFolder, "flags.yml").isFile() && new File(dataFolder, "config.yml").isFile()) {
-                this.ConvertFile();
+                this.convertFile();
             }
 
             if (!new File(dataFolder, "uuids.yml").isFile()) {
@@ -485,6 +453,17 @@ public class Residence extends JavaPlugin {
                 }
             }
 
+            BigDoors = Bukkit.getPluginManager().getPlugin("BigDoors") != null;
+
+            if (BigDoors) {
+                try {
+                    BigDoorsManager.register(this);
+                } catch (Throwable e) {
+                    BigDoors = false;
+                    e.printStackTrace();
+                }
+            }
+
             this.getConfigManager().copyOverTranslations();
 
             parseHelpEntries();
@@ -564,17 +543,14 @@ public class Residence extends JavaPlugin {
                 }
                 Bukkit.getConsoleSender().sendMessage(getPrefix() + " Player data loaded: " + OfflinePlayerList.size());
             } else {
-                Bukkit.getScheduler().runTaskAsynchronously(this, new Runnable() {
-                    @Override
-                    public void run() {
-                        for (OfflinePlayer player : Bukkit.getOfflinePlayers()) {
-                            if (player == null)
-                                continue;
-                            String name = player.getName();
-                            if (name == null)
-                                continue;
-                            addOfflinePlayerToChache(player);
-                        }
+                CMIScheduler.runTaskAsynchronously(this, () -> {
+                    for (OfflinePlayer player : Bukkit.getOfflinePlayers()) {
+                        if (player == null)
+                            continue;
+                        String name = player.getName();
+                        if (name == null)
+                            continue;
+                        addOfflinePlayerToChache(player);
                     }
                 });
             }
@@ -630,11 +606,10 @@ public class Residence extends JavaPlugin {
                     setWorldEdit();
                 setWorldGuard();
 
+                setKingdoms();
 
                 PluginManager pm = getServer().getPluginManager();
 
-                blistener = new ResidenceBlockListener(this);
-                plistener = new ResidencePlayerListener(this);
                 if (Version.isCurrentEqualOrHigher(Version.v1_9_R1))
                     pm.registerEvents(new ResidencePlayerListener1_9(this), this);
                 if (Version.isCurrentEqualOrHigher(Version.v1_12_R1))
@@ -649,19 +624,23 @@ public class Residence extends JavaPlugin {
                     pm.registerEvents(new ResidencePlayerListener1_16(this), this);
                 if (Version.isCurrentEqualOrHigher(Version.v1_17_R1))
                     pm.registerEvents(new ResidencePlayerListener1_17(this), this);
-                elistener = new ResidenceEntityListener(this);
-                flistener = new ResidenceFixesListener();
-                slistener = new ResidenceRaidListener();
+                if (Version.isCurrentEqualOrHigher(Version.v1_19_R1))
+                    pm.registerEvents(new ResidencePlayerListener1_19(this), this);
+                if (Version.isCurrentEqualOrHigher(Version.v1_20_R1))
+                    pm.registerEvents(new ResidencePlayerListener1_20(this), this);
+                if (Version.isCurrentEqualOrHigher(Version.v1_21_R1))
+                    pm.registerEvents(new ResidencePlayerListener1_21(this), this);
 
-                shlistener = new ShopListener(this);
-                spigotlistener = new SpigotListener();
+                blistener = new ResidenceBlockListener(this);
+                plistener = new ResidencePlayerListener(this);
+                elistener = new ResidenceEntityListener(this);
 
                 pm.registerEvents(blistener, this);
                 pm.registerEvents(plistener, this);
                 pm.registerEvents(elistener, this);
-                pm.registerEvents(flistener, this);
-                pm.registerEvents(shlistener, this);
-                pm.registerEvents(slistener, this);
+                pm.registerEvents(new ResidenceFixesListener(), this);
+                pm.registerEvents(new ShopListener(this), this);
+                pm.registerEvents(new ResidenceRaidListener(), this);
 
                 // 1.8 event
                 if (Version.isCurrentEqualOrHigher(Version.v1_8_R1))
@@ -688,7 +667,7 @@ public class Residence extends JavaPlugin {
 
             try {
                 Class.forName("org.bukkit.event.player.PlayerItemDamageEvent");
-                getServer().getPluginManager().registerEvents(spigotlistener, this);
+                getServer().getPluginManager().registerEvents(new SpigotListener(), this);
             } catch (Exception e) {
             }
 
@@ -713,23 +692,35 @@ public class Residence extends JavaPlugin {
                 e.printStackTrace();
             }
 
+            try {
+                // Pl3xMap
+                Plugin pl3xmap = Bukkit.getPluginManager().getPlugin("Pl3xMap");
+                if (pl3xmap != null && getConfigManager().Pl3xMapUse) {
+                    Pl3xManager = new Pl3xMapManager(this);
+                    getServer().getPluginManager().registerEvents(new Pl3xMapListeners(this), this);
+                    getPl3xManager().api = Pl3xMap.api();
+                    getPl3xManager().activate();
+                }
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
 
             int autosaveInt = getConfigManager().getAutoSaveInterval();
             if (autosaveInt < 1) {
                 autosaveInt = 1;
             }
             autosaveInt = autosaveInt * 60 * 20;
-            autosaveBukkitId = server.getScheduler().scheduleSyncRepeatingTask(this, autoSave, autosaveInt, autosaveInt);
+            autosaveBukkitId = CMIScheduler.scheduleSyncRepeatingTask(this, autoSave, autosaveInt, autosaveInt);
 
             if (getConfigManager().getHealInterval() > 0)
-                healBukkitId = server.getScheduler().scheduleSyncRepeatingTask(this, doHeals, 20, getConfigManager().getHealInterval() * 20);
+                healBukkitId = CMIScheduler.scheduleSyncRepeatingTask(this, doHeals, 20, getConfigManager().getHealInterval() * 20);
             if (getConfigManager().getFeedInterval() > 0)
-                feedBukkitId = server.getScheduler().scheduleSyncRepeatingTask(this, doFeed, 20, getConfigManager().getFeedInterval() * 20);
+                feedBukkitId = CMIScheduler.scheduleSyncRepeatingTask(this, doFeed, 20, getConfigManager().getFeedInterval() * 20);
             if (getConfigManager().getSafeZoneInterval() > 0)
-                effectRemoveBukkitId = server.getScheduler().scheduleSyncRepeatingTask(this, removeBadEffects, 20, getConfigManager().getSafeZoneInterval() * 20);
+                effectRemoveBukkitId = CMIScheduler.scheduleSyncRepeatingTask(this, removeBadEffects, 20, getConfigManager().getSafeZoneInterval() * 20);
 
             if (getConfigManager().AutoMobRemoval())
-                DespawnMobsBukkitId = server.getScheduler().scheduleSyncRepeatingTask(this, DespawnMobs, 20 * getConfigManager().AutoMobRemovalInterval(), 20
+                despawnMobsBukkitId = CMIScheduler.scheduleSyncRepeatingTask(this, DespawnMobs, 20 * getConfigManager().AutoMobRemovalInterval(), 20
                     * getConfigManager().AutoMobRemovalInterval());
 
             if (getConfigManager().useLeases()) {
@@ -738,7 +729,7 @@ public class Residence extends JavaPlugin {
                     leaseInterval = 1;
                 }
                 leaseInterval = leaseInterval * 60 * 20;
-                leaseBukkitId = server.getScheduler().scheduleSyncRepeatingTask(this, leaseExpire, leaseInterval, leaseInterval);
+                leaseBukkitId = CMIScheduler.scheduleSyncRepeatingTask(this, leaseExpire, leaseInterval, leaseInterval);
             }
             if (getConfigManager().enabledRentSystem()) {
                 int rentint = getConfigManager().getRentCheckInterval();
@@ -746,11 +737,11 @@ public class Residence extends JavaPlugin {
                     rentint = 1;
                 }
                 rentint = rentint * 60 * 20;
-                rentBukkitId = server.getScheduler().scheduleSyncRepeatingTask(this, rentExpire, rentint, rentint);
+                rentBukkitId = CMIScheduler.scheduleSyncRepeatingTask(this, rentExpire, rentint, rentint);
             }
             for (Player player : Bukkit.getServer().getOnlinePlayers()) {
                 if (getPermissionManager().isResidenceAdmin(player)) {
-                    turnResAdminOn(player);
+                    ResAdmin.turnResAdminOn(player);
                 }
             }
             try {
@@ -772,7 +763,7 @@ public class Residence extends JavaPlugin {
 
         getShopSignUtilManager().LoadShopVotes();
         getShopSignUtilManager().LoadSigns();
-        getShopSignUtilManager().BoardUpdate();
+        getShopSignUtilManager().boardUpdate();
 
         CMIVersionChecker.VersionCheck(null, 11480, this.getDescription());
         fullyLoaded = true;
@@ -892,6 +883,21 @@ public class Residence extends JavaPlugin {
         }
     }
 
+    private GameManagement kingdomsmanager = null;
+
+    private void setKingdoms() {
+        if (Bukkit.getPluginManager().getPlugin("Kingdoms") != null) {
+            try {
+                kingdomsmanager = Kingdoms.getManagers();
+            } catch (Throwable e) {
+                this.consoleMessage("Failed to recognize Kingdoms plugin. Compatability disabled");
+            }
+        }
+    }
+
+    public GameManagement getKingdomsManager() {
+        return kingdomsmanager;
+    }
 
     private void setWorldGuard() {
         Plugin wgplugin = server.getPluginManager().getPlugin("WorldGuard");
@@ -957,6 +963,9 @@ public class Residence extends JavaPlugin {
         return DynManager;
     }
 
+    public Pl3xMapManager getPl3xManager() {
+        return Pl3xManager;
+    }
 
     public WESchematicManager getSchematicManager() {
         return SchematicManager;
@@ -1138,45 +1147,59 @@ public class Residence extends JavaPlugin {
         }
     }
 
+    @Deprecated
+    /**
+    * @deprecated Use {@link ResAdmin#isResAdmin(CommandSender)} instead.
+    */
     public boolean isResAdminOn(CommandSender sender) {
-        if (sender instanceof Player)
-            return isResAdminOn((Player) sender);
-        return true;
+        return ResAdmin.isResAdmin(sender);
     }
 
+    @Deprecated
+    /**
+    * @deprecated Use {@link ResAdmin#isResAdmin(Player)} instead.
+    */
     public boolean isResAdminOn(Player player) {
-        if (player == null)
-            return true;
-        return resadminToggle.contains(player.getName());
+        return ResAdmin.isResAdmin(player);
     }
 
-    public void turnResAdminOn(Player player) {
-        resadminToggle.add(player.getName());
+    @Deprecated
+    /**
+    * @deprecated Use {@link ResAdmin#turnResAdmin(Player, Boolean)} instead.
+    */
+    public void turnResAdminOn2(Player player) {
+        ResAdmin.turnResAdmin(player, true);
     }
 
+    @Deprecated
+    /**
+    * @deprecated Use {@link ResAdmin#turnResAdmin(Player, Boolean)} instead.
+    */
+    public void turnResAdminOff2(Player player) {
+        ResAdmin.turnResAdmin(player, false);
+    }
+
+    @Deprecated
+    /**
+    * @deprecated Use {@link ResAdmin#isResAdmin(Player)} instead.
+    */
     public boolean isResAdminOn(String player) {
-        return resadminToggle.contains(player);
+        ResidencePlayer rPlayer = this.getPlayerManager().getResidencePlayer(player);
+        if (rPlayer == null)
+            return false;
+        return ResAdmin.isResAdmin(rPlayer.getUniqueId());
     }
 
-    private static void saveFile(File worldFolder, String fileName, String key, Object value) throws IOException {
-        File ymlFlagsSaveLoc = new File(worldFolder, "res_" + fileName + ".yml");
-        File tmpFlagsFile = new File(worldFolder, "tmp_res_" + fileName + ".yml");
-
-        // Separate Flags file
-        YMLSaveHelper flagsTemp = new YMLSaveHelper(tmpFlagsFile);
-        flagsTemp.getRoot().put(key, value);
-        flagsTemp.save();
-
-        if (ymlFlagsSaveLoc.isFile()) {
+    private static void saveBackup(File ymlSaveLoc, String worldName, File worldFolder) {
+        if (ymlSaveLoc.isFile()) {
             File backupFolder = new File(worldFolder, "Backup");
             backupFolder.mkdirs();
-            File backupFile = new File(backupFolder, "res_" + fileName + ".yml");
+            File backupFile = new File(backupFolder, "res_" + worldName + ".yml");
             if (backupFile.isFile()) {
                 backupFile.delete();
             }
-            ymlFlagsSaveLoc.renameTo(backupFile);
+            ymlSaveLoc.renameTo(backupFile);
         }
-        tmpFlagsFile.renameTo(ymlFlagsSaveLoc);
     }
 
     private void saveYml() throws IOException {
@@ -1188,14 +1211,23 @@ public class Residence extends JavaPlugin {
         Map<String, Object> save = rmanager.save();
         for (Entry<String, Object> entry : save.entrySet()) {
 
+            boolean emptyRecord = false;
+            // Not saving files without any records in them. Mainly for servers with many small temporary worlds
+            try {
+                emptyRecord = ((LinkedHashMap) entry.getValue()).isEmpty();
+            } catch (Throwable e) {
+            }
+
             File ymlSaveLoc = new File(worldFolder, "res_" + entry.getKey() + ".yml");
+
+            if (emptyRecord) {
+                saveBackup(ymlSaveLoc, entry.getKey(), worldFolder);
+                continue;
+            }
+
             File tmpFile = new File(worldFolder, "tmp_res_" + entry.getKey() + ".yml");
 
             syml = new YMLSaveHelper(tmpFile);
-            syml.getRoot().put("Version", saveVersion);
-            World world = server.getWorld(entry.getKey());
-            if (world != null)
-                syml.getRoot().put("Seed", world.getSeed());
             if (this.getResidenceManager().getMessageCatch(entry.getKey()) != null)
                 syml.getRoot().put("Messages", this.getResidenceManager().getMessageCatch(entry.getKey()));
             if (this.getResidenceManager().getFlagsCatch(entry.getKey()) != null)
@@ -1203,17 +1235,10 @@ public class Residence extends JavaPlugin {
 
             syml.getRoot().put("Residences", entry.getValue());
             syml.save();
-            if (ymlSaveLoc.isFile()) {
-                File backupFolder = new File(worldFolder, "Backup");
-                backupFolder.mkdirs();
-                File backupFile = new File(backupFolder, "res_" + entry.getKey() + ".yml");
-                if (backupFile.isFile()) {
-                    backupFile.delete();
-                }
-                ymlSaveLoc.renameTo(backupFile);
-            }
-            tmpFile.renameTo(ymlSaveLoc);
 
+            saveBackup(ymlSaveLoc, entry.getKey(), worldFolder);
+
+            tmpFile.renameTo(ymlSaveLoc);
         }
 
         YMLSaveHelper yml;
@@ -1222,7 +1247,6 @@ public class Residence extends JavaPlugin {
         File tmpFile = new File(saveFolder, "tmp_forsale.yml");
         yml = new YMLSaveHelper(tmpFile);
         yml.save();
-        yml.getRoot().put("Version", saveVersion);
         yml.getRoot().put("Economy", tmanager.save());
         yml.save();
         if (ymlSaveLoc.isFile()) {
@@ -1240,7 +1264,6 @@ public class Residence extends JavaPlugin {
         ymlSaveLoc = new File(saveFolder, "leases.yml");
         tmpFile = new File(saveFolder, "tmp_leases.yml");
         yml = new YMLSaveHelper(tmpFile);
-        yml.getRoot().put("Version", saveVersion);
         yml.getRoot().put("Leases", leasemanager.save());
         yml.save();
         if (ymlSaveLoc.isFile()) {
@@ -1258,7 +1281,6 @@ public class Residence extends JavaPlugin {
         ymlSaveLoc = new File(saveFolder, "permlists.yml");
         tmpFile = new File(saveFolder, "tmp_permlists.yml");
         yml = new YMLSaveHelper(tmpFile);
-        yml.getRoot().put("Version", saveVersion);
         yml.getRoot().put("PermissionLists", pmanager.save());
         yml.save();
         if (ymlSaveLoc.isFile()) {
@@ -1276,7 +1298,6 @@ public class Residence extends JavaPlugin {
         ymlSaveLoc = new File(saveFolder, "rent.yml");
         tmpFile = new File(saveFolder, "tmp_rent.yml");
         yml = new YMLSaveHelper(tmpFile);
-        yml.getRoot().put("Version", saveVersion);
         yml.getRoot().put("RentSystem", rentmanager.save());
         yml.save();
         if (ymlSaveLoc.isFile()) {
@@ -1384,10 +1405,10 @@ public class Residence extends JavaPlugin {
                 worlds.put(worldName, yml.getRoot().get("Residences"));
 
                 int pass = (int) (System.currentTimeMillis() - time);
-                String PastTime = pass > 1000 ? String.format("%.2f", (pass / 1000F)) + " sec" : pass + " ms";
+                String pastTime = pass > 1000 ? String.format("%.2f", (pass / 1000F)) + " sec" : pass + " ms";
 
                 if (!isDisabledWorld(worldName) && !this.getConfigManager().CleanerStartupLog)
-                    Bukkit.getConsoleSender().sendMessage(getPrefix() + " Loaded " + worldName + " data. (" + PastTime + ")");
+                    Bukkit.getConsoleSender().sendMessage(getPrefix() + " Loaded " + worldName + " data. (" + pastTime + ")");
             }
 
             getResidenceManager().load(worlds);
@@ -1471,7 +1492,7 @@ public class Residence extends JavaPlugin {
         }
     }
 
-    private void ConvertFile() {
+    private void convertFile() {
         File file = new File(this.getDataFolder(), "config.yml");
 
         File file_old = new File(this.getDataFolder(), "config_old.yml");
@@ -1605,38 +1626,6 @@ public class Residence extends JavaPlugin {
         }
     }
 
-//    private void writeDefaultLanguageFile(String lang) {
-//	File outFile = new File(new File(this.getDataFolder(), "Language"), lang + ".yml");
-//	outFile.getParentFile().mkdirs();
-//	if (this.writeDefaultFileFromJar(outFile, "languagefiles/" + lang + ".yml", true)) {
-//	    System.out.println("[Residence] Wrote default " + lang + " Language file...");
-//	}
-//    }
-//
-//    private boolean checkNewLanguageVersion(String lang) throws IOException, FileNotFoundException, InvalidConfigurationException {
-//	File outFile = new File(new File(this.getDataFolder(), "Language"), lang + ".yml");
-//	File checkFile = new File(new File(this.getDataFolder(), "Language"), "temp-" + lang + ".yml");
-//	if (outFile.isFile()) {
-//	    FileConfiguration testconfig = new YamlConfiguration();
-//	    testconfig.load(outFile);
-//	    int oldversion = testconfig.getInt("FieldsVersion", 0);
-//	    if (!this.writeDefaultFileFromJar(checkFile, "languagefiles/" + lang + ".yml", false)) {
-//		return false;
-//	    }
-//	    FileConfiguration testconfig2 = new YamlConfiguration();
-//	    testconfig2.load(checkFile);
-//	    int newversion = testconfig2.getInt("FieldsVersion", oldversion);
-//	    if (checkFile.isFile()) {
-//		checkFile.delete();
-//	    }
-//	    if (newversion > oldversion) {
-//		return true;
-//	    }
-//	    return false;
-//	}
-//	return true;
-//    }
-
     private boolean writeDefaultFileFromJar(File writeName, String jarPath, boolean backupOld) {
         try {
             File fileBackup = new File(this.getDataFolder(), "backup-" + writeName);
@@ -1724,7 +1713,7 @@ public class Residence extends JavaPlugin {
         if (offPlayer != null)
             return offPlayer;
 
-        Player player = Bukkit.getPlayer(Name);
+        Player player = Bukkit.getPlayerExact(Name);
         if (player != null)
             return player;
 
@@ -1802,13 +1791,14 @@ public class Residence extends JavaPlugin {
     }
 
     public String getPlayerName(UUID uuid) {
+        if (uuid == null)
+            return null;
+
         String cache = cachedPlayerNames.get(uuid);
         if (cache != null) {
             return cache.equalsIgnoreCase("_UNKNOWN_") ? null : cache;
         }
 
-        if (uuid == null)
-            return null;
         OfflinePlayer p = getServ().getPlayer(uuid);
         if (p == null)
             p = getOfflinePlayer(uuid);
@@ -1834,6 +1824,9 @@ public class Residence extends JavaPlugin {
     }
 
     public boolean isDisabledWorld(String worldname) {
+        if (!getConfigManager().EnabledWorldsList.isEmpty()) {
+            return !getConfigManager().EnabledWorldsList.contains(worldname);
+        }
         return getConfigManager().DisabledWorldsList.contains(worldname);
     }
 
@@ -1842,6 +1835,11 @@ public class Residence extends JavaPlugin {
     }
 
     public boolean isDisabledWorldListener(String worldname) {
+
+        if (!getConfigManager().EnabledWorldsList.isEmpty()) {
+            return !getConfigManager().EnabledWorldsList.contains(worldname) && getConfigManager().DisableListeners;
+        }
+
         return getConfigManager().DisabledWorldsList.contains(worldname) && getConfigManager().DisableListeners;
     }
 
@@ -1850,6 +1848,11 @@ public class Residence extends JavaPlugin {
     }
 
     public boolean isDisabledWorldCommand(String worldname) {
+
+        if (!getConfigManager().EnabledWorldsList.isEmpty()) {
+            return !getConfigManager().EnabledWorldsList.contains(worldname) && getConfigManager().DisableCommands;
+        }
+
         return getConfigManager().DisabledWorldsList.contains(worldname) && getConfigManager().DisableCommands;
     }
 

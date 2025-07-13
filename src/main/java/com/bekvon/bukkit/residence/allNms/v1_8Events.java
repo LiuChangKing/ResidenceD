@@ -2,6 +2,7 @@ package com.bekvon.bukkit.residence.allNms;
 
 import com.bekvon.bukkit.residence.Residence;
 import com.bekvon.bukkit.residence.containers.Flags;
+import com.bekvon.bukkit.residence.containers.ResAdmin;
 import com.bekvon.bukkit.residence.containers.lm;
 import com.bekvon.bukkit.residence.protection.FlagPermissions;
 import com.bekvon.bukkit.residence.utils.Utils;
@@ -21,41 +22,41 @@ import java.util.List;
 public class v1_8Events implements Listener {
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onPlayerInteractAtArmoStand(PlayerInteractAtEntityEvent event) {
-	Player player = event.getPlayer();
-	if (Residence.getInstance().isResAdminOn(player))
-	    return;
+        Player player = event.getPlayer();
+        if (ResAdmin.isResAdmin(player))
+            return;
 
-	Entity ent = event.getRightClicked();
-	if (!Utils.isArmorStandEntity(ent.getType()))
-	    return;
+        Entity ent = event.getRightClicked();
+        if (!Utils.isArmorStandEntity(ent.getType()))
+            return;
 
-	FlagPermissions perms = Residence.getInstance().getPermsByLocForPlayer(ent.getLocation(), player);
+        FlagPermissions perms = Residence.getInstance().getPermsByLocForPlayer(ent.getLocation(), player);
 
-	if (!perms.playerHas(player, Flags.container, perms.playerHas(player, Flags.use, true))) {
-	    event.setCancelled(true);
-	    Residence.getInstance().msg(player, lm.Flag_Deny, Flags.container);
-	}
+        if (!perms.playerHas(player, Flags.container, perms.playerHas(player, Flags.use, true))) {
+            event.setCancelled(true);
+            Residence.getInstance().msg(player, lm.Flag_Deny, Flags.container);
+        }
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onBlockExplodeEvent(BlockExplodeEvent event) {
 
-	Location loc = event.getBlock().getLocation();
+        Location loc = event.getBlock().getLocation();
 
-	if (Residence.getInstance().isDisabledWorldListener(loc.getWorld()))
-	    return;
-	if (event.isCancelled())
-	    return;
-	FlagPermissions world = Residence.getInstance().getWorldFlags().getPerms(loc.getWorld().getName());
-	List<Block> preserve = new ArrayList<Block>();
-	for (Block block : event.blockList()) {
-	    FlagPermissions blockperms = Residence.getInstance().getPermsByLoc(block.getLocation());
-	    if (!blockperms.has(Flags.explode, world.has(Flags.explode, true))) {
-		preserve.add(block);
-	    }
-	}
-	for (Block block : preserve) {
-	    event.blockList().remove(block);
-	}
+        if (Residence.getInstance().isDisabledWorldListener(loc.getWorld()))
+            return;
+        if (event.isCancelled())
+            return;
+        FlagPermissions world = Residence.getInstance().getWorldFlags().getPerms(loc.getWorld().getName());
+        List<Block> preserve = new ArrayList<Block>();
+        for (Block block : event.blockList()) {
+            FlagPermissions blockperms = Residence.getInstance().getPermsByLoc(block.getLocation());
+            if (!blockperms.has(Flags.explode, world.has(Flags.explode, true))) {
+                preserve.add(block);
+            }
+        }
+        for (Block block : preserve) {
+            event.blockList().remove(block);
+        }
     }
 }
