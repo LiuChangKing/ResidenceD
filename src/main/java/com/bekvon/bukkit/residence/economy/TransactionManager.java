@@ -5,7 +5,6 @@ import com.bekvon.bukkit.residence.api.MarketBuyInterface;
 import com.bekvon.bukkit.residence.containers.ResidencePlayer;
 import com.bekvon.bukkit.residence.containers.Visualizer;
 import com.bekvon.bukkit.residence.containers.lm;
-import com.bekvon.bukkit.residence.listeners.ResidenceLWCListener;
 import com.bekvon.bukkit.residence.permissions.PermissionGroup;
 import com.bekvon.bukkit.residence.permissions.PermissionManager.ResPerm;
 import com.bekvon.bukkit.residence.protection.ClaimedResidence;
@@ -234,10 +233,6 @@ public class TransactionManager implements MarketBuyInterface {
             res.getPermissions().setOwner(player, true);
             res.getPermissions().applyDefaultFlags();
             removeFromSale(res);
-
-            if (plugin.getConfigManager().isRemoveLwcOnBuy() && plugin.isLwcPresent())
-                ResidenceLWCListener.removeLwcFromResidence(player, res);
-
             plugin.getSignUtil().CheckSign(res);
 
             Visualizer v = new Visualizer(player);

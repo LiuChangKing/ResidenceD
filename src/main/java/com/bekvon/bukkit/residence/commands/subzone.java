@@ -40,14 +40,9 @@ public class subzone implements cmd {
 	}
 
 
-	if (plugin.getWorldEdit() != null) {
-	    if (plugin.getWorldEditTool() == plugin.getConfigManager().getSelectionTool()) {
-		plugin.getSelectionManager().worldEdit(player);
-	    }
-	}
-	if (plugin.getSelectionManager().hasPlacedBoth(player)) {
-	    if (!resadmin && !ResPerm.create_subzone.hasPermission(player, lm.Subzone_CantCreate))
-		return true;
+        if (plugin.getSelectionManager().hasPlacedBoth(player)) {
+            if (!resadmin && !ResPerm.create_subzone.hasPermission(player, lm.Subzone_CantCreate))
+                return true;
 
 	    res.addSubzone(player, plugin.getSelectionManager().getPlayerLoc1(player), plugin.getSelectionManager().getPlayerLoc2(player),
 		zname, resadmin);

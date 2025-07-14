@@ -86,10 +86,6 @@ public class expand implements cmd {
         plugin.getSelectionManager().modify(player, false, amount);
 
         if (plugin.getSelectionManager().hasPlacedBoth(player)) {
-            if (plugin.getWorldEdit() != null && plugin.getWorldEditTool().equals(plugin.getConfigManager().getSelectionTool())) {
-                plugin.getSelectionManager().worldEdit(player);
-            }
-
             res.replaceArea(player, plugin.getSelectionManager().getSelectionCuboid(player), areaName, resadmin);
             return true;
         }

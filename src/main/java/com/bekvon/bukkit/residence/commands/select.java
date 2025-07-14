@@ -100,12 +100,6 @@ public class select implements cmd {
                 plugin.getSelectionManager().getSelection(player).selectChunk();
                 plugin.getSelectionManager().afterSelectionUpdate(player, true);
                 return true;
-            case "worldedit":
-                if (plugin.getSelectionManager().worldEdit(player)) {
-                    plugin.msg(player, lm.Select_Success);
-                    plugin.getSelectionManager().afterSelectionUpdate(player, false);
-                }
-                return true;
             }
         } else if (args.length == 2) {
             int amount = 0;
@@ -253,8 +247,5 @@ public class select implements cmd {
         c.get("residence.Info", Arrays.asList("&eUsage: &6/res select residence <residence>", "Selects a existing area in a residence."));
         LocaleManager.addTabCompleteSub(this, "residence", "[residence]");
 
-        c.get("worldedit.Description", "Set selection using the current WorldEdit selection.");
-        c.get("worldedit.Info", Arrays.asList("&eUsage: &6/res select worldedit", "Sets selection area using the current WorldEdit selection."));
-        LocaleManager.addTabCompleteSub(this, "worldedit");
     }
 }

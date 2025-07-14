@@ -889,12 +889,10 @@ public class SelectionManager {
     }
 
     public boolean worldEdit(Player player) {
-        plugin.msg(player, lm.General_WorldEditNotFound);
         return false;
     }
 
     public boolean worldEditUpdate(Player player) {
-        plugin.msg(player, lm.General_WorldEditNotFound);
         return false;
     }
 

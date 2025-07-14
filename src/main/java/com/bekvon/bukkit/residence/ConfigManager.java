@@ -54,10 +54,6 @@ public class ConfigManager {
     protected boolean NoWaterPlace;
     protected boolean AutoCleanUp;
     protected boolean SellSubzone;
-    protected boolean LwcOnDelete = false;
-    protected boolean LwcOnBuy = false;
-    protected boolean LwcOnUnrent = false;
-    protected List<Material> LwcMatList = new ArrayList<Material>();
     protected boolean UseClean = false;
     protected boolean PvPFlagPrevent;
     protected boolean OverridePvp;
@@ -89,7 +85,6 @@ public class ConfigManager {
     protected int RentInformBefore;
     protected int RentInformDelay;
     protected int rentCheckInterval;
-    protected int chatPrefixLength;
     protected int leaseCheckInterval;
     protected int autoSaveInt;
     protected boolean NewSaveMechanic;
@@ -143,8 +138,6 @@ public class ConfigManager {
     protected boolean flagsInherit;
     protected boolean ignoreGroupedFlagAcess;
     protected CMIChatColor chatColor;
-    protected boolean chatEnable;
-    private boolean chatListening;
     private ELMessageType EnterLeaveMessageType;
 //    protected boolean actionBar;
 //    protected boolean titleMessage;
@@ -191,7 +184,6 @@ public class ConfigManager {
     protected boolean SelectionIgnoreYInSubzone = false;
     private int SelectionNetherHeight = 128;
     protected boolean NoCostForYBlocks = false;
-    protected boolean WorldEditIntegration = false;
     protected boolean useVisualizer;
     protected boolean DisableListeners;
     protected boolean DisableCommands;
@@ -619,8 +611,6 @@ public class ConfigManager {
             "This will lower residence price by up to 319 times, so adjust block price BEFORE enabling this");
         NoCostForYBlocks = c.get("Global.Selection.NoCostForYBlocks", false);
 
-        c.addComment("Global.Selection.WorldEditIntegration", "Enable or disable world edit integration into Residence plugin");
-        WorldEditIntegration = c.get("Global.Selection.WorldEditIntegration", true);
 
         c.addComment("Global.InfoToolId", "This determins which tool you can use to see info on residences, default is String.",
             "Simply equip this tool and hit a location inside the residence and it will display the info for it.");
@@ -954,24 +944,6 @@ public class ConfigManager {
         c.addComment("Global.AutoCleanUp.UserName", "Name of the user which receives removed residence");
         AutoCleanUserName = c.get("Global.AutoCleanUp.UserName", "Server_Land");
 
-        if (Version.isCurrentEqualOrHigher(Version.v1_13_R1)) {
-            LwcMatList.clear();
-            c.addComment("Global.Lwc.OnDelete", "Removes lwc protection from all defined objects when removing residence");
-            LwcOnDelete = c.get("Global.Lwc.OnDelete", true);
-            c.addComment("Global.Lwc.OnBuy", "Removes lwc protection from all defined objects when buying residence");
-            LwcOnBuy = c.get("Global.Lwc.OnBuy", true);
-            c.addComment("Global.Lwc.OnUnrent", "Removes lwc protection from all defined objects when unrenting residence");
-            LwcOnUnrent = c.get("Global.Lwc.OnUnrent", true);
-
-            c.addComment("Global.Lwc.MaterialList", "List of blocks you want to remove protection from");
-            for (String oneName : c.get("Global.Lwc.MaterialList", Arrays.asList("CHEST", "TRAPPED_CHEST", "furnace", "dispenser"))) {
-                Material mat = Material.getMaterial(oneName.toUpperCase());
-                if (mat != null)
-                    LwcMatList.add(mat);
-                else
-                    Bukkit.getConsoleSender().sendMessage("Incorrect Lwc material name for " + oneName);
-            }
-        }
 
         c.addComment("Global.AntiGreef.RangeGaps",
             "Distance in blocks between residences to be left out",
@@ -1102,7 +1074,7 @@ public class ConfigManager {
         c.addComment("Global.EnablePermissions", "Whether or not to use the Permissions system in conjunction with this config.");
         c.get("Global.EnablePermissions", true);
 
-        c.addComment("Global.EnableEconomy", "Enable / Disable Residence's Economy System (Vault or CMIEconomy supported).");
+        c.addComment("Global.EnableEconomy", "Enable or disable Residence's economy system (Vault supported).");
         enableEconomy = c.get("Global.EnableEconomy", true);
 
         c.addComment("Global.ChargeWhen", "Defines when we should charge money. Only works if economy is enabled");
@@ -1187,9 +1159,6 @@ public class ConfigManager {
 
         ActionBarOnSelection = c.get("Global.ActionBar.ShowOnSelection", true);
 
-        c.addComment("Global.ResidenceChatEnable", "Enable or disable residence chat channels.");
-        chatEnable = c.get("Global.ResidenceChatEnable", true);
-
         c.addComment("Global.ResidenceChatColor", "Color of residence chat.");
         try {
             chatColor = CMIChatColor.getColor((c.get("Global.ResidenceChatColor", "DARK_PURPLE")));
@@ -1201,11 +1170,6 @@ public class ConfigManager {
             chatColor = CMIChatColor.DARK_PURPLE;
         }
 
-        c.addComment("Global.ResidenceChatListening", "When enabled players with access to chat flag will be able to listen to residence chat without joining it");
-        chatListening = c.get("Global.ResidenceChatListening", false);
-
-        c.addComment("Global.ResidenceChatPrefixLength", "Max lenght of residence chat prefix including color codes");
-        chatPrefixLength = c.get("Global.ResidenceChatPrefixLength", 16);
 
         c.addComment("Global.AdminOnlyCommands", "Whether or not to ignore the usual Permission flags and only allow OPs and groups with 'residence.admin' to change residences.");
         adminsOnly = c.get("Global.AdminOnlyCommands", false);
@@ -1702,21 +1666,6 @@ public class ConfigManager {
         return NoWaterPlace;
     }
 
-    public List<Material> getLwcMatList() {
-        return LwcMatList;
-    }
-
-    public boolean isRemoveLwcOnUnrent() {
-        return LwcOnUnrent;
-    }
-
-    public boolean isRemoveLwcOnBuy() {
-        return LwcOnBuy;
-    }
-
-    public boolean isRemoveLwcOnDelete() {
-        return LwcOnDelete;
-    }
 
     public boolean isUseResidenceFileClean() {
         return AutoCleanUp;
@@ -1794,10 +1743,6 @@ public class ConfigManager {
 
     public int getRentCheckInterval() {
         return rentCheckInterval;
-    }
-
-    public int getChatPrefixLength() {
-        return chatPrefixLength;
     }
 
     public int getLeaseCheckInterval() {
@@ -1880,10 +1825,6 @@ public class ConfigManager {
 
     public boolean isIgnoreGroupedFlagAcess() {
         return ignoreGroupedFlagAcess;
-    }
-
-    public boolean chatEnabled() {
-        return chatEnable;
     }
 
     public boolean useActionBarOnSelection() {
@@ -2170,10 +2111,6 @@ public class ConfigManager {
         return InfoExcludeDFlags;
     }
 
-    public boolean isChatListening() {
-        return chatListening;
-    }
-
     public boolean isLoadEveryWorld() {
         return LoadEveryWorld;
     }
@@ -2240,10 +2177,6 @@ public class ConfigManager {
 
     public boolean isARCRatioConfirmation() {
         return ARCRatioConfirmation;
-    }
-
-    public boolean isWorldEditIntegration() {
-        return WorldEditIntegration;
     }
 
     public int getSignsMaxPerResidence() {

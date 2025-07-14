@@ -24,11 +24,7 @@ public class create implements cmd {
 	    return false;
 	}
 
-	if (plugin.getWorldEdit() != null) {
-	    if (plugin.getWorldEditTool() == plugin.getConfigManager().getSelectionTool()) {
-		plugin.getSelectionManager().worldEdit(player);
-	    }
-	} 
+
 
 	if (plugin.getSelectionManager().hasPlacedBoth(player)) {
 
