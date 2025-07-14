@@ -1,0 +1,525 @@
+# Residence 的全局设定
+Global:
+  # 插件启动时进行 UUID 转换
+  # 如不确定请勿更改
+  UUIDConvertion: false
+  # 极不推荐启用，仅在确实需要时再开启
+  # 若服务器为离线模式，建议保持为 false 并使用 UUID 管理归属
+  OfflineMode: false
+  # 拥有 residence.versioncheck 权限的玩家登录时会收到新版本提示
+  versionCheck: false
+  # 从 Language 文件夹加载指定语言文件
+  Language: Chinese
+  # 默认的区域选择工具，默认为木锄
+  SelectionToolId: WOODEN_HOE
+  Selection:
+    # 若启用，选择区域时将忽略 Y 坐标，从基岩到天空
+    IgnoreY: true
+    # 启用后，在已有领地内选择子区块时会自动使用该领地的上下高度
+    # 关闭则按玩家实际选择的高度
+    IgnoreYInSubzone: true
+    # 在创建住宅时定义了裸体的高度。当执行 /res选择Vert或 /Res Auto之类的命令时，这主要适用，该命令将扩展到定义的高度
+    # 这不能高于319或低于1
+    netherHeight: 128
+    # 通过将其设置为True，玩家只会为X*Z块支付忽略高度
+    # 这将降低居住价格高达319次，因此在启用此事之前调整块价格
+    NoCostForYBlocks: true
+  # 该确定您可以使用哪种工具来查看有关住宅的信息，默认为字符串。
+  # 只需装备此工具并击中住宅内部的位置，它将显示其信息。
+  InfoToolId: STRING
+  Optimizations:
+    # 启用后，即使世界不存在，我们也会从每个世界文件中加载数据，但以后可能会加载
+    # 通常只有在您有多元插件的多元插件时才有用
+    LoadEveryWorld: false
+    # 启用后减少插件启动时的额外日志输出
+    CleanerStartupLog: true
+    # 这将稍微更改组的行为文件canteleport部分，其中包括服务器所有者
+    # 当将其设置为false和Canteleport设置为False时，玩家将无法选择传送到其他玩家住所，仅为自己
+    # 当将其设置为True且Canteleport设置为False时，玩家将无法选择传送到住所
+    # 请记住，这仅适用于 /res tp之类的命令
+    CanTeleportIncludeOwner: false
+    # 主世界名称，通常为默认的 'world'，请务必注意大小写
+    DefaultWorld: world
+    DisabledWorlds:
+      # 该插件被禁用的世界列表
+      # 请确保世界名称大小写正确
+      # 如果白名单包含任何条目，则完全忽略了本节
+      BlackList: [spawn]
+      # 启用此插件的世界列表
+      # 请确保世界名称大小写正确
+      # 如果白名单包含任何条目，则完全忽略了黑名单部分
+      WhiteList: []
+      # 禁用包含世界的所有听众
+      DisableListeners: true
+      # 禁用包含世界中的任何命令用法
+      DisableCommands: true
+      # 禁用包含世界的居住地创建
+      DisableResidenceCreation: true
+    # 在居住标志之后，延迟在项目拾取之间的几秒钟阻止它
+    # 将其保持在10秒钟以降低不确定性检查
+    ItemPickUpDelay: 10
+    AutomaticResidenceCreation:
+      # 设置为true /res auto命令时，将检查与其他住宅的新区域碰撞，以避免重叠。
+      # 将其设置为假以获得一些表演，但是新的住所通常可以与旧住所重叠
+      CheckCollision: true
+      # 自动创建领地时检测形状是否过于奇怪
+      # 在创建前会提醒玩家该领地并非标准长方体
+      Ratio:
+        Inform: true
+        Confirmation: true
+        # 定义定量价值时，当居住时间算作怪异形状时
+        # 值为3将意味着Cuboid的一侧之一至少比其余的侧面大3倍
+        Value: 3
+      # 启用了这将切换到用于计算新居住区域的旧方法
+      # 旧方法的分配效率较低，因此当您拥有100多个居住区时，它不会推荐使用
+      OldMethod: false
+      # 使用自动住宅创建命令时定义新的住宅名称增量如果已经存在该名称的住宅
+      IncrementFormat: _[number]
+      Size:
+        # 启用时，我们将尝试通过定义的界限创建区域
+        Enabled: false
+        # 价值在1到100之间，这将定义我们将根据玩家许可组创建的居住尺寸
+        Percentage: 50
+        # 块中的值。虽然以前的百分比将决定一般规模，但可以用来避免拥有较小的住宅
+        # 例如，如果玩家可以访问30x30居住地，并且百分比设置为50％，那么而不是使用15个块大小，我们将使用20（默认值）
+        # 请记住，这不会覆盖实际的最大/分钟居住地大小的玩家可以拥有
+        Min: 5
+        # 块中的值。虽然以前的百分比将决定一般规模，但可以用来避免拥有庞大的住宅
+        # 例如，如果玩家可以访问500x500居住地，并且百分比设置为50％，那么而不是使用250个块大小，我们将使用100（默认）
+        # 请记住，这不会覆盖实际的最大/分钟居住地大小的玩家可以拥有
+        Max: 100
+    GlobalChat:
+      # 启用或禁用聊天修改，包括播放器主要居住名称
+      Enabled: false
+      # 修改聊天内容以加入聊天前缀；若使用其他聊天管理插件，可在格式中加入 {residence} 标签并关闭此项
+      SelfModify: true
+      Format: '&c[&e%1&c]'
+    # 当此项为 true 时，若玩家没有 tp 旗帜，任何传送到该领地的行为都会被拒绝
+    # 可避免他人通过第三方插件（如 Essentials 的 /tpa）传送进来
+    BlockAnyTeleportation: true
+    # 通过将其设置为True，常规PVP标志将充当OverridePVP标志
+    # OverridePVP标志试图忽略任何其他插件在该住宅中的任何PVP保护
+    OverridePvp: false
+    KickLocation:
+      # 通过将其设置为True，当玩家从Residence踢另一个玩家时，他将被传送到这个位置，而不是到户外居住
+      Use: false
+      World: world
+      X: 0.5
+      Y: 63.0
+      Z: 0.5
+      # 小于0-向上，超过0-朝下。从-90到90不等
+      Pitch: 0.0
+      # 头部位于左右。从-180到180不等
+      Yaw: 0.0
+    FlyLandLocation:
+      # 当玩家飞行状态时使用时使用，因为飞旗，没有稳固的土地来供球员降落
+      World: world
+      X: 0.5
+      Y: 63.0
+      Z: 0.5
+      # 小于0-向上，超过0-朝下。从-90到90不等
+      Pitch: 0.0
+      # 头部位于左右。从-180到180不等
+      Yaw: 0.0
+    InfoCommand:
+      # 通过将其设置为true，在使用 /res信息检查居住信息时，您将仅在列表中获得名称，通过徘徊在它们上，您将获得标志列表
+      ShortInformation: true
+      # 将设置为flags.yl文件中设置的true默认居住标志时，将从info命令输出中排除，不会显示
+      # 如果标志获得不同的状态，则将显示
+      ExcludeDefaultFlags: false
+    Vote:
+      # 范围玩家可以投票给，默认情况下为0到10分
+      RangeFrom: 0
+      RangeTo: 10
+      # 如果这是真的，玩家只能为商店而不是投票而付出
+      OnlyLike: false
+    ConsoleLogs:
+      # 如果此真实，将在控制台中记录Flag更改GUI的GUI
+      ShowFlagChanges: true
+    Intervals:
+      # 用适当的标志在几秒钟内治愈/喂养参与者的频率
+      # 更大的数字可以节省一些服务器资源
+      # 如果要完全禁用特定的检查，请设置为0。建议如果您不使用特定标志
+      Heal: 1
+      Feed: 5
+      SafeZone: 3
+    # 如果居住没有PvP True Flag集，则包含一种含义的药水将被忽略
+    NegativePotionEffects:
+    - blindness
+    - confusion
+    - harm
+    - hunger
+    - poison
+    - slow
+    - slow_digging
+    - weakness
+    - wither
+    NegativeLingeringPotions:
+    - slowness
+    - instant_damage
+    - poison
+    - slowness
+    # 定义特定WSPEED1和WSPEED2标志的速度。可以从0到5
+    WalkSpeed:
+      '1': 0.5
+      '2': 2.0
+  Signs:
+    MaxPerResidence: 5
+  # 运动检查之间的间隔为毫秒。
+  # 减少这将增加服务器上的负载。
+  # 增加这将使玩家在被限制的运动区域被传送出去之前进一步移动。
+  MoveCheckInterval: 500
+  Tp:
+    # 该间隔在几秒钟内用于传送。
+    # 使用0禁用
+    TeleportDelay: 3
+    # 玩家传送到领地时在标题栏额外显示提示信息
+    TeleportTitleMessage: true
+    # 不允许使用 /res tp传送的世界列表
+    # 这只会阻止对这些世界的传送，而不是从中阻止
+    BlockedWorlds:
+    - SomeWorldNames
+  RandomTeleportation:
+    Worlds:
+      # 使用此功能的世界名称。添加带有适当名称的Anthere以启用随机传送
+      world:
+        Enabled: true
+        # 最大坐标到传送，设置为1000，可以在-1000和1000坐标之间传送播放器
+        MaxCoord: 1000
+        # 如果MaxCoord设置为1000，Mincoord设置为500，则可以将播放器传送到-1000至-500至500至1000坐标之间
+        MinCoord: 500
+        CenterX: 0
+        CenterZ: 0
+    # 在再次使用命令之前，要等待多长时间的播放器。
+    Cooldown: 5
+    # 尝试找到正确的远程位置的次数。
+    # 保持较低的数字，因为玩家总是可以在延迟后重试
+    MaxTries: 20
+  # 在居住区之间的间隔（几分钟）节省。
+  SaveInterval: 10
+  # 新的保存机械师可以最大程度地减少保存文件几次，然后加速保存/加载时间一般
+  # 更大的文件具有更大的影响
+  NewSaveMechanic: true
+  Backup:
+    AutoCleanUp:
+      # 您是否要自动从主备份文件夹中自动删除备份文件，如果它们比定义的一天数量大
+      Use: true
+      Days: 30
+    # 您想通过在备份文件夹中的主要居住文件夹中创建zip文件来备份文件
+    # 这个不会对保存文件夹中制作的常规备份文件有影响
+    UseZip: true
+    IncludeFiles:
+      Worlds: true
+      forsale: true
+      leases: true
+      permlists: true
+      rent: true
+      flags: true
+      groups: true
+      config: true
+  AutoCleanUp:
+    # 如果播放器离线X天，则在服务器启动上进行了高度实验性的住宅清洁。
+    # 玩家可以使用Residence绕过这一点。CleanBypass权限节点
+    Use: false
+    # 玩家离线多久后删除其领地
+    Days: 60
+    # 如果无法确定居住所有者，则启用时，我们会将有关它的一些基本信息打印到控制台中
+    DetailsOnUnknown: false
+    # 该操作对服务器负担较重，重建过程中可能造成卡顿
+    # 是否在清理时还原旧领地区域
+    # 此功能需要安装 WorldEdit
+    Regenerate: false
+    # 将包含在支票清单中的世界
+    Worlds:
+    - world
+    # 启用后，我们将住宅转移到定义的用户而不是删除用户
+    # 定义的用户将被排除在清理操作之外
+    TrasnferToUser: false
+    # 接收删除住宅的用户名称
+    UserName: Server_Land
+  AntiGreef:
+    # 遗体之间的距离距离
+    # 这将防止住宅区被创建
+    # 如果旧居住的所有者和新住所的所有者相同
+    # 设置为0或一个空列表，如果要禁用此列表
+    # 如果您想对所有世界使用相同的限制，请使用“全部”
+    # 如果您只想在这个世界上使用此限制，请使用特定的世界名称
+    # 特定的世界名称将覆盖“所有”价值
+    RangeGaps:
+    - all-8
+    TNT:
+      # 设置为true时，将允许带有TNT的TNT和MINECART在住宅以外的62（默认）级别爆炸
+      # 这将允许使用TNT和更多香草播放开采
+      ExplodeBelow: true
+      level: 1
+    Creeper:
+      # 当设置为true时，将允许爬行者在62（默认）级别以下爆炸
+      # 这将提供更现实的游戏
+      # 为此，您将需要在世界范围内禁用爬行者爆炸。这可以在全球世界部分下的标志文件中完成
+      ExplodeBelow: true
+      level: 1
+    Flow:
+      # 从中开始熔岩和水流阻滞的水平
+      # 这在居住区没有影响
+      Level: 1
+      # 此设置为真，熔岩流室外被阻塞
+      NoLavaFlow: true
+      # 将此设置为真，住宅外部的水流被阻塞
+      NoWaterFlow: true
+      Worlds:
+      - world
+    Place:
+      # 从哪个开始，从哪个开始熔岩和水位
+      # 这在居住区没有影响
+      Level: 1
+      # 随着此设置为真，Playrs不能将熔岩放在住宅外
+      NoLavaPlace: true
+      # 将此设置为真，玩家不能将水放在住所外
+      NoWaterPlace: true
+      Worlds:
+      - world
+    BlockFall:
+      # 随着此设置为真，如果它们将降落在不同的区域
+      Use: true
+      # 从哪个开始，从哪个开始块的跌落
+      # 这在居住区或外部没有影响
+      Level: 1
+      Worlds:
+      - world
+    ResCleaning:
+      # 将此设置为真，在玩家删除其住所后，下面列出的所有块将被空气块替换
+      # 防止居住在格里芬目标附近创建的有效方法，然后将其删除
+      # 注意力！清理区域时，较大的居住区可能希望在服务器上创造更大的负载。因此，如果普通玩家可以使用大型住宅，请不要使用此功能。 1500万块将是最大限制
+      Use: false
+      # 您要替换块的级别
+      Level: 1
+      # 要替换的块列表
+      # 默认情况下，只有水和熔岩将被更换
+      Blocks:
+      - WATER
+      - LAVA
+      Worlds:
+      - world
+    Flags:
+      # 通过将其设置为“列表”的真实标志，将受到更改的保护
+      # 在邀请某人并将PVP标志杀死的人们中保护示例以杀死他们
+      Prevent: true
+      list:
+      - pvp
+  # 如果权限无法连接或您不使用权限，则使用的默认组使用。
+  DefaultGroup: default
+  # 启用 /禁用租赁系统。
+  UseLeaseSystem: false
+  # 设置租赁或租金到期日期的显示格式
+  # 具体用法可参考: http://www.tutorialspoint.com/java/java_date_time.htm
+  DateFormat: E yyyy.MM.dd 'at' hh:mm:ss a zzz
+  # 设置租赁或租金到期日期的简短格式
+  # 具体用法可参考: http://www.tutorialspoint.com/java/java_date_time.htm
+  DateFormatShort: MM.dd hh:mm
+  # 设置日期显示所使用的时区，当服务器位置与玩家分布地区不同时尤其有用
+  # 完整时区列表可在 http://www.mkyong.com/java/java-display-list-of-timezone-with-gmt/ 查看
+  TimeZone: Asia/Shanghai
+  # 启用或禁用移除领地时返还金钱
+  ResMoneyBack: false
+  # 启用或禁用移除领地时返还其银行余额
+  ResBankBack: true
+  # 租赁到期检查的间隔时间（分钟），仅在启用租赁系统时生效
+  LeaseCheckInterval: 10
+  # 若玩家资金充足则自动续租，经济系统关闭时此设置无效
+  LeaseAutoRenew: true
+  # 是否启用权限系统
+  EnablePermissions: true
+  # 启用或禁用 Residence 的经济系统（支持 Vault）
+  EnableEconomy: true
+  # 定义在何时收取费用，仅在启用经济系统时生效
+  ChargeWhen:
+    # 在创建领地（/res create 与 /res auto）时收取费用
+    Creating: true
+    # 在扩展领地面积时收取费用
+    Expanding: true
+    # 在新增区域时收取费用
+    AreaAdd: true
+  # 默认为 None，会通过 Vault API 尝试连接默认经济插件，如失败则寻找其他受支持的经济插件
+  # 也可以自定义经济接口以直接接入经济系统
+  # 可用值: Vault, None
+  Type: None
+  # 启用后，若领地可租或出售将在聊天中额外提示如何租用或购买
+  ExtraEnterMessage: true
+  Sell:
+    # 如果设置为真，这将允许出售子区域。建议将其保留为假
+    Subzone: false
+  # 启用或禁用租金系统
+  EnableRentSystem: false
+  Rent:
+    # 如果某些人仍在租用居住地，则防止住所/subzone拆除
+    PreventRemoval: true
+    # 设置为真正的居住租金时，可以从居住银行续签
+    DeductFromBank: false
+    # 当设置为真正的居住租金时，可以从居住银行续签，如果没有足够的钱，我们将其余的钱从玩家中扣除
+    # 这将覆盖扣除炸弹的行为
+    DeductFromBankThenPlayer: false
+    Inform:
+      # 告知玩家租金时间结束
+      OnEnding: true
+      # 时间范围为几分钟，开始通知结束租金
+      Before: 1440
+      # 时间范围为几秒钟，在玩家登录后等待多长时间才能告知租金
+      Delay: 60
+    DefaultValues:
+      # 租金时使用的默认值
+      AllowRenewing: true
+      StayInMarket: true
+      AllowAutoPay: true
+      # 若设为 true，当玩家未指定是否自动支付租金时默认启用
+      PlayerAutoPay: true
+    Schematics:
+      # 实验功能！若设为 true，租约结束后将恢复为设置 backup 标志时的状态
+      # 出于安全原因，仅拥有额外 residence.backup 权限的玩家可设置 backup 标志
+      RestoreAfterRentEnds: true
+      # 设为 true 时，仅在将 backup 旗帜改为 true 时保存区域状态
+      # 设为 false 时，玩家每次租用都会保存一次区域，以便保持最新外观
+      # 注意设为 false 会略微增加服务器负荷
+      SaveOnFlagChange: true
+  Bank:
+    # 定义最大金额可以持有
+    # 设置为0将禁用限制
+    Capacity: 0.0
+  # 在居住租金到期支票之间（如果启用租金系统）之间的间隔（如果启用了租金）。
+  RentCheckInterval: 10
+  Messages:
+    # 定义要发送居住地的位置，请输入/离开/拒绝移动和类似消息。可能的选项： ActionBar, TitleBar, ChatBox
+    # titlebar可以具有％subtitle％变量来定义第二行
+    GeneralMessages: ActionBar
+  ActionBar:
+    ShowOnSelection: true
+  # 居住聊天的颜色。
+  ResidenceChatColor: DARK_PURPLE
+  # 是否忽略通常的权限标志，仅允许使用“居住”的OP和组更改住宅。
+  AdminOnlyCommands: false
+  # 将其设置为True使服务器OPS管理员。
+  AdminOPs: true
+  # 将其设置为True Server Administration，如果它们是OP或具有Residence.Admin权限节点，则不需要使用 /resadmin命令访问admin命令。
+  AdminFullAccess: false
+  # 这是您用于多世界的插件的名称，如果您没有多世界插件，则可以安全地忽略它。
+  # 唯一要做的是检查在居住之前启用多世界插件，以确保适当地为其他世界加载住宅。
+  MultiWorldPlugin: Multiverse-Core
+  # 将其设置为真实会导致子区域从其父区域继承标志。
+  ResidenceFlagsInherit: true
+  # 将此设置为false将允许租赁参与者修改租用的住所。
+  PreventRentModify: true
+  # 当Subzone所有者与父级所有者不同时，将其设置为true将防止子区删除。
+  PreventSubZoneRemoval: true
+  # 将其设置为False，即使在保存文件中检测到错误，也会导致住宅继续加载。
+  StopOnSaveFault: true
+  ResidenceNameRegex: '[^a-zA-Z0-9\-\_]'
+  # 将其设置为TRUE，每次居住时都会将消息发送到控制台，或者租金到期或租赁过期支票。
+  ShowIntervalMessages: false
+  # 将其设置为True，将胸部放在地面上时，将其发送给新玩家的教程消息。
+  ShowNoobMessage: true
+  # 如果没有任何东西，将其设置为True创建居住的胸部。
+  # 如果他仍然没有任何住所，则只有一次重新启动
+  NewPlayer:
+    Use: false
+    # 将其设置为真实，将免费创建住宅
+    # 通过设置为虚假，如果他拥有的话，将从玩家那里拿走钱
+    Free: true
+    # 从放置的胸部到两侧。通过设置为5，住宅总共将为5+5+1 = 11个块
+    Range:
+      X: 5
+      Y: 5
+      Z: 5
+  # 实验 - 以下设置是用于使用MOD时的“容器”和“使用”标志检查的块ID列表。
+  CustomContainers: []
+  CustomBothClick: []
+  CustomRightClick: []
+  Visualizer:
+    # 启用后，玩家将看到粒子效果以标记选择范围
+    Use: true
+    # 绘制粒子效果的范围（以方块为单位）
+    # 建议不要超过 30，玩家实际可见距离约为 16 格
+    Range: 16
+    # 粒子效果显示时长，单位毫秒（5000 = 5 秒）
+    ShowFor: 5000
+    # 每隔多少刻更新一次粒子效果
+    updateInterval: 20
+    # 行与行之间粒子效果的间距
+    RowSpacing: 1
+    # 列与列之间粒子效果的间距
+    CollumnSpacing: 1
+    # 定义跳过多少粒子来形成移动效果
+    # 值越大可以适当降低更新频率
+    SkipBy: 2
+    # 每名玩家可见的最大边框粒子数量
+    FrameCap: 500
+    # 每名玩家可见的最大侧面粒子数量
+    SidesCap: 2000
+    # 粒子效果名称，例如: explode、largeexplode、hugeexplosion、fireworksSpark、splash、wake、crit、magicCrit
+    #  smoke、largesmoke、spell、instantSpell、mobSpell、mobSpellAmbient、witchMagic、dripWater、dripLava、angryVillager、happyVillager、townaura
+    #  note、portal、enchantmenttable、flame、lava、footstep、cloud、reddust、snowballpoof、snowshovel、slime、heart、barrier
+    #  droplet、take、mobappearance
+
+    # 若使用 Spigot 服务器，可用的粒子效果还包括: click2, click1, bow_fire, door_toggle, iron_door_toggle, trapdoor_toggle, iron_trapdoor_toggle, fence_gate_toggle, door_close, iron_door_close, trapdoor_close, iron_trapdoor_close, fence_gate_close, extinguish, record_play, ghast_shriek, ghast_shoot, blaze_shoot, zombie_chew_wooden_door, zombie_chew_iron_door, zombie_destroy_door, smoke, step_sound, potion_break, instant_potion_break, ender_signal, mobspawner_flames, brewing_stand_brew, chorus_flower_grow, chorus_flower_death, portal_travel, endereye_launch, firework_shoot, villager_plant_grow, dragon_breath, anvil_break, anvil_use, anvil_land, enderdragon_shoot, wither_break_block, wither_shoot, zombie_infect, zombie_converted_villager, bat_takeoff, end_gateway_spawn, enderdragon_growl, phantom_bite, zombie_converted_to_drowned, husk_converted_to_zombie, grindstone_use, book_page_turn, smithing_table_use, pointed_dripstone_land, pointed_dripstone_drip_lava_into_cauldron, pointed_dripstone_drip_water_into_cauldron, skeleton_converted_to_stray, composter_fill_attempt, lava_interact, redstone_torch_burnout, end_portal_frame_fill, dripping_dripstone, bone_meal_use, ender_dragon_destroy_block, sponge_dry, electric_spark, copper_wax_on, copper_wax_off, oxidised_copper_scrape, wither_spawned, ender_dragon_death, end_portal_created_in_overworld, phantom_bites, zombie_converts_to_drowned, husk_converts_to_zombie, grindstone_used, book_page_turned, composter_composts, lava_converts_block, redstone_torch_burns_out, ender_eye_placed, ender_dragon_destroys_block, wet_sponge_vaporizes_in_nether, sound_stop_jukebox_song, particles_sculk_charge, particles_sculk_shriek, particles_and_sound_brush_block_complete, particles_egg_crack
+    Selected:
+      Frame: happyVillager
+      Sides: reddust
+    Overlap:
+      Frame: FLAME
+      Sides: FLAME
+    # 当玩家进入居住时，显示出粒子的效果。仅适用于主要居住区
+    EnterAnimation: true
+  # 当玩家被推回时显示粒子效应
+  BounceAnimation: true
+  GUI:
+    # 启用或禁用Flag Gui
+    Enabled: true
+    # 将标志设置为true时要使用的项目ID和数据
+    setTrue: GREEN_WOOL
+    # 将标志设置为false时要使用的项目ID和数据
+    setFalse: RED_WOOL
+    # 设置标志以删除标志时要使用的项目ID和数据
+    setRemove: LIGHT_GRAY_WOOL
+  # 默认值= false。启用此功能，将定期从怪物中清除带有标志名称的住宅。
+  # 这在服务器端很重，所以只有在您真的需要此功能的情况下才能启用
+  AutoMobRemoval:
+    Use: false
+    # 几秒钟内一次检查住宅中的怪物的频率。保持合理的数量
+    Interval: 5
+  EnforceAreaInsideArea: false
+  EnableSpout: false
+  EnableLeaseMoneyAccount: true
+  # 通过将其设置为真实，将启用Kcouldron服务器的部分兼容性。动作栏消息和选择可视化器将自动禁用，因为不正确的兼容性
+  Couldroncompatibility: false
+DynMap:
+  # 启用或禁用Dynmap支持
+  Use: true
+  # 当设置为true时，我们将默认在Dynmap窗口上隐藏居住区
+  # 仍然可以启用住宅，可以在左上角提供Dynmap选项
+  HideByDefault: false
+  # 显示或隐藏领地的标志
+  ShowFlags: true
+  # 启用后，默认标志不会在领地概览中显示
+  ExcludeDefaultFlags: true
+  # 若设为 true，带有 hidden 标志的领地在 dynmap 上也会被隐藏
+  HideHidden: true
+  Layer:
+    # 启用3D区域
+    3dRegions: true
+    # 有多深入subsines展示
+    SubZoneDepth: 2
+  Border:
+    # 边界的颜色。从此页面挑选颜色http://www.w3schools.com/colors/colors_picker.asp
+    Color: '#FF0000'
+    # 透明度。 0.3表示只有30％的颜色可见
+    Opacity: 0.3
+    # 边界厚度
+    Weight: 3
+  Fill:
+    Opacity: 0.3
+    Color: '#FFFF00'
+    ForRent: '#33cc33'
+    Rented: '#99ff33'
+    ForSale: '#0066ff'
+  # 仅在此列表中显示区域
+  VisibleRegions: []
+  # 即使没有隐藏在地图上的地图上的区域
+  HiddenRegions: []
