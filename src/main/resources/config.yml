@@ -11,7 +11,7 @@ Global:
   # 从 Language 文件夹加载指定语言文件
   Language: Chinese
   # 默认的区域选择工具，默认为木锄
-  SelectionToolId: WOODEN_HOE
+  SelectionToolId: STICK
   Selection:
     # 若启用，选择区域时将忽略 Y 坐标，从基岩到天空
     IgnoreY: true
