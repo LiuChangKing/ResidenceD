@@ -27,14 +27,18 @@ public class Language {
      * Reloads the config
      */
     public void LanguageReload() {
-        File f = new File(plugin.getDataFolder(), "Language" + File.separator + plugin.getConfigManager().getLanguage() + ".yml");
+        File langDir = new File(plugin.getDataFolder(), "Language");
+        if (!langDir.isDirectory())
+            langDir.mkdirs();
+
+        File f = new File(langDir, plugin.getConfigManager().getLanguage() + ".yml");
         if (!f.isFile())
             try {
                 f.createNewFile();
             } catch (IOException e2) {
                 e2.printStackTrace();
             }
-        f = new File(plugin.getDataFolder(), "Language" + File.separator + "English.yml");
+        f = new File(langDir, "English.yml");
         if (!f.isFile())
             try {
                 f.createNewFile();
