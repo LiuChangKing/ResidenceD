@@ -19,19 +19,23 @@ repositories {
     maven {
         url = 'https://repo.extendedclip.com/content/repositories/placeholderapi/'
     }
+    maven {
+        name = 'eldonexus'
+        url = 'https://eldonexus.de/repository/maven-public/'
+    }
 }
 
 dependencies {
-    implementation 'com.github.Zrips:CMILib:1.4.7.4'
     compileOnly 'me.clip:placeholderapi:2.11.6'
-    compileOnly "com.github.MilkBowl:VaultAPI:1.7"
+    compileOnly 'nl.pim16aap2:BigDoors:0.1.8.58'
+    compileOnly 'com.github.MilkBowl:VaultAPI:1.7'
     compileOnly 'org.spigotmc:spigot-api:1.18.2-R0.1-SNAPSHOT'
     compileOnly 'org.spigotmc:spigot-api:1.20.1-R0.1-SNAPSHOT'
     compileOnly 'org.spigotmc:spigot-api:1.21-R0.1-SNAPSHOT'
     compileOnly fileTree(dir: 'libs', include: ['*.jar'])
 }
 
-def targetJavaVersion = 8
+def targetJavaVersion = 17
 java {
     def javaVersion = JavaVersion.toVersion(targetJavaVersion)
     sourceCompatibility = javaVersion
