@@ -20,8 +20,6 @@ import com.bekvon.bukkit.residence.itemlist.WorldItemManager;
 import com.bekvon.bukkit.residence.listeners.*;
 import com.bekvon.bukkit.residence.permissions.PermissionManager;
 import com.bekvon.bukkit.residence.persistance.YMLSaveHelper;
-import com.bekvon.bukkit.residence.pl3xmap.Pl3xMapListeners;
-import com.bekvon.bukkit.residence.pl3xmap.Pl3xMapManager;
 import com.bekvon.bukkit.residence.protection.*;
 import com.bekvon.bukkit.residence.protection.FlagPermissions.FlagCombo;
 import com.bekvon.bukkit.residence.raid.ResidenceRaidListener;
@@ -46,7 +44,6 @@ import net.Zrips.CMILib.Util.CMIVersionChecker;
 import net.Zrips.CMILib.Version.Schedulers.CMIScheduler;
 import net.Zrips.CMILib.Version.Schedulers.CMITask;
 import net.Zrips.CMILib.Version.Version;
-import net.pl3x.map.core.Pl3xMap;
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -116,7 +113,6 @@ public class Residence extends JavaPlugin {
 //    private TownManager townManager;
     protected RandomTp RandomTpManager;
     protected DynMapManager DynManager;
-    protected Pl3xMapManager Pl3xManager;
     protected Sorting SortingManager;
     protected AutoSelection AutoSelectionManager;
     protected WESchematicManager SchematicManager;
@@ -692,18 +688,6 @@ public class Residence extends JavaPlugin {
                 e.printStackTrace();
             }
 
-            try {
-                // Pl3xMap
-                Plugin pl3xmap = Bukkit.getPluginManager().getPlugin("Pl3xMap");
-                if (pl3xmap != null && getConfigManager().Pl3xMapUse) {
-                    Pl3xManager = new Pl3xMapManager(this);
-                    getServer().getPluginManager().registerEvents(new Pl3xMapListeners(this), this);
-                    getPl3xManager().api = Pl3xMap.api();
-                    getPl3xManager().activate();
-                }
-            } catch (Throwable e) {
-                e.printStackTrace();
-            }
 
             int autosaveInt = getConfigManager().getAutoSaveInterval();
             if (autosaveInt < 1) {
@@ -963,9 +947,6 @@ public class Residence extends JavaPlugin {
         return DynManager;
     }
 
-    public Pl3xMapManager getPl3xManager() {
-        return Pl3xManager;
-    }
 
     public WESchematicManager getSchematicManager() {
         return SchematicManager;

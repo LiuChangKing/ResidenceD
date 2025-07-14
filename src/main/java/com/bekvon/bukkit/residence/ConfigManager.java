@@ -277,29 +277,6 @@ public class ConfigManager {
     public List<String> DynMapVisibleRegions;
     public List<String> DynMapHiddenRegions;
     // DynMap
-
-    // Pl3xMap
-    public boolean Pl3xMapHideByDefault;
-    public boolean Pl3xMapUse;
-
-    public boolean Pl3xMapShowFlags;
-    public boolean Pl3xMapExcludeDefaultFlags;
-    public boolean Pl3xMapHideHidden;
-    public int Pl3xMapLayerSubZoneDepth;
-    public int Pl3xBorderColor = 0;
-    public int Pl3xFillColor = 0;
-//    public Color Pl3xMapBorderColor = new Color(125, 125, 125);
-//    public double Pl3xMapBorderOpacity;
-    public int Pl3xMapBorderWeight;
-//    public Color Pl3xMapFillColor = new Color(125, 125, 125);
-//    public double Pl3xMapFillOpacity;
-    public int Pl3xMapFillForRent = 0;
-    public int Pl3xMapFillRented = 0;
-    public int Pl3xMapFillForSale = 0;
-    public List<String> Pl3xMapVisibleRegions;
-    public List<String> Pl3xMapHiddenRegions;
-    // Pl3xMap
-
     // Raid
     public static boolean RaidEnabled = false;
     public static boolean RaidAttackerBlockBreak = false;
@@ -619,32 +596,31 @@ public class ConfigManager {
 
         c.copyDefaults(true);
 
-        c.addComment("Global", "These are Global Settings for Residence.");
+        c.addComment("Global", "Residence 的全局设定");
 
-        c.addComment("Global.UUIDConvertion", "Starts UUID conversion on plugin startup", "DON'T change this if you are not sure what you doing");
+        c.addComment("Global.UUIDConvertion", "插件启动时进行 UUID 转换", "如不确定请勿更改");
         UUIDConvertion = c.get("Global.UUIDConvertion", true);
 
         c.addComment("Global.OfflineMode",
-            "STRONGLY not recomended to be used anymore. Only enable if you are sure you want to use this",
-            "If you running offline server. Suggestion would be to keep this at false and base residence ownership from UUID and not on players name");
+            "极不推荐启用，仅在确实需要时再开启",
+            "若服务器为离线模式，建议保持为 false 并使用 UUID 管理归属");
         OfflineMode = c.get("Global.OfflineMode", false);
 
-        c.addComment("Global.versionCheck", "Players with residence.versioncheck permission node will be noticed about new residence version on login");
+        c.addComment("Global.versionCheck", "拥有 residence.versioncheck 权限的玩家登录时会收到新版本提示");
         versionCheck = c.get("Global.versionCheck", true);
 
-        c.addComment("Global.Language", "This loads the <language>.yml file in the Residence Language folder",
-            "All Residence text comes from this file. (NOT DONE YET)");
+        c.addComment("Global.Language", "从 Language 文件夹加载指定语言文件");
         language = c.get("Global.Language", "English");
 
-        c.addComment("Global.SelectionToolId", "Wooden Hoe is the default selection tool for Residence.");
+        c.addComment("Global.SelectionToolId", "默认的区域选择工具，默认为木锄");
         selectionTool = CMIMaterial.get(c.get("Global.SelectionToolId", CMIMaterial.WOODEN_HOE.name()));
 
-        c.addComment("Global.Selection.IgnoreY", "By setting this to true, all selections will be made from bedrock to sky ignoring Y coordinates");
+        c.addComment("Global.Selection.IgnoreY", "若启用，选择区域时将忽略 Y 坐标，从基岩到天空");
         SelectionIgnoreY = c.get("Global.Selection.IgnoreY", false);
 
         c.addComment("Global.Selection.IgnoreYInSubzone",
-            "When this set to true, selections inside existing residence will be from bottom to top of that residence",
-            "When this set to false, selections inside existing residence will be exactly as they are");
+            "启用后，在已有领地内选择子区块时会自动使用该领地的上下高度",
+            "关闭则按玩家实际选择的高度");
         SelectionIgnoreYInSubzone = c.get("Global.Selection.IgnoreYInSubzone", false);
 
         c.addComment("Global.Selection.netherHeight",
@@ -1470,50 +1446,6 @@ public class ConfigManager {
         DynMapVisibleRegions = c.get("DynMap.VisibleRegions", new ArrayList<String>());
         c.addComment("DynMap.HiddenRegions", "Hides region on map even if its not hidden in game");
         DynMapHiddenRegions = c.get("DynMap.HiddenRegions", new ArrayList<String>());
-
-        c.addComment("Pl3xMap.Use", "Enables or disable Pl3xMap Support");
-        Pl3xMapUse = c.get("Pl3xMap.Use", true);
-        c.addComment("Pl3xMap.HideByDefault", "When set to true we will hide residence areas by default on Pl3xMap window",
-            "Residences can still be enabled throw provided Pl3xMap option on left top side");
-        Pl3xMapHideByDefault = c.get("Pl3xMap.HideByDefault", false);
-        c.addComment("Pl3xMap.ShowFlags", "Shows or hides residence flags");
-        Pl3xMapShowFlags = c.get("Pl3xMap.ShowFlags", true);
-        c.addComment("Pl3xMap.ExcludeDefaultFlags", "When enabled default flags will not be included in residence overview");
-        Pl3xMapExcludeDefaultFlags = c.get("Pl3xMap.ExcludeDefaultFlags", true);
-        c.addComment("Pl3xMap.HideHidden", "If set true, residence with hidden flag set to true will be hidden from Pl3xMap");
-        Pl3xMapHideHidden = c.get("Pl3xMap.HideHidden", true);
-
-//	c.addComment("Pl3xMap.Layer.3dRegions", "Enables 3D zones");
-//	Pl3xMapLayer3dRegions = c.get("Pl3xMap.Layer.3dRegions", true);
-        c.addComment("Pl3xMap.Layer.SubZoneDepth", "How deep to go into subzones to show");
-        Pl3xMapLayerSubZoneDepth = c.get("Pl3xMap.Layer.SubZoneDepth", 2);
-
-        c.addComment("Pl3xMap.Border.Color", "Color of border. Pick color from this page http://www.w3schools.com/colors/colors_picker.asp");
-
-        Color Pl3xFill = processColor(c.get("Pl3xMap.Border.Color", "#FF0000"));
-
-        c.addComment("Pl3xMap.Border.Opacity", "Transparency. 0.3 means that only 30% of color will be visible");
-        Double Pl3xMapBorderOpacity = c.get("Pl3xMap.Border.Opacity", 0.3);
-
-        Pl3xFillColor = argb(CMINumber.clamp((int) (Pl3xMapBorderOpacity * 255), 0, 255), Pl3xFill);
-
-        c.addComment("Pl3xMap.Border.Weight", "Border thickness");
-        Pl3xMapBorderWeight = c.get("Pl3xMap.Border.Weight", 3);
-        Double Pl3xMapFillOpacity = c.get("Pl3xMap.Fill.Opacity", 0.3);
-
-        Color Pl3xMapFillColor = processColor(c.get("Pl3xMap.Fill.Color", "#FF0000"));
-
-        Pl3xBorderColor = argb(CMINumber.clamp((int) (Pl3xMapFillOpacity * 255), 0, 255), Pl3xMapFillColor);
-
-        Pl3xMapFillForRent = argb(CMINumber.clamp((int) (Pl3xMapFillOpacity * 255), 0, 255), processColor(c.get("Pl3xMap.Fill.ForRent", "#33cc33")));
-        Pl3xMapFillRented = argb(CMINumber.clamp((int) (Pl3xMapFillOpacity * 255), 0, 255), processColor(c.get("Pl3xMap.Fill.Rented", "#99ff33")));
-        Pl3xMapFillForSale = argb(CMINumber.clamp((int) (Pl3xMapFillOpacity * 255), 0, 255), processColor(c.get("Pl3xMap.Fill.ForSale", "#0066ff")));
-
-        c.addComment("Pl3xMap.VisibleRegions", "Shows only regions on this list");
-        Pl3xMapVisibleRegions = c.get("Pl3xMap.VisibleRegions", new ArrayList<String>());
-        c.addComment("Pl3xMap.HiddenRegions", "Hides region on map even if its not hidden in game");
-        Pl3xMapHiddenRegions = c.get("Pl3xMap.HiddenRegions", new ArrayList<String>());
-
         c.addComment("Raid", "In development");
 
         c.addComment("Raid.Enabled", "Determines if you want to enable raid feature for your server",
