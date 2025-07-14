@@ -63,10 +63,6 @@ public class remove implements cmd {
             return true;
         }
 
-        if (res.getRaid().isRaidInitialized() && !resadmin) {
-            plugin.msg(sender, lm.Raid_noRemoval);
-            return true;
-        }
 
         plugin.deleteConfirm.remove(senderName);
 

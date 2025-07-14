@@ -1339,10 +1339,6 @@ public class ResidenceManager implements ResidenceInterface {
             return false;
         }
 
-        if (res.getRaid().isRaidInitialized() && !resadmin) {
-            plugin.msg(sender, lm.Raid_cantDo);
-            return false;
-        }
 
         oldName = res.getName();
         if (res.getPermissions().hasResidencePermission(sender, true) || resadmin) {

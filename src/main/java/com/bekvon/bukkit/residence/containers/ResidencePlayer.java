@@ -6,7 +6,6 @@ import com.bekvon.bukkit.residence.listeners.ResidenceEntityListener;
 import com.bekvon.bukkit.residence.permissions.PermissionGroup;
 import com.bekvon.bukkit.residence.permissions.PermissionManager.ResPerm;
 import com.bekvon.bukkit.residence.protection.ClaimedResidence;
-import com.bekvon.bukkit.residence.raid.ResidenceRaid;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -389,37 +388,9 @@ public class ResidencePlayer {
     }
 
     public ClaimedResidence getCurrentlyRaidedResidence() {
-        for (ClaimedResidence one : getResList()) {
-            if (one.getRaid().isUnderRaid() || one.getRaid().isInPreRaid()) {
-                return one;
-            }
-        }
         return null;
     }
 
-    public Long getLastRaidAttackTimer() {
-        return ResidencePlayerRaidData.get(this.getUniqueId()).getLastRaidAttackTimer();
-    }
-
-    public void setLastRaidAttackTimer(@Nonnull Long lastRaidAttackTimer) {
-        ResidencePlayerRaidData.get(this.getUniqueId()).setLastRaidAttackTimer(lastRaidAttackTimer);
-    }
-
-    public Long getLastRaidDefendTimer() {
-        return ResidencePlayerRaidData.get(this.getUniqueId()).getLastRaidDefendTimer();
-    }
-
-    public void setLastRaidDefendTimer(@Nonnull Long lastRaidDefendTimer) {
-        ResidencePlayerRaidData.get(this.getUniqueId()).setLastRaidDefendTimer(lastRaidDefendTimer);
-    }
-
-    public ResidenceRaid getJoinedRaid() {
-        return ResidencePlayerRaidData.get(this.getUniqueId()).getJoinedRaid();
-    }
-
-    public void setJoinedRaid(ResidenceRaid raid) {
-        ResidencePlayerRaidData.get(this.getUniqueId()).setJoinedRaid(raid);
-    }
 
     public PlayerGroup getGroups() {
         return groups;
