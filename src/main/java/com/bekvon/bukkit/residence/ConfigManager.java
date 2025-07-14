@@ -462,41 +462,41 @@ public class ConfigManager {
         if (cfg == null)
             return;
         cfg.load();
-        cfg.addComment("Global", "These are Global Settings for Residence.");
-        cfg.addComment("Global.Flags", "These are world flags that are applied when the player is NOT within a residence.");
-        cfg.addComment("Global.Flags.Global", "these are default for all worlds unless specified below, they can be overridden per group",
-            "Using command: false flag will allow you to disable and allow predefined commands. Command list can be difined under CommandLimits section");
+        cfg.addComment("Global", "这是 Residence 插件的全局设置。");
+        cfg.addComment("Global.Flags", "当玩家不在领地内时生效的世界旗帜设置。");
+        cfg.addComment("Global.Flags.Global", "所有世界通用的默认值，可在下方按组覆盖",
+            "使用 command: false 旗帜可禁用或允许预设指令，具体列表在 CommandLimits 部分设置");
 
-        cfg.addComment("Global.CommandLimits", "Provide list of commands you want to allow or block", "This is when using 'command: false' flag for global/world flags",
-            "For example 'res create' under allow section and '*' would block everything except 'res create' command", "Can be defined per world just like world flags can be",
-            "This will NOT apply inside residences. Inside residence command limits are based on residence command flag and its set commands limits",
-            "Residence itself will need to have 'command: false' to override global command limits with specific to that residence ones");
+        cfg.addComment("Global.CommandLimits", "在此列出要允许或阻止的指令", "在全局或世界旗帜中使用 'command: false' 时生效",
+            "例如在允许列表写入 'res create'，而在禁止列表使用 '*'，则除了 'res create' 外其余指令均被禁止", "可像世界旗帜一样按世界分别设定",
+            "此设定不影响领地内部，领地内的指令限制取决于其 command 旗帜及相应列表",
+            "若希望某个领地拥有独立指令限制，需要为其设置 'command: false' 以覆盖全局限制");
 
-        cfg.addComment("Global.CommandLimits.Global.Inherit", "When enabled allowed and blocked commands inside residence will be inherited from global list and combined with residence command limits");
+        cfg.addComment("Global.CommandLimits.Global.Inherit", "启用后，领地内允许或禁止的指令将继承全局列表，并与领地自身的指令限制合并");
 
-        cfg.addComment("Global.FlagPermission", "This gives permission to change certain flags to all groups, unless specifically denied to the group.");
-        cfg.addComment("Global.FlagGui", "This sets GUI items to represent each flag, if not given, then gray wool will be used");
-        cfg.addComment("Global.ResidenceDefault", "These are default flags applied to all residences from any user group.");
-        cfg.addComment("Global.CreatorDefault", "These are default flags applied to the residence creator of any group.");
-        cfg.addComment("Global.RentedDefault", "These are default flags applied to the residence renter of any group.");
-        cfg.addComment("Global.GroupedFlags", "These are grouped flags, so when using /res pset nickname redstone true, player will get all flags in list, same when setting to false or removing them.");
-        cfg.addComment("Global.GroupedFlags.trusted", "This group of flags will be used for padd sub command");
-        cfg.addComment("Global.TotalFlagDisabling", "Completely disables defined flag which will no longer be accesable even with resadmin command",
-            "Can save some of the server processing resources if you don't want to utilize specific checks for specific flags");
-        cfg.addComment("Global.GroupDefault", "These are default group flags applied to a residence made by a user of any group.");
-        cfg.addComment("ItemList", "this is where you can create blacklists / whitelists");
-        cfg.addComment("ItemList.DefaultList", "list name is not important, as long as it is unique. Its good to use a descripive name.");
-        cfg.addComment("ItemList.DefaultList.Type", "type of the list, can be blacklist, whitelist, or ignorelist");
-        cfg.addComment("ItemList.DefaultList.Items", "If you want, you can have this list only apply to one world, otherwise it applies to all worlds",
+        cfg.addComment("Global.FlagPermission", "除非某权限组被明确禁止，否则所有组都可修改这些旗帜");
+        cfg.addComment("Global.FlagGui", "为每个旗帜在 GUI 中设置展示物品，未设置时默认使用灰色羊毛");
+        cfg.addComment("Global.ResidenceDefault", "所有用户组创建的领地默认启用的旗帜");
+        cfg.addComment("Global.CreatorDefault", "所有用户组的领地创建者默认拥有的旗帜");
+        cfg.addComment("Global.RentedDefault", "所有用户组的领地租户默认拥有的旗帜");
+        cfg.addComment("Global.GroupedFlags", "组合旗帜设置，执行 /res pset 玩家 redstone true 时会同时赋予列表中所有旗帜，设为 false 或移除时亦如此");
+        cfg.addComment("Global.GroupedFlags.trusted", "此组旗帜用于 padd 子指令");
+        cfg.addComment("Global.TotalFlagDisabling", "完全禁用指定旗帜，即便 resadmin 命令也无法使用",
+            "若不需要某些检测，可通过此项减少服务器开销");
+        cfg.addComment("Global.GroupDefault", "任何用户组创建的领地都将默认应用的组旗帜");
+        cfg.addComment("ItemList", "在此可以创建物品黑/白名单");
+        cfg.addComment("ItemList.DefaultList", "列表名称并不重要，只需保证唯一，最好取个有意义的名称");
+        cfg.addComment("ItemList.DefaultList.Type", "列表的类型，可选择 blacklist、whitelist 或 ignorelist");
+        cfg.addComment("ItemList.DefaultList.Items", "若需要，可让此列表仅在指定世界生效，否则适用于所有世界",
             "World: world",
-            "You can also have the list apply only to one group, otherwise it applies for all groups",
+            "也可让此列表仅作用于某个权限组，否则对所有组有效",
             "Group: default",
-            "this is the actual list of material names that this list allows or disallows",
-            "You can look up the material name by item ID in game by typing /res material <id>",
-            "Alternativly, you can simply use the item ID in the list, but its less descriptive and harder to see what the list allows or dissallows at a glance");
+            "以下为此列表允许或禁止的物品名称",
+            "可在游戏内使用 /res material <id> 查询物品名称",
+            "当然也可以直接填入物品 ID，但这样不够直观，难以快速判断列表内容");
 
         for (Flags fl : Flags.values()) {
-            cfg.addComment("Global.FlagPermission." + fl, "Applies to: " + fl.getFlagMode());
+            cfg.addComment("Global.FlagPermission." + fl, "适用于： " + fl.getFlagMode());
         }
 
         cfg.save();
@@ -602,138 +602,138 @@ public class ConfigManager {
         SelectionIgnoreYInSubzone = c.get("Global.Selection.IgnoreYInSubzone", false);
 
         c.addComment("Global.Selection.netherHeight",
-            "Defines height of nether when creating residences. This mostly applies when performing commands like /res select vert or /res auto which will expand residence to defined height",
-            "This cant be higher than 319 or lower than 1");
+            "在创建住宅时定义了裸体的高度。当执行 /res选择Vert或 /Res Auto之类的命令时，这主要适用，该命令将扩展到定义的高度",
+            "这不能高于319或低于1");
         SelectionNetherHeight = c.get("Global.Selection.netherHeight", 128);
         SelectionNetherHeight = SelectionNetherHeight > 319 ? 319 : SelectionNetherHeight < 1 ? 1 : SelectionNetherHeight;
 
-        c.addComment("Global.Selection.NoCostForYBlocks", "By setting this to true, player will only pay for x*z blocks ignoring height",
-            "This will lower residence price by up to 319 times, so adjust block price BEFORE enabling this");
+        c.addComment("Global.Selection.NoCostForYBlocks", "通过将其设置为True，玩家只会为X*Z块支付忽略高度",
+            "这将降低居住价格高达319次，因此在启用此事之前调整块价格");
         NoCostForYBlocks = c.get("Global.Selection.NoCostForYBlocks", false);
 
 
-        c.addComment("Global.InfoToolId", "This determins which tool you can use to see info on residences, default is String.",
-            "Simply equip this tool and hit a location inside the residence and it will display the info for it.");
+        c.addComment("Global.InfoToolId", "该确定您可以使用哪种工具来查看有关住宅的信息，默认为字符串。",
+            "只需装备此工具并击中住宅内部的位置，它将显示其信息。");
         infoTool = CMIMaterial.get(c.get("Global.InfoToolId", Material.STRING.toString()));
 
-        c.addComment("Global.Optimizations.LoadEveryWorld", "When enabled we will load data from every single world file even if world doesn't exist but might be loaded later on",
-            "Usually only useful when you have multiverse plugin which loads worlds durring server work time");
+        c.addComment("Global.Optimizations.LoadEveryWorld", "启用后，即使世界不存在，我们也会从每个世界文件中加载数据，但以后可能会加载",
+            "通常只有在您有多元插件的多元插件时才有用");
         LoadEveryWorld = c.get("Global.Optimizations.LoadEveryWorld", true);
 
-        c.addComment("Global.Optimizations.CleanerStartupLog", "While enabled we will avoid showing extra feedback lines on startup");
+        c.addComment("Global.Optimizations.CleanerStartupLog", "启用后减少插件启动时的额外日志输出");
         CleanerStartupLog = c.get("Global.Optimizations.CleanerStartupLog", true);
 
-        c.addComment("Global.Optimizations.CanTeleportIncludeOwner", "This will slightly change behavior of groups file CanTeleport section which will include server owner into check",
-            "When this is set to false and CanTeleport set to false, players will not have option to teleport to other player residences, only to their own",
-            "When this is set to true and CanTeleport set to false, players will not have option to teleport to residences in general",
-            "Keep in mind that this only applies for commands like /res tp");
+        c.addComment("Global.Optimizations.CanTeleportIncludeOwner", "这将稍微更改组的行为文件canteleport部分，其中包括服务器所有者",
+            "当将其设置为false和Canteleport设置为False时，玩家将无法选择传送到其他玩家住所，仅为自己",
+            "当将其设置为True且Canteleport设置为False时，玩家将无法选择传送到住所",
+            "请记住，这仅适用于 /res tp之类的命令");
         CanTeleportIncludeOwner = c.get("Global.Optimizations.CanTeleportIncludeOwner", false);
 
-        c.addComment("Global.Optimizations.DefaultWorld", "Name of your main residence world. Usually normal starting world 'World'. Capitalization essential");
+        c.addComment("Global.Optimizations.DefaultWorld", "主世界名称，通常为默认的 'world'，请务必注意大小写");
         DefaultWorld = c.get("Global.Optimizations.DefaultWorld", defaultWorldName);
 
-        c.addComment("Global.Optimizations.DisabledWorlds.BlackList", "List Of Worlds where this plugin is disabled", "Make sure that world names capitalization is correct",
-            "In case WhiteList contains any entries then this section is ignored entirely");
+        c.addComment("Global.Optimizations.DisabledWorlds.BlackList", "该插件被禁用的世界列表", "请确保世界名称大小写正确",
+            "如果白名单包含任何条目，则完全忽略了本节");
         DisabledWorldsList = c.get("Global.Optimizations.DisabledWorlds.BlackList", (List<String>) c.getC().getList("Global.Optimizations.DisabledWorlds.List", new ArrayList<String>()));
 
-        c.addComment("Global.Optimizations.DisabledWorlds.WhiteList", "List Of Worlds where this plugin is enabled", "Make sure that world names capitalization is correct",
-            "In case WhiteList contains any entries then BlackList section is ignored entirely");
+        c.addComment("Global.Optimizations.DisabledWorlds.WhiteList", "启用此插件的世界列表", "请确保世界名称大小写正确",
+            "如果白名单包含任何条目，则完全忽略了黑名单部分");
         EnabledWorldsList = c.get("Global.Optimizations.DisabledWorlds.WhiteList", new ArrayList<String>());
 
-        c.addComment("Global.Optimizations.DisabledWorlds.DisableListeners", "Disables all listeners in included worlds");
+        c.addComment("Global.Optimizations.DisabledWorlds.DisableListeners", "禁用包含世界的所有听众");
         DisableListeners = c.get("Global.Optimizations.DisabledWorlds.DisableListeners", true);
-        c.addComment("Global.Optimizations.DisabledWorlds.DisableCommands", "Disables any command usage in included worlds");
+        c.addComment("Global.Optimizations.DisabledWorlds.DisableCommands", "禁用包含世界中的任何命令用法");
         DisableCommands = c.get("Global.Optimizations.DisabledWorlds.DisableCommands", true);
-        c.addComment("Global.Optimizations.DisabledWorlds.DisableResidenceCreation", "Disables residence creation in included worlds");
+        c.addComment("Global.Optimizations.DisabledWorlds.DisableResidenceCreation", "禁用包含世界的居住地创建");
         DisableResidenceCreation = c.get("Global.Optimizations.DisabledWorlds.DisableResidenceCreation", true);
 
-        c.addComment("Global.Optimizations.ItemPickUpDelay", "Delay in seconds between item pickups after residence flag prevents it", "Keep it at arround 10 sec to lower unesecery checks");
+        c.addComment("Global.Optimizations.ItemPickUpDelay", "在居住标志之后，延迟在项目拾取之间的几秒钟阻止它", "将其保持在10秒钟以降低不确定性检查");
         ItemPickUpDelay = c.get("Global.Optimizations.ItemPickUpDelay", 10);
 
         c.addComment("Global.Optimizations.AutomaticResidenceCreation.CheckCollision",
-            "When set to true /res auto command will check for new area collision with other residences to avoid overlapping.",
-            "Set it to false to gain some performace but new residence can often overlap with old ones");
+            "设置为true /res auto命令时，将检查与其他住宅的新区域碰撞，以避免重叠。",
+            "将其设置为假以获得一些表演，但是新的住所通常可以与旧住所重叠");
         ARCCheckCollision = c.get("Global.Optimizations.AutomaticResidenceCreation.CheckCollision", true);
 
         c.addComment("Global.Optimizations.AutomaticResidenceCreation.Ratio",
-            "Weird shaped residence detection when using automatic residence creation",
-            "This will inform player about residence shape being iregular cuboid before creation of it");
+            "自动创建领地时检测形状是否过于奇怪",
+            "在创建前会提醒玩家该领地并非标准长方体");
         ARCRatioInform = c.get("Global.Optimizations.AutomaticResidenceCreation.Ratio.Inform", true);
 
         c.addComment("Global.Optimizations.AutomaticResidenceCreation.Confirmation",
-            "While enabled player will be required to click on chat message or perform /res create [resName] to finalize creation of residence when its in a weird shape");
+            "虽然启用播放器将被要求单击聊天消息或执行 /res create [resname]以最终确定居住的创建");
         ARCRatioConfirmation = c.get("Global.Optimizations.AutomaticResidenceCreation.Ratio.Confirmation", true);
 
         c.addComment("Global.Optimizations.AutomaticResidenceCreation.Ratio.Value",
-            "Defines value of ration when residence will be counted as weird shaped ones",
-            "Value of 3 will mean that one of the sides of cuboid is atleast 3 times bigger than one of the remaining ones");
+            "定义定量价值时，当居住时间算作怪异形状时",
+            "值为3将意味着Cuboid的一侧之一至少比其余的侧面大3倍");
         ARCRatioValue = c.get("Global.Optimizations.AutomaticResidenceCreation.Ratio.Value", 3);
 
         c.addComment("Global.Optimizations.AutomaticResidenceCreation.OldMethod",
-            "Enabled this will switch to old method for calculating new residence area", "Old method is allot less efficient, so its not recomended to be used when you have residence areas over 100");
+            "启用了这将切换到用于计算新居住区域的旧方法", "旧方法的分配效率较低，因此当您拥有100多个居住区时，它不会推荐使用");
         ARCOldMethod = c.get("Global.Optimizations.AutomaticResidenceCreation.OldMethod", false);
 
         c.addComment("Global.Optimizations.AutomaticResidenceCreation.IncrementFormat",
-            "Defines new residence name increment when using automatic residence creation command if residence with that name already exist");
+            "使用自动住宅创建命令时定义新的住宅名称增量如果已经存在该名称的住宅");
         ARCIncrementFormat = c.get("Global.Optimizations.AutomaticResidenceCreation.IncrementFormat", "_[number]");
 
         c.addComment("Global.Optimizations.AutomaticResidenceCreation.Size.Enabled",
-            "When enabled we will try to create region by defined bounds");
+            "启用时，我们将尝试通过定义的界限创建区域");
         ARCSizeEnabled = c.get("Global.Optimizations.AutomaticResidenceCreation.Size.Enabled", false);
 
         c.addComment("Global.Optimizations.AutomaticResidenceCreation.Size.Percentage",
-            "Value between 1 and 100 which will define size of residence we will create in percentage depending on players permission group");
+            "价值在1到100之间，这将定义我们将根据玩家许可组创建的居住尺寸");
         ARCSizePercentage = c.get("Global.Optimizations.AutomaticResidenceCreation.Size.Percentage", 50);
         ARCSizePercentage = CMINumber.clamp(ARCSizePercentage, 1, 100);
 
         c.addComment("Global.Optimizations.AutomaticResidenceCreation.Size.Min",
-            "Value in blocks. While previous percentage will determine general size, this can be used to avoid having tiny residences",
-            "For example if player has access to 30x30 residence and Percentage is set to 50% then instead of using 15 block size we will use 20 (default)",
-            "Keep in mind that this will not override actual max/min residence sizes player can have");
+            "块中的值。虽然以前的百分比将决定一般规模，但可以用来避免拥有较小的住宅",
+            "例如，如果玩家可以访问30x30居住地，并且百分比设置为50％，那么而不是使用15个块大小，我们将使用20（默认值）",
+            "请记住，这不会覆盖实际的最大/分钟居住地大小的玩家可以拥有");
         ARCSizeMin = c.get("Global.Optimizations.AutomaticResidenceCreation.Size.Min", 5);
         ARCSizeMin = ARCSizeMin < 1 ? 1 : ARCSizeMin;
 
         c.addComment("Global.Optimizations.AutomaticResidenceCreation.Size.Max",
-            "Value in blocks. While previous percentage will determine general size, this can be used to avoid having huge residences",
-            "For example if player has access to 500x500 residence and Percentage is set to 50% then instead of using 250 block size we will use 100 (default)",
-            "Keep in mind that this will not override actual max/min residence sizes player can have");
+            "块中的值。虽然以前的百分比将决定一般规模，但可以用来避免拥有庞大的住宅",
+            "例如，如果玩家可以访问500x500居住地，并且百分比设置为50％，那么而不是使用250个块大小，我们将使用100（默认）",
+            "请记住，这不会覆盖实际的最大/分钟居住地大小的玩家可以拥有");
         ARCSizeMax = c.get("Global.Optimizations.AutomaticResidenceCreation.Size.Max", 100);
         ARCSizeMax = ARCSizeMax < ARCSizeMin ? ARCSizeMin : ARCSizeMax;
 
-//	c.addComment("Global.Optimizations.DisabledNoFlagMessage.Use", "Enable if you want to hide no flag error messages in particular worlds",
-//	    "You can bypass this with residence.checkbadflags permission node");
+//	c.addComment("Global.Optimizations.DisabledNoFlagMessage.Use", "启用如果您想在特定世界中隐藏不隐藏标志错误消息",
+//	    "您可以使用Residence绕过它。CHECKBADFLAGS权限节点");
 //	DisableNoFlagMessageUse = c.get("Global.Optimizations.DisabledNoFlagMessage.Use", false);
-//	c.addComment("Global.Optimizations.DisabledNoFlagMessage.Worlds", "List Of Worlds where player wont get error messages");
+//	c.addComment("Global.Optimizations.DisabledNoFlagMessage.Worlds", "玩家无法获得错误消息的世界列表");
 //	DisableNoFlagMessageWorlds = c.get("Global.Optimizations.DisabledNoFlagMessage.Worlds", Arrays.asList(Bukkit.getWorlds().get(0).getName()));
 
         c.addComment("Global.Optimizations.GlobalChat.Enabled",
-            "Enables or disables chat modification by including players main residence name");
+            "启用或禁用聊天修改，包括播放器主要居住名称");
         GlobalChatEnabled = c.get("Global.Optimizations.GlobalChat.Enabled", false);
         c.addComment("Global.Optimizations.GlobalChat.SelfModify",
-            "Modifys chat to add chat titles.  If you're using a chat manager, you may add the tag {residence} to your chat format and disable this.");
+            "修改聊天内容以加入聊天前缀；若使用其他聊天管理插件，可在格式中加入 {residence} 标签并关闭此项");
         GlobalChatSelfModify = c.get("Global.Optimizations.GlobalChat.SelfModify", true);
         GlobalChatFormat = c.get("Global.Optimizations.GlobalChat.Format", "&c[&e%1&c]");
 
         c.addComment("Global.Optimizations.BlockAnyTeleportation",
-            "When this set to true, any teleportation to residence where player don't have tp flag, action will be denyied",
-            "This can prevent from teleporting players to residence with 3rd party plugins like esentials /tpa");
+            "当此项为 true 时，若玩家没有 tp 旗帜，任何传送到该领地的行为都会被拒绝",
+            "可避免他人通过第三方插件（如 Essentials 的 /tpa）传送进来");
         BlockAnyTeleportation = c.get("Global.Optimizations.BlockAnyTeleportation", true);
 
-        c.addComment("Global.Optimizations.OverridePvp", "By setting this to true, regular pvp flag will be acting as overridepvp flag",
-            "Overridepvp flag tries to ignore any pvp protection in that residence by any other plugin");
+        c.addComment("Global.Optimizations.OverridePvp", "通过将其设置为True，常规PVP标志将充当OverridePVP标志",
+            "OverridePVP标志试图忽略任何其他插件在该住宅中的任何PVP保护");
         OverridePvp = c.get("Global.Optimizations.OverridePvp", false);
 
         // residence kick location
         c.addComment("Global.Optimizations.KickLocation.Use",
-            "By setting this to true, when player kicks another player from residence, he will be teleported to this location instead of getting outside residence");
+            "通过将其设置为True，当玩家从Residence踢另一个玩家时，他将被传送到这个位置，而不是到户外居住");
         Boolean UseKick = c.get("Global.Optimizations.KickLocation.Use", false);
         String KickLocationWorld = c.get("Global.Optimizations.KickLocation.World", defaultWorldName);
         Double KickLocationX = c.get("Global.Optimizations.KickLocation.X", 0.5);
         Double KickLocationY = c.get("Global.Optimizations.KickLocation.Y", 63.0);
         Double KickLocationZ = c.get("Global.Optimizations.KickLocation.Z", 0.5);
-        c.addComment("Global.Optimizations.KickLocation.Pitch", "Less than 0 - head up, more than 0 - head down. Range from -90 to 90");
+        c.addComment("Global.Optimizations.KickLocation.Pitch", "小于0-向上，超过0-朝下。从-90到90不等");
         Double KickPitch = c.get("Global.Optimizations.KickLocation.Pitch", 0.0);
-        c.addComment("Global.Optimizations.KickLocation.Yaw", "Head position to left and right. Range from -180 to 180");
+        c.addComment("Global.Optimizations.KickLocation.Yaw", "头部位于左右。从-180到180不等");
         Double KickYaw = c.get("Global.Optimizations.KickLocation.Yaw", 0.0);
         if (UseKick) {
             World world = Bukkit.getWorld(KickLocationWorld);
@@ -746,14 +746,14 @@ public class ConfigManager {
             KickLocation = null;
         }
 
-        c.addComment("Global.Optimizations.FlyLandLocation.World", "Used when players fly state is being turned to false because of fly flag and there is no solid land where to land for player");
+        c.addComment("Global.Optimizations.FlyLandLocation.World", "当玩家飞行状态时使用时使用，因为飞旗，没有稳固的土地来供球员降落");
         String FlyLocationWorld = c.get("Global.Optimizations.FlyLandLocation.World", defaultWorldName);
         Double FlyLocationX = c.get("Global.Optimizations.FlyLandLocation.X", 0.5);
         Double FlyLocationY = c.get("Global.Optimizations.FlyLandLocation.Y", 63.0);
         Double FlyLocationZ = c.get("Global.Optimizations.FlyLandLocation.Z", 0.5);
-        c.addComment("Global.Optimizations.FlyLandLocation.Pitch", "Less than 0 - head up, more than 0 - head down. Range from -90 to 90");
+        c.addComment("Global.Optimizations.FlyLandLocation.Pitch", "小于0-向上，超过0-朝下。从-90到90不等");
         Double FlyPitch = c.get("Global.Optimizations.FlyLandLocation.Pitch", 0.0);
-        c.addComment("Global.Optimizations.FlyLandLocation.Yaw", "Head position to left and right. Range from -180 to 180");
+        c.addComment("Global.Optimizations.FlyLandLocation.Yaw", "头部位于左右。从-180到180不等");
         Double FlyYaw = c.get("Global.Optimizations.FlyLandLocation.Yaw", 0.0);
         World world = Bukkit.getWorld(FlyLocationWorld);
         if (world != null) {
@@ -763,34 +763,34 @@ public class ConfigManager {
         }
 
         c.addComment("Global.Optimizations.InfoCommand.ShortInformation",
-            "By setting this to true, when checking residence info with /res info, you will get only names in list, by hovering on them, you will get flag list");
+            "通过将其设置为true，在使用 /res信息检查居住信息时，您将仅在列表中获得名称，通过徘徊在它们上，您将获得标志列表");
         ShortInfoUse = c.get("Global.Optimizations.InfoCommand.ShortInformation", c.getC().getBoolean("Global.Optimizations.ShortInfo.Use", true));
 
         c.addComment("Global.Optimizations.InfoCommand.ExcludeDefaultFlags",
-            "When set to true default residence flags set in flags.yml file will get excluded from info command output and will not be shown", "If flag gets different state then it will be shown");
+            "将设置为flags.yl文件中设置的true默认居住标志时，将从info命令输出中排除，不会显示", "如果标志获得不同的状态，则将显示");
         InfoExcludeDFlags = c.get("Global.Optimizations.InfoCommand.ExcludeDefaultFlags", false);
 
         // Vote range
-        c.addComment("Global.Optimizations.Vote.RangeFrom", "Range players can vote to, by default its from 0 to 10 points");
+        c.addComment("Global.Optimizations.Vote.RangeFrom", "范围玩家可以投票给，默认情况下为0到10分");
         VoteRangeFrom = c.get("Global.Optimizations.Vote.RangeFrom", 0);
         VoteRangeTo = c.get("Global.Optimizations.Vote.RangeTo", 10);
 
-        c.addComment("Global.Optimizations.Vote.OnlyLike", "If this true, players can only give like for shop instead of point voting");
+        c.addComment("Global.Optimizations.Vote.OnlyLike", "如果这是真的，玩家只能为商店而不是投票而付出");
         OnlyLike = c.get("Global.Optimizations.Vote.OnlyLike", false);
 
-        c.addComment("Global.Optimizations.ConsoleLogs.ShowFlagChanges", "If this true, flag changes throw GUI will be recorded in console");
+        c.addComment("Global.Optimizations.ConsoleLogs.ShowFlagChanges", "如果此真实，将在控制台中记录Flag更改GUI的GUI");
         ConsoleLogsShowFlagChanges = c.get("Global.Optimizations.ConsoleLogs.ShowFlagChanges", true);
 
         // Healing/Feed interval
-        c.addComment("Global.Optimizations.Intervals.Heal", "How often in seconds to heal/feed players in residence with appropriate flag",
-            "Bigger numbers can save some server resources", "Set to 0 if you want to disable specific checks entirely. Recommended in case you are not using specific flags");
+        c.addComment("Global.Optimizations.Intervals.Heal", "用适当的标志在几秒钟内治愈/喂养参与者的频率",
+            "更大的数字可以节省一些服务器资源", "如果要完全禁用特定的检查，请设置为0。建议如果您不使用特定标志");
         HealInterval = c.get("Global.Optimizations.Intervals.Heal", 1);
         FeedInterval = c.get("Global.Optimizations.Intervals.Feed", 5);
         SafeZoneInterval = c.get("Global.Optimizations.Intervals.SafeZone", 3);
 
         // negative potion effect list
         c.addComment("Global.Optimizations.NegativePotionEffects",
-            "Potions containing one of thos effects will be ignored if residence don't have pvp true flag set");
+            "如果居住没有PvP True Flag集，则包含一种含义的药水将被忽略");
         NegativePotionEffects = c.get("Global.Optimizations.NegativePotionEffects", Arrays.asList("blindness", "confusion", "harm", "hunger", "poison", "slow",
             "slow_digging", "weakness", "wither"));
 
@@ -798,7 +798,7 @@ public class ConfigManager {
             "slowness"));
 
         c.addComment("Global.Optimizations.WalkSpeed",
-            "Defines speed for particular wspeed1 and wspeed2 flags. It can be from 0 up to 5");
+            "定义特定WSPEED1和WSPEED2标志的速度。可以从0到5");
         WalkSpeed1 = c.get("Global.Optimizations.WalkSpeed.1", 0.5D);
         WalkSpeed1 = WalkSpeed1 < 0 ? 0 : WalkSpeed1;
         WalkSpeed1 = WalkSpeed1 > 5 ? 5 : WalkSpeed1;
@@ -811,16 +811,16 @@ public class ConfigManager {
         SignsMaxPerResidence = c.get("Global.Signs.MaxPerResidence", 5);
         SignsMaxPerResidence = SignsMaxPerResidence < 0 ? 0 : SignsMaxPerResidence;
 
-        c.addComment("Global.MoveCheckInterval", "The interval, in milliseconds, between movement checks.", "Reducing this will increase the load on the server.",
-            "Increasing this will allow players to move further in movement restricted zones before they are teleported out.");
+        c.addComment("Global.MoveCheckInterval", "运动检查之间的间隔为毫秒。", "减少这将增加服务器上的负载。",
+            "增加这将使玩家在被限制的运动区域被传送出去之前进一步移动。");
         minMoveUpdate = c.get("Global.MoveCheckInterval", 500);
 
-        c.addComment("Global.Tp.TeleportDelay", "The interval, in seconds, for teleportation.", "Use 0 to disable");
+        c.addComment("Global.Tp.TeleportDelay", "该间隔在几秒钟内用于传送。", "使用0禁用");
         TeleportDelay = c.get("Global.Tp.TeleportDelay", 3);
-        c.addComment("Global.Tp.TeleportTitleMessage", "Show aditional message in title message area when player is teleporting to residence");
+        c.addComment("Global.Tp.TeleportTitleMessage", "玩家传送到领地时在标题栏额外显示提示信息");
         TeleportTitleMessage = c.get("Global.Tp.TeleportTitleMessage", true);
 
-        c.addComment("Global.Tp.BlockedWorlds", "List of worlds where teleportation using /res tp is not allowed", "This only blocks teleportation to those worlds, not from them");
+        c.addComment("Global.Tp.BlockedWorlds", "不允许使用 /res tp传送的世界列表", "这只会阻止对这些世界的传送，而不是从中阻止");
         TeleportBlockedWorlds = c.get("Global.Tp.BlockedWorlds", Arrays.asList("SomeWorldNames"));
         CMIList.toLowerCase(TeleportBlockedWorlds);
 
@@ -844,15 +844,15 @@ public class ConfigManager {
 
                     if (!commented)
                         c.addComment("Global.RandomTeleportation.Worlds." + one,
-                            "World name to use this feature. Add annother one with appropriate name to enable random teleportation");
+                            "使用此功能的世界名称。添加带有适当名称的Anthere以启用随机传送");
 
                     if (!commented)
-                        c.addComment(path + "MaxCoord", "Max coordinate to teleport, setting to 1000, player can be teleported between -1000 and 1000 coordinates");
+                        c.addComment(path + "MaxCoord", "最大坐标到传送，设置为1000，可以在-1000和1000坐标之间传送播放器");
                     int MaxCoord = c.get(path + "MaxCoord", 1000);
 
                     if (!commented)
                         c.addComment(path + "MinCoord",
-                            "If maxcoord set to 1000 and mincoord to 500, then player can be teleported between -1000 to -500 and 500 to 1000 coordinates");
+                            "如果MaxCoord设置为1000，Mincoord设置为500，则可以将播放器传送到-1000至-500至500至1000坐标之间");
                     int MinCoord = c.get(path + "MinCoord", c.getC().getInt(path + "MinCord", 500));
                     int CenterX = c.get(path + "CenterX", 0);
                     int CenterZ = c.get(path + "CenterZ", 0);
@@ -889,25 +889,25 @@ public class ConfigManager {
             RTeleport.add(new RandomTeleport(one, MaxCoord, MinCoord, CenterX, CenterZ));
         }
 
-        c.addComment("Global.RandomTeleportation.Cooldown", "How long force player to wait before using command again.");
+        c.addComment("Global.RandomTeleportation.Cooldown", "在再次使用命令之前，要等待多长时间的播放器。");
         rtCooldown = c.get("Global.RandomTeleportation.Cooldown", 5);
 
-        c.addComment("Global.RandomTeleportation.MaxTries", "How many times to try find correct location for teleportation.",
-            "Keep it at low number, as player always can try again after delay");
+        c.addComment("Global.RandomTeleportation.MaxTries", "尝试找到正确的远程位置的次数。",
+            "保持较低的数字，因为玩家总是可以在延迟后重试");
         rtMaxTries = c.get("Global.RandomTeleportation.MaxTries", 20);
 
-        c.addComment("Global.SaveInterval", "The interval, in minutes, between residence saves.");
+        c.addComment("Global.SaveInterval", "在居住区之间的间隔（几分钟）节省。");
         autoSaveInt = c.get("Global.SaveInterval", 10);
-        c.addComment("Global.NewSaveMechanic", "New save mechanic can minimize save file couple times and speedup save/load time in general", "Bigger files have bigger impact");
+        c.addComment("Global.NewSaveMechanic", "新的保存机械师可以最大程度地减少保存文件几次，然后加速保存/加载时间一般", "更大的文件具有更大的影响");
         NewSaveMechanic = c.get("Global.NewSaveMechanic", true);
 
         c.addComment("Global.Backup.AutoCleanUp.Use",
-            "Do you want to automatically remove backup files from main backup folder if they are older than defined day amount");
+            "您是否要自动从主备份文件夹中自动删除备份文件，如果它们比定义的一天数量大");
         BackupAutoCleanUpUse = c.get("Global.Backup.AutoCleanUp.Use", false);
         BackupAutoCleanUpDays = c.get("Global.Backup.AutoCleanUp.Days", 30);
 
-        c.addComment("Global.Backup.UseZip", "Do you want to backup files by creating zip files in main residence folder in backup folder",
-            "This wont have effect on regular backuped files made in save folder");
+        c.addComment("Global.Backup.UseZip", "您想通过在备份文件夹中的主要居住文件夹中创建zip文件来备份文件",
+            "这个不会对保存文件夹中制作的常规备份文件有影响");
         UseZipBackup = c.get("Global.Backup.UseZip", true);
 
         BackupWorldFiles = c.get("Global.Backup.IncludeFiles.Worlds", true);
@@ -920,39 +920,39 @@ public class ConfigManager {
         BackupconfigFile = c.get("Global.Backup.IncludeFiles.config", true);
 
         // Auto remove old residences
-        c.addComment("Global.AutoCleanUp.Use", "HIGHLY EXPERIMENTAL residence cleaning on server startup if player is offline for x days.",
-            "Players can bypass this with residence.cleanbypass permission node");
+        c.addComment("Global.AutoCleanUp.Use", "如果播放器离线X天，则在服务器启动上进行了高度实验性的住宅清洁。",
+            "玩家可以使用Residence绕过这一点。CleanBypass权限节点");
         AutoCleanUp = c.get("Global.AutoCleanUp.Use", false);
-        c.addComment("Global.AutoCleanUp.Days", "For how long player should be offline to delete hes residence");
+        c.addComment("Global.AutoCleanUp.Days", "玩家离线多久后删除其领地");
         AutoCleanUpDays = c.get("Global.AutoCleanUp.Days", 60);
-        c.addComment("Global.AutoCleanUp.DetailsOnUnknown", "When enabled in case residence owner can't be determined we will print out some basic information about it into console");
+        c.addComment("Global.AutoCleanUp.DetailsOnUnknown", "如果无法确定居住所有者，则启用时，我们会将有关它的一些基本信息打印到控制台中");
         AutoCleanDetailsOnUnknown = c.get("Global.AutoCleanUp.DetailsOnUnknown", false);
-        c.addComment("Global.AutoCleanUp.Regenerate", "Extra heavy on server and will lag it out while regeneration is ongoing",
-            "Do you want to regenerate old residence area",
-            "This requires world edit to be present");
+        c.addComment("Global.AutoCleanUp.Regenerate", "该操作对服务器负担较重，重建过程中可能造成卡顿",
+            "是否在清理时还原旧领地区域",
+            "此功能需要安装 WorldEdit");
         AutoCleanUpRegenerate = c.get("Global.AutoCleanUp.Regenerate", false);
-        c.addComment("Global.AutoCleanUp.Worlds", "Worlds to be included in check list");
+        c.addComment("Global.AutoCleanUp.Worlds", "将包含在支票清单中的世界");
         AutoCleanUpWorlds = c.get("Global.AutoCleanUp.Worlds", Arrays.asList(defaultWorldName));
 
         for (int i = 0; i < AutoCleanUpWorlds.size(); i++) {
             AutoCleanUpWorlds.set(i, AutoCleanUpWorlds.get(i).toLowerCase());
         }
 
-        c.addComment("Global.AutoCleanUp.TrasnferToUser", "When enabled we will transfer residence to defined user instead of removing it", "Defined user will be excluded from cleanup operation");
+        c.addComment("Global.AutoCleanUp.TrasnferToUser", "启用后，我们将住宅转移到定义的用户而不是删除用户", "定义的用户将被排除在清理操作之外");
         AutoCleanTrasnferToUser = c.get("Global.AutoCleanUp.TrasnferToUser", false);
 
-        c.addComment("Global.AutoCleanUp.UserName", "Name of the user which receives removed residence");
+        c.addComment("Global.AutoCleanUp.UserName", "接收删除住宅的用户名称");
         AutoCleanUserName = c.get("Global.AutoCleanUp.UserName", "Server_Land");
 
 
         c.addComment("Global.AntiGreef.RangeGaps",
-            "Distance in blocks between residences to be left out",
-            "This will prevent from residences being created back to back",
-            "In case owner of old residence and new one is the same this range restriction wont be taken into effect",
-            "Set to 0 or an empty list if you want to disable this",
-            "Use 'all' if you want to use same limitation on all worlds",
-            "Use specific world name if you only want to use this limitation on this world",
-            "Specific world name will override 'all' value");
+            "遗体之间的距离距离",
+            "这将防止住宅区被创建",
+            "如果旧居住的所有者和新住所的所有者相同",
+            "设置为0或一个空列表，如果要禁用此列表",
+            "如果您想对所有世界使用相同的限制，请使用“全部”",
+            "如果您只想在这个世界上使用此限制，请使用特定的世界名称",
+            "特定的世界名称将覆盖“所有”价值");
 
         List<String> ls = new ArrayList<String>();
         if (c.getC().isInt("Global.AntiGreef.RangeGap")) {
@@ -976,39 +976,39 @@ public class ConfigManager {
 
         // TNT explosions below 63
         c.addComment("Global.AntiGreef.TNT.ExplodeBelow",
-            "When set to true will allow tnt and minecart with tnt to explode below 62 (default) level outside of residence",
-            "This will allow mining with tnt and more vanilla play");
+            "设置为true时，将允许带有TNT的TNT和MINECART在住宅以外的62（默认）级别爆炸",
+            "这将允许使用TNT和更多香草播放开采");
         TNTExplodeBelow = c.get("Global.AntiGreef.TNT.ExplodeBelow", false);
         TNTExplodeBelowLevel = c.get("Global.AntiGreef.TNT.level", 62);
         // Creeper explosions below 63
-        c.addComment("Global.AntiGreef.Creeper.ExplodeBelow", "When set to true will allow Creeper explode below 62 (default) level outside of residence",
-            "This will give more realistic game play",
-            "For this to work properly you will need to disable creeper explosion in the world in general. This can be done in flags file under global world section");
+        c.addComment("Global.AntiGreef.Creeper.ExplodeBelow", "当设置为true时，将允许爬行者在62（默认）级别以下爆炸",
+            "这将提供更现实的游戏",
+            "为此，您将需要在世界范围内禁用爬行者爆炸。这可以在全球世界部分下的标志文件中完成");
         CreeperExplodeBelow = c.get("Global.AntiGreef.Creeper.ExplodeBelow", false);
         CreeperExplodeBelowLevel = c.get("Global.AntiGreef.Creeper.level", 62);
         // Flow
-        c.addComment("Global.AntiGreef.Flow.Level", "Level from which one to start lava and water flow blocking", "This don't have effect in residence area");
+        c.addComment("Global.AntiGreef.Flow.Level", "从中开始熔岩和水流阻滞的水平", "这在居住区没有影响");
         FlowLevel = c.get("Global.AntiGreef.Flow.Level", 63);
-        c.addComment("Global.AntiGreef.Flow.NoLavaFlow", "With this set to true, lava flow outside residence is blocked");
+        c.addComment("Global.AntiGreef.Flow.NoLavaFlow", "此设置为真，熔岩流室外被阻塞");
         NoLava = c.get("Global.AntiGreef.Flow.NoLavaFlow", false);
-        c.addComment("Global.AntiGreef.Flow.NoWaterFlow", "With this set to true, water flow outside residence is blocked");
+        c.addComment("Global.AntiGreef.Flow.NoWaterFlow", "将此设置为真，住宅外部的水流被阻塞");
         NoWater = c.get("Global.AntiGreef.Flow.NoWaterFlow", false);
         NoFlowWorlds = c.get("Global.AntiGreef.Flow.Worlds", Arrays.asList(defaultWorldName));
 
         // Place
-        c.addComment("Global.AntiGreef.Place.Level", "Level from which one to start block lava and water place", "This don't have effect in residence area");
+        c.addComment("Global.AntiGreef.Place.Level", "从哪个开始，从哪个开始熔岩和水位", "这在居住区没有影响");
         PlaceLevel = c.get("Global.AntiGreef.Place.Level", 63);
-        c.addComment("Global.AntiGreef.Place.NoLavaPlace", "With this set to true, playrs cant place lava outside residence");
+        c.addComment("Global.AntiGreef.Place.NoLavaPlace", "随着此设置为真，Playrs不能将熔岩放在住宅外");
         NoLavaPlace = c.get("Global.AntiGreef.Place.NoLavaPlace", false);
-        c.addComment("Global.AntiGreef.Place.NoWaterPlace", "With this set to true, players cant place water outside residence");
+        c.addComment("Global.AntiGreef.Place.NoWaterPlace", "将此设置为真，玩家不能将水放在住所外");
         NoWaterPlace = c.get("Global.AntiGreef.Place.NoWaterPlace", false);
         NoPlaceWorlds = c.get("Global.AntiGreef.Place.Worlds", Arrays.asList(defaultWorldName));
 
         // Sand fall
-        c.addComment("Global.AntiGreef.BlockFall.Use", "With this set to true, falling blocks will be deleted if they will land in different area");
+        c.addComment("Global.AntiGreef.BlockFall.Use", "随着此设置为真，如果它们将降落在不同的区域");
         useBlockFall = c.get("Global.AntiGreef.BlockFall.Use", true);
-        c.addComment("Global.AntiGreef.BlockFall.Level", "Level from which one to start block block's fall",
-            "This don't have effect in residence area or outside");
+        c.addComment("Global.AntiGreef.BlockFall.Level", "从哪个开始，从哪个开始块的跌落",
+            "这在居住区或外部没有影响");
         BlockFallLevel = c.get("Global.AntiGreef.BlockFall.Level", 62);
         BlockFallWorlds = c.get("Global.AntiGreef.BlockFall.Worlds", Arrays.asList(defaultWorldName));
 
@@ -1016,13 +1016,13 @@ public class ConfigManager {
             // Res cleaning
             CleanBlocks.clear();
             c.addComment("Global.AntiGreef.ResCleaning.Use",
-                "With this set to true, after player removes its residence, all blocks listed below, will be replaced with air blocks",
-                "Effective way to prevent residence creating near greefing target and then remove it",
-                "ATTENTION! Bigger residence areas could want to create bigger loads on server when cleaning up areas. So don't use this if regular player have access to huge residences. 15 million blocks would be a max limit");
+                "将此设置为真，在玩家删除其住所后，下面列出的所有块将被空气块替换",
+                "防止居住在格里芬目标附近创建的有效方法，然后将其删除",
+                "注意力！清理区域时，较大的居住区可能希望在服务器上创造更大的负载。因此，如果普通玩家可以使用大型住宅，请不要使用此功能。 1500万块将是最大限制");
             UseClean = c.get("Global.AntiGreef.ResCleaning.Use", false);
-            c.addComment("Global.AntiGreef.ResCleaning.Level", "Level from whichone you want to replace blocks");
+            c.addComment("Global.AntiGreef.ResCleaning.Level", "您要替换块的级别");
             CleanLevel = c.get("Global.AntiGreef.ResCleaning.Level", 63);
-            c.addComment("Global.AntiGreef.ResCleaning.Blocks", "Block list to be replaced", "By default only water and lava will be replaced");
+            c.addComment("Global.AntiGreef.ResCleaning.Blocks", "要替换的块列表", "默认情况下，只有水和熔岩将被更换");
             List<?> pls = c.get("Global.AntiGreef.ResCleaning.Blocks", Arrays.asList(CMIMaterial.WATER.toString(), CMIMaterial.LAVA.toString()));
             for (Object one : pls) {
                 CMIMaterial mat = CMIMaterial.get(String.valueOf(one));
@@ -1036,57 +1036,57 @@ public class ConfigManager {
             }
         }
 
-        c.addComment("Global.AntiGreef.Flags.Prevent", "By setting this to true flags from list will be protected from change while there is some one inside residence besides owner",
-            "Protects in example from people inviting some one and changing pvp flag to true to kill them");
+        c.addComment("Global.AntiGreef.Flags.Prevent", "通过将其设置为“列表”的真实标志，将受到更改的保护",
+            "在邀请某人并将PVP标志杀死的人们中保护示例以杀死他们");
         PvPFlagPrevent = c.get("Global.AntiGreef.Flags.Prevent", true);
         FlagsList = c.get("Global.AntiGreef.Flags.list", Arrays.asList("pvp"));
 
-        c.addComment("Global.DefaultGroup", "The default group to use if Permissions fails to attach or your not using Permissions.");
+        c.addComment("Global.DefaultGroup", "如果权限无法连接或您不使用权限，则使用的默认组使用。");
         defaultGroup = c.get("Global.DefaultGroup", "default");
 
-        c.addComment("Global.UseLeaseSystem", "Enable / Disable the Lease System.");
+        c.addComment("Global.UseLeaseSystem", "启用 /禁用租赁系统。");
         useLeases = c.get("Global.UseLeaseSystem", false);
 
-        c.addComment("Global.DateFormat", "Sets date format when shown in example lease or rent expire date",
-            "How to use it properly, more information can be found at http://www.tutorialspoint.com/java/java_date_time.htm");
+        c.addComment("Global.DateFormat", "设置租赁或租金到期日期的显示格式",
+            "具体用法可参考: http://www.tutorialspoint.com/java/java_date_time.htm");
         DateFormat = c.get("Global.DateFormat", "E yyyy.MM.dd 'at' hh:mm:ss a zzz");
 
-        c.addComment("Global.DateFormatShort", "Sets date format when shown in example lease or rent expire date",
-            "How to use it properly, more information can be found at http://www.tutorialspoint.com/java/java_date_time.htm");
+        c.addComment("Global.DateFormatShort", "设置租赁或租金到期日期的简短格式",
+            "具体用法可参考: http://www.tutorialspoint.com/java/java_date_time.htm");
         DateFormatShort = c.get("Global.DateFormatShort", "MM.dd hh:mm");
 
-        c.addComment("Global.TimeZone", "Sets time zone for showing date, useful when server is in different country then main server player base",
-            "Full list of possible time zones can be found at http://www.mkyong.com/java/java-display-list-of-timezone-with-gmt/");
+        c.addComment("Global.TimeZone", "设置日期显示所使用的时区，当服务器位置与玩家分布地区不同时尤其有用",
+            "完整时区列表可在 http://www.mkyong.com/java/java-display-list-of-timezone-with-gmt/ 查看");
         TimeZone = c.get("Global.TimeZone", Calendar.getInstance().getTimeZone().getID());
 
-        c.addComment("Global.ResMoneyBack", "Enable / Disable money returning on residence removal.");
+        c.addComment("Global.ResMoneyBack", "启用或禁用移除领地时返还金钱");
         ResMoneyBack = c.get("Global.ResMoneyBack", false);
 
-        c.addComment("Global.ResBankBack", "Enable / Disable money returning from residence bank on residence removal.");
+        c.addComment("Global.ResBankBack", "启用或禁用移除领地时返还其银行余额");
         ResBankBack = c.get("Global.ResBankBack", true);
 
-        c.addComment("Global.LeaseCheckInterval", "The interval, in minutes, between residence lease checks (if leases are enabled).");
+        c.addComment("Global.LeaseCheckInterval", "租赁到期检查的间隔时间（分钟），仅在启用租赁系统时生效");
         leaseCheckInterval = c.get("Global.LeaseCheckInterval", 10);
 
-        c.addComment("Global.LeaseAutoRenew", "Allows leases to automatically renew so long as the player has the money, if economy is disabled, this setting does nothing.");
+        c.addComment("Global.LeaseAutoRenew", "若玩家资金充足则自动续租，经济系统关闭时此设置无效");
         leaseAutoRenew = c.get("Global.LeaseAutoRenew", true);
 
-        c.addComment("Global.EnablePermissions", "Whether or not to use the Permissions system in conjunction with this config.");
+        c.addComment("Global.EnablePermissions", "是否启用权限系统");
         c.get("Global.EnablePermissions", true);
 
-        c.addComment("Global.EnableEconomy", "Enable or disable Residence's economy system (Vault supported).");
+        c.addComment("Global.EnableEconomy", "启用或禁用 Residence 的经济系统（支持 Vault）");
         enableEconomy = c.get("Global.EnableEconomy", true);
 
-        c.addComment("Global.ChargeWhen", "Defines when we should charge money. Only works if economy is enabled");
-        c.addComment("Global.ChargeWhen.Creating", "Charges money on residence creation, this includes /res create and /res auto");
+        c.addComment("Global.ChargeWhen", "定义在何时收取费用，仅在启用经济系统时生效");
+        c.addComment("Global.ChargeWhen.Creating", "在创建领地（/res create 与 /res auto）时收取费用");
         chargeOnCreation = c.get("Global.ChargeWhen.Creating", true);
-        c.addComment("Global.ChargeWhen.Expanding", "Charges money on residence area expansion");
+        c.addComment("Global.ChargeWhen.Expanding", "在扩展领地面积时收取费用");
         chargeOnExpansion = c.get("Global.ChargeWhen.Expanding", true);
-        c.addComment("Global.ChargeWhen.AreaAdd", "Charges money on area addition");
+        c.addComment("Global.ChargeWhen.AreaAdd", "在新增区域时收取费用");
         chargeOnAreaAdd = c.get("Global.ChargeWhen.AreaAdd", true);
 
-        c.addComment("Global.Type", "Defaults to None which will start by looking to default economy engine throw vault API and if it fails to any supported economy engine",
-            "Custom economy engines can be defined to access economy directly", "Supported variables: " + EconomyType.toStringLine());
+        c.addComment("Global.Type", "默认为 None，会通过 Vault API 尝试连接默认经济插件，如失败则寻找其他受支持的经济插件",
+            "也可以自定义经济接口以直接接入经济系统", "可用值: " + EconomyType.toStringLine());
         VaultEconomy = EconomyType.getByName(c.get("Global.Type", "None"));
         if (VaultEconomy == null)
 
@@ -1096,70 +1096,70 @@ public class ConfigManager {
             VaultEconomy = EconomyType.None;
         }
 
-        c.addComment("Global.ExtraEnterMessage", "When enabled extra message will appear in chat if residence is for rent or for sell to inform how he can rent/buy residence with basic information.");
+        c.addComment("Global.ExtraEnterMessage", "启用后，若领地可租或出售将在聊天中额外提示如何租用或购买");
         ExtraEnterMessage = c.get("Global.ExtraEnterMessage", true);
 
-        c.addComment("Global.Sell.Subzone", "If set to true, this will allow to sell subzones. Its recommended to keep it false tho");
+        c.addComment("Global.Sell.Subzone", "如果设置为真，这将允许出售子区域。建议将其保留为假");
         SellSubzone = c.get("Global.Sell.Subzone", false);
 
-        c.addComment("Global.EnableRentSystem", "Enables or disables the Rent System");
+        c.addComment("Global.EnableRentSystem", "启用或禁用租金系统");
         enableRentSystem = c.get("Global.EnableRentSystem", true);
 
 //	TownEnabled = c.get("Global.Town.Enabled", true);
-//	c.addComment("Global.Town.MinRange", "Range between residences","Protects from building residence near another residence if owner not belonging to same town");
+//	c.addComment("Global.Town.MinRange", "住宅之间的范围","如果所有者不属于同一城镇");
 //	TownMinRange = c.get("Global.Town.MinRange", 16);
 
-        c.addComment("Global.Rent.PreventRemoval", "Prevents residence/subzone removal if its subzone is still rented by some one");
+        c.addComment("Global.Rent.PreventRemoval", "如果某些人仍在租用居住地，则防止住所/subzone拆除");
         RentPreventRemoval = c.get("Global.Rent.PreventRemoval", true);
 
-        c.addComment("Global.Rent.DeductFromBank", "When set to true residence rent can be renewed from residence bank");
+        c.addComment("Global.Rent.DeductFromBank", "设置为真正的居住租金时，可以从居住银行续签");
         DeductFromBank = c.get("Global.Rent.DeductFromBank", false);
         c.addComment("Global.Rent.DeductFromBankThenPlayer",
-            "When set to true residence rent can be renewed from residence bank and if there is not enough money then we will deduct rest of it from player",
-            "This will override behavior of DeductFromBank");
+            "当设置为真正的居住租金时，可以从居住银行续签，如果没有足够的钱，我们将其余的钱从玩家中扣除",
+            "这将覆盖扣除炸弹的行为");
         DeductFromBankThenPlayer = c.get("Global.Rent.DeductFromBankThenPlayer", false);
 
-        c.addComment("Global.Rent.Inform.OnEnding", "Informs players on rent time ending");
+        c.addComment("Global.Rent.Inform.OnEnding", "告知玩家租金时间结束");
         RentInformOnEnding = c.get("Global.Rent.Inform.OnEnding", true);
-        c.addComment("Global.Rent.Inform.Before", "Time range in minutes when to start informing about ending rent");
+        c.addComment("Global.Rent.Inform.Before", "时间范围为几分钟，开始通知结束租金");
         RentInformBefore = c.get("Global.Rent.Inform.Before", 1440);
-        c.addComment("Global.Rent.Inform.Delay", "Time range in seconds for how long to wait after player logs in to inform about ending rents");
+        c.addComment("Global.Rent.Inform.Delay", "时间范围为几秒钟，在玩家登录后等待多长时间才能告知租金");
         RentInformDelay = c.get("Global.Rent.Inform.Delay", 60);
 
-        c.addComment("Global.Rent.DefaultValues.AllowRenewing", "Default values used when putting residence for rent");
+        c.addComment("Global.Rent.DefaultValues.AllowRenewing", "租金时使用的默认值");
         RentAllowRenewing = c.get("Global.Rent.DefaultValues.AllowRenewing", true);
         RentStayInMarket = c.get("Global.Rent.DefaultValues.StayInMarket", true);
         RentAllowAutoPay = c.get("Global.Rent.DefaultValues.AllowAutoPay", true);
-        c.addComment("Global.Rent.DefaultValues.PlayerAutoPay", "If set to true, when player is not defining auto pay on renting, then this value will be used");
+        c.addComment("Global.Rent.DefaultValues.PlayerAutoPay", "若设为 true，当玩家未指定是否自动支付租金时默认启用");
         RentPlayerAutoPay = c.get("Global.Rent.DefaultValues.PlayerAutoPay", true);
 
-        c.addComment("Global.Rent.Schematics.RestoreAfterRentEnds", "EXPERIMENTAL!!! If set to true, residence will be restored to state it was when backup flag was set to true",
-            "For securoty reassons only players with aditional residence.backup permission node can set backup flag");
+        c.addComment("Global.Rent.Schematics.RestoreAfterRentEnds", "实验功能！若设为 true，租约结束后将恢复为设置 backup 标志时的状态",
+            "出于安全原因，仅拥有额外 residence.backup 权限的玩家可设置 backup 标志");
         RestoreAfterRentEnds = c.get("Global.Rent.Schematics.RestoreAfterRentEnds", true);
-        c.addComment("Global.Rent.Schematics.SaveOnFlagChange", "When set to true, area state will be saved only when setting backup to true value",
-            "When set to false, area state will be saved before each renting to have always up to date area look",
-            "Keep in mind that when its set to false, there is slightly bigger server load as it has to save area each time when some one rents it");
+        c.addComment("Global.Rent.Schematics.SaveOnFlagChange", "设为 true 时，仅在将 backup 旗帜改为 true 时保存区域状态",
+            "设为 false 时，玩家每次租用都会保存一次区域，以便保持最新外观",
+            "注意设为 false 会略微增加服务器负荷");
         SchematicsSaveOnFlagChange = c.get("Global.Rent.Schematics.SaveOnFlagChange", true);
 
-        c.addComment("Global.Bank.Capacity", "Defines max amount residence bank can hold", "Setting to 0 will disable limitations");
+        c.addComment("Global.Bank.Capacity", "定义最大金额可以持有", "设置为0将禁用限制");
         BankCapacity = c.get("Global.Bank.Capacity", 0D);
 
-        c.addComment("Global.RentCheckInterval", "The interval, in minutes, between residence rent expiration checks (if the rent system is enabled).");
+        c.addComment("Global.RentCheckInterval", "在居住租金到期支票之间（如果启用租金系统）之间的间隔（如果启用了租金）。");
         rentCheckInterval = c.get("Global.RentCheckInterval", 10);
 
         ELMessageType old = c.getC().isBoolean("Global.ActionBar.General") && c.getC().getBoolean("Global.ActionBar.General") ? ELMessageType.ActionBar
             : ELMessageType.ActionBar;
         old = c.getC().isBoolean("Global.TitleBar.EnterLeave") && c.getC().getBoolean("Global.TitleBar.EnterLeave") ? ELMessageType.TitleBar : old;
 
-        c.addComment("Global.Messages.GeneralMessages", "Defines where you want to send residence enter/leave/deny move and similar messages. Possible options: " + ELMessageType.getAllValuesAsString(),
-            "TitleBar can have %subtitle% variable to define second line");
+        c.addComment("Global.Messages.GeneralMessages", "定义要发送居住地的位置，请输入/离开/拒绝移动和类似消息。可能的选项： " + ELMessageType.getAllValuesAsString(),
+            "titlebar可以具有％subtitle％变量来定义第二行");
         EnterLeaveMessageType = ELMessageType.getByName(c.get("Global.Messages.GeneralMessages", old.toString()));
         if (EnterLeaveMessageType == null || Version.isCurrentEqualOrLower(Version.v1_7_R4))
             EnterLeaveMessageType = ELMessageType.ActionBar;
 
         ActionBarOnSelection = c.get("Global.ActionBar.ShowOnSelection", true);
 
-        c.addComment("Global.ResidenceChatColor", "Color of residence chat.");
+        c.addComment("Global.ResidenceChatColor", "居住聊天的颜色。");
         try {
             chatColor = CMIChatColor.getColor((c.get("Global.ResidenceChatColor", "DARK_PURPLE")));
         } catch (Exception ex) {
@@ -1171,51 +1171,51 @@ public class ConfigManager {
         }
 
 
-        c.addComment("Global.AdminOnlyCommands", "Whether or not to ignore the usual Permission flags and only allow OPs and groups with 'residence.admin' to change residences.");
+        c.addComment("Global.AdminOnlyCommands", "是否忽略通常的权限标志，仅允许使用“居住”的OP和组更改住宅。");
         adminsOnly = c.get("Global.AdminOnlyCommands", false);
 
-        c.addComment("Global.AdminOPs", "Setting this to true makes server OPs admins.");
+        c.addComment("Global.AdminOPs", "将其设置为True使服务器OPS管理员。");
         adminOps = c.get("Global.AdminOPs", true);
 
         c.addComment("Global.AdminFullAccess",
-            "Setting this to true server administration wont need to use /resadmin command to access admin command if they are op or have residence.admin permission node.");
+            "将其设置为True Server Administration，如果它们是OP或具有Residence.Admin权限节点，则不需要使用 /resadmin命令访问admin命令。");
         AdminFullAccess = c.get("Global.AdminFullAccess", false);
 
-        c.addComment("Global.MultiWorldPlugin", "This is the name of the plugin you use for multiworld, if you don't have a multiworld plugin you can safely ignore this.",
-            "The only thing this does is check to make sure the multiworld plugin is enabled BEFORE Residence, to ensure properly loading residences for other worlds.");
+        c.addComment("Global.MultiWorldPlugin", "这是您用于多世界的插件的名称，如果您没有多世界插件，则可以安全地忽略它。",
+            "唯一要做的是检查在居住之前启用多世界插件，以确保适当地为其他世界加载住宅。");
         multiworldPlugin = c.get("Global.MultiWorldPlugin", "Multiverse-Core");
 
-        c.addComment("Global.ResidenceFlagsInherit", "Setting this to true causes subzones to inherit flags from their parent zones.");
+        c.addComment("Global.ResidenceFlagsInherit", "将其设置为真实会导致子区域从其父区域继承标志。");
         flagsInherit = c.get("Global.ResidenceFlagsInherit", true);
 
-        c.addComment("Global.PreventRentModify", "Setting this to false will allow rented residences to be modified by the renting player.");
+        c.addComment("Global.PreventRentModify", "将此设置为false将允许租赁参与者修改租用的住所。");
         preventBuildInRent = c.get("Global.PreventRentModify", true);
 
-        c.addComment("Global.PreventSubZoneRemoval", "Setting this to true will prevent subzone deletion when subzone owner is not same as parent zone owner.");
+        c.addComment("Global.PreventSubZoneRemoval", "当Subzone所有者与父级所有者不同时，将其设置为true将防止子区删除。");
         PreventSubZoneRemoval = c.get("Global.PreventSubZoneRemoval", true);
 
-        c.addComment("Global.StopOnSaveFault", "Setting this to false will cause residence to continue to load even if a error is detected in the save file.");
+        c.addComment("Global.StopOnSaveFault", "将其设置为False，即使在保存文件中检测到错误，也会导致住宅继续加载。");
         stopOnSaveError = c.get("Global.StopOnSaveFault", true);
 
         c.addComment("This is the residence name filter, that filters out invalid characters.  Google 'Java RegEx' or 'Java Regular Expressions' for more info on how they work.");
         namefix = c.get("Global.ResidenceNameRegex", "[^a-zA-Z0-9\\-\\_]");
 
-        c.addComment("Global.ShowIntervalMessages", "Setting this to true sends a message to the console every time Residence does a rent expire check or a lease expire check.");
+        c.addComment("Global.ShowIntervalMessages", "将其设置为TRUE，每次居住时都会将消息发送到控制台，或者租金到期或租赁过期支票。");
         showIntervalMessages = c.get("Global.ShowIntervalMessages", false);
 
-        c.addComment("Global.ShowNoobMessage", "Setting this to true sends a tutorial message to the new player when he places chest on ground.");
+        c.addComment("Global.ShowNoobMessage", "将其设置为True，将胸部放在地面上时，将其发送给新玩家的教程消息。");
         ShowNoobMessage = c.get("Global.ShowNoobMessage", true);
 
-        c.addComment("Global.NewPlayer", "Setting this to true creates residence around players placed chest if he don't have any.", "Only once every server restart if he still don't have any residence");
+        c.addComment("Global.NewPlayer", "如果没有任何东西，将其设置为True创建居住的胸部。", "如果他仍然没有任何住所，则只有一次重新启动");
         NewPlayerUse = c.get("Global.NewPlayer.Use", false);
-        c.addComment("Global.NewPlayer.Free", "Setting this to true, residence will be created for free", "By setting to false, money will be taken from player, if he has them");
+        c.addComment("Global.NewPlayer.Free", "将其设置为真实，将免费创建住宅", "通过设置为虚假，如果他拥有的话，将从玩家那里拿走钱");
         NewPlayerFree = c.get("Global.NewPlayer.Free", true);
-        c.addComment("Global.NewPlayer.Range", "Range from placed chest to both sides. By setting to 5, residence will be 5+5+1 = 11 blocks wide in total");
+        c.addComment("Global.NewPlayer.Range", "从放置的胸部到两侧。通过设置为5，住宅总共将为5+5+1 = 11个块");
         NewPlayerRangeX = c.get("Global.NewPlayer.Range.X", 5);
         NewPlayerRangeY = c.get("Global.NewPlayer.Range.Y", 5);
         NewPlayerRangeZ = c.get("Global.NewPlayer.Range.Z", 5);
 
-        c.addComment("Global.CustomContainers", "Experimental - The following settings are lists of block IDs to be used as part of the checks for the 'container' and 'use' flags when using mods.");
+        c.addComment("Global.CustomContainers", "实验 - 以下设置是用于使用MOD时的“容器”和“使用”标志检查的块ID列表。");
         List<String> pls = c.get("Global.CustomContainers", new ArrayList<String>());
         for (String one : pls) {
             Material mat = CMILib.getInstance().getItemManager().getMaterial(one);
@@ -1237,35 +1237,34 @@ public class ConfigManager {
                 customRightClick.add(mat);
         }
 
-        c.addComment("Global.Visualizer.Use", "With this enabled player will see particle effects to mark selection boundaries");
+        c.addComment("Global.Visualizer.Use", "启用后，玩家将看到粒子效果以标记选择范围");
         useVisualizer = c.get("Global.Visualizer.Use", true);
-        c.addComment("Global.Visualizer.Range", "Range in blocks to draw particle effects for player", "Keep it no more as 30, as player cant see more than 16 blocks");
+        c.addComment("Global.Visualizer.Range", "绘制粒子效果的范围（以方块为单位）", "建议不要超过 30，玩家实际可见距离约为 16 格");
         VisualizerRange = c.get("Global.Visualizer.Range", 16);
-        c.addComment("Global.Visualizer.ShowFor", "For how long in miliseconds (5000 = 5sec) to show particle effects");
+        c.addComment("Global.Visualizer.ShowFor", "粒子效果显示时长，单位毫秒（5000 = 5 秒）");
         VisualizerShowFor = c.get("Global.Visualizer.ShowFor", 5000);
-        c.addComment("Global.Visualizer.updateInterval", "How often in ticks to update particles for player");
+        c.addComment("Global.Visualizer.updateInterval", "每隔多少刻更新一次粒子效果");
         VisualizerUpdateInterval = c.get("Global.Visualizer.updateInterval", 20);
-        c.addComment("Global.Visualizer.RowSpacing", "Spacing in blocks between particle effects for rows");
+        c.addComment("Global.Visualizer.RowSpacing", "行与行之间粒子效果的间距");
         VisualizerRowSpacing = c.get("Global.Visualizer.RowSpacing", 1);
         if (VisualizerRowSpacing < 1)
             VisualizerRowSpacing = 1;
-        c.addComment("Global.Visualizer.CollumnSpacing", "Spacing in blocks between particle effects for collums");
+        c.addComment("Global.Visualizer.CollumnSpacing", "列与列之间粒子效果的间距");
         VisualizerCollumnSpacing = c.get("Global.Visualizer.CollumnSpacing", 1);
         if (VisualizerCollumnSpacing < 1)
             VisualizerCollumnSpacing = 1;
 
-        c.addComment("Global.Visualizer.SkipBy", "Defines by how many particles we need to skip", "This will create moving particle effect and will improve overall look of selection",
-            "By increasing this number, you can decrease update interval");
+        c.addComment("Global.Visualizer.SkipBy", "定义跳过多少粒子来形成移动效果", "值越大可以适当降低更新频率");
         VisualizerSkipBy = c.get("Global.Visualizer.SkipBy", 2);
         if (VisualizerSkipBy < 1)
             VisualizerSkipBy = 1;
 
-        c.addComment("Global.Visualizer.FrameCap", "Maximum amount of frame particles to show for one player");
+        c.addComment("Global.Visualizer.FrameCap", "每名玩家可见的最大边框粒子数量");
         VisualizerFrameCap = c.get("Global.Visualizer.FrameCap", 500);
         if (VisualizerFrameCap < 1)
             VisualizerFrameCap = 1;
 
-        c.addComment("Global.Visualizer.SidesCap", "Maximum amount of sides particles to show for one player");
+        c.addComment("Global.Visualizer.SidesCap", "每名玩家可见的最大侧面粒子数量");
         VisualizerSidesCap = c.get("Global.Visualizer.SidesCap", 2000);
         if (VisualizerSidesCap < 1)
             VisualizerSidesCap = 1;
@@ -1282,10 +1281,12 @@ public class ConfigManager {
             effectsList.append(one.name().toLowerCase());
         }
 
-        c.addComment("Global.Visualizer.Selected", "Particle effect names. possible: explode, largeexplode, hugeexplosion, fireworksSpark, splash, wake, crit, magicCrit",
-            " smoke, largesmoke, spell, instantSpell, mobSpell, mobSpellAmbient, witchMagic, dripWater, dripLava, angryVillager, happyVillager, townaura",
-            " note, portal, enchantmenttable, flame, lava, footstep, cloud, reddust, snowballpoof, snowshovel, slime, heart, barrier", " droplet, take, mobappearance", "",
-            "If using spigot based server different particles can be used:", effectsList.toString());
+        c.addComment("Global.Visualizer.Selected", "粒子效果名称，例如: explode、largeexplode、hugeexplosion、fireworksSpark、splash、wake、crit、magicCrit",
+            " smoke、largesmoke、spell、instantSpell、mobSpell、mobSpellAmbient、witchMagic、dripWater、dripLava、angryVillager、happyVillager、townaura",
+            " note、portal、enchantmenttable、flame、lava、footstep、cloud、reddust、snowballpoof、snowshovel、slime、heart、barrier",
+            " droplet、take、mobappearance",
+            "",
+            "若使用 Spigot 服务器，可用的粒子效果还包括: " + effectsList.toString());
 
         // Frame
         String efname = c.get("Global.Visualizer.Selected.Frame", "happyVillager");
@@ -1317,38 +1318,38 @@ public class ConfigManager {
             Bukkit.getConsoleSender().sendMessage("Can't find effect for Selected Sides with this name, it was set to default");
         }
 
-        c.addComment("Global.Visualizer.EnterAnimation", "Shows particle effect when player enters residence. Only applies to main residence area");
+        c.addComment("Global.Visualizer.EnterAnimation", "当玩家进入居住时，显示出粒子的效果。仅适用于主要居住区");
         EnterAnimation = c.get("Global.Visualizer.EnterAnimation", true);
 
-        c.addComment("Global.BounceAnimation", "Shows particle effect when player are being pushed back");
+        c.addComment("Global.BounceAnimation", "当玩家被推回时显示粒子效应");
         BounceAnimation = c.get("Global.BounceAnimation", true);
 
-        c.addComment("Global.GUI.Enabled", "Enable or disable flag GUI");
+        c.addComment("Global.GUI.Enabled", "启用或禁用Flag Gui");
         useFlagGUI = c.get("Global.GUI.Enabled", true);
 
-        c.addComment("Global.GUI.setTrue", "Item id and data to use when flag is set to true");
+        c.addComment("Global.GUI.setTrue", "将标志设置为true时要使用的项目ID和数据");
 
         CMIMaterial Mat = CMIMaterial.get(c.get("Global.GUI.setTrue", "GREEN_WOOL"));
         if (Mat == null)
             Mat = CMIMaterial.GREEN_WOOL;
         guiBottonStates.put(FlagState.TRUE, Mat.newItemStack());
 
-        c.addComment("Global.GUI.setFalse", "Item id and data to use when flag is set to false");
+        c.addComment("Global.GUI.setFalse", "将标志设置为false时要使用的项目ID和数据");
         Mat = CMIMaterial.get(c.get("Global.GUI.setFalse", "RED_WOOL"));
         if (Mat == null)
             Mat = CMIMaterial.RED_WOOL;
         guiBottonStates.put(FlagState.FALSE, Mat.newItemStack());
 
-        c.addComment("Global.GUI.setRemove", "Item id and data to use when flag is set to remove");
+        c.addComment("Global.GUI.setRemove", "设置标志以删除标志时要使用的项目ID和数据");
         Mat = CMIMaterial.get(c.get("Global.GUI.setRemove", "LIGHT_GRAY_WOOL"));
         if (Mat == null)
             Mat = CMIMaterial.LIGHT_GRAY_WOOL;
         guiBottonStates.put(FlagState.NEITHER, Mat.newItemStack());
 
-        c.addComment("Global.AutoMobRemoval", "Default = false. Enabling this, residences with flag nomobs will be cleared from monsters in regular intervals.",
-            "This is quite heavy on server side, so enable only if you really need this feature");
+        c.addComment("Global.AutoMobRemoval", "默认值= false。启用此功能，将定期从怪物中清除带有标志名称的住宅。",
+            "这在服务器端很重，所以只有在您真的需要此功能的情况下才能启用");
         AutoMobRemoval = c.get("Global.AutoMobRemoval.Use", false);
-        c.addComment("Global.AutoMobRemoval.Interval", "How often in seconds to check for monsters in residences. Keep it at reasonable amount");
+        c.addComment("Global.AutoMobRemoval.Interval", "几秒钟内一次检查住宅中的怪物的频率。保持合理的数量");
         AutoMobRemovalInterval = c.get("Global.AutoMobRemoval.Interval", 5);
 
         enforceAreaInsideArea = c.get("Global.EnforceAreaInsideArea", false);
@@ -1356,7 +1357,7 @@ public class ConfigManager {
         enableLeaseMoneyAccount = c.get("Global.EnableLeaseMoneyAccount", true);
 
         c.addComment("Global.Couldroncompatibility",
-            "By setting this to true, partial compatibility for kCouldron servers will be enabled. Action bar messages and selection visualizer will be disabled automatically as off incorrect compatibility");
+            "通过将其设置为真实，将启用Kcouldron服务器的部分兼容性。动作栏消息和选择可视化器将自动禁用，因为不正确的兼容性");
         Couldroncompatibility = c.get("Global.Couldroncompatibility", false);
         if (Couldroncompatibility) {
             useVisualizer = false;
@@ -1364,27 +1365,27 @@ public class ConfigManager {
             ActionBarOnSelection = false;
         }
 
-        c.addComment("DynMap.Use", "Enables or disable DynMap Support");
+        c.addComment("DynMap.Use", "启用或禁用Dynmap支持");
         DynMapUse = c.get("DynMap.Use", true);
-        c.addComment("DynMap.HideByDefault", "When set to true we will hide residence areas by default on dynmap window", "Residences can still be enabled throw provided DynMap option on left top side");
+        c.addComment("DynMap.HideByDefault", "当设置为true时，我们将默认在Dynmap窗口上隐藏居住区", "仍然可以启用住宅，可以在左上角提供Dynmap选项");
         DynMapHideByDefault = c.get("DynMap.HideByDefault", false);
-        c.addComment("DynMap.ShowFlags", "Shows or hides residence flags");
+        c.addComment("DynMap.ShowFlags", "显示或隐藏领地的标志");
         DynMapShowFlags = c.get("DynMap.ShowFlags", true);
-        c.addComment("DynMap.ExcludeDefaultFlags", "When enabled default flags will not be included in residence overview");
+        c.addComment("DynMap.ExcludeDefaultFlags", "启用后，默认标志不会在领地概览中显示");
         DynMapExcludeDefaultFlags = c.get("DynMap.ExcludeDefaultFlags", true);
-        c.addComment("DynMap.HideHidden", "If set true, residence with hidden flag set to true will be hidden from dynmap");
+        c.addComment("DynMap.HideHidden", "若设为 true，带有 hidden 标志的领地在 dynmap 上也会被隐藏");
         DynMapHideHidden = c.get("DynMap.HideHidden", true);
 
-        c.addComment("DynMap.Layer.3dRegions", "Enables 3D zones");
+        c.addComment("DynMap.Layer.3dRegions", "启用3D区域");
         DynMapLayer3dRegions = c.get("DynMap.Layer.3dRegions", true);
-        c.addComment("DynMap.Layer.SubZoneDepth", "How deep to go into subzones to show");
+        c.addComment("DynMap.Layer.SubZoneDepth", "有多深入subsines展示");
         DynMapLayerSubZoneDepth = c.get("DynMap.Layer.SubZoneDepth", 2);
 
-        c.addComment("DynMap.Border.Color", "Color of border. Pick color from this page http://www.w3schools.com/colors/colors_picker.asp");
+        c.addComment("DynMap.Border.Color", "边界的颜色。从此页面挑选颜色http://www.w3schools.com/colors/colors_picker.asp");
         DynMapBorderColor = c.get("DynMap.Border.Color", "#FF0000");
-        c.addComment("DynMap.Border.Opacity", "Transparency. 0.3 means that only 30% of color will be visible");
+        c.addComment("DynMap.Border.Opacity", "透明度。 0.3表示只有30％的颜色可见");
         DynMapBorderOpacity = c.get("DynMap.Border.Opacity", 0.3);
-        c.addComment("DynMap.Border.Weight", "Border thickness");
+        c.addComment("DynMap.Border.Weight", "边界厚度");
         DynMapBorderWeight = c.get("DynMap.Border.Weight", 3);
         DynMapFillOpacity = c.get("DynMap.Fill.Opacity", 0.3);
         DynMapFillColor = c.get("DynMap.Fill.Color", "#FFFF00");
@@ -1392,9 +1393,9 @@ public class ConfigManager {
         DynMapFillRented = c.get("DynMap.Fill.Rented", "#99ff33");
         DynMapFillForSale = c.get("DynMap.Fill.ForSale", "#0066ff");
 
-        c.addComment("DynMap.VisibleRegions", "Shows only regions on this list");
+        c.addComment("DynMap.VisibleRegions", "仅在此列表中显示区域");
         DynMapVisibleRegions = c.get("DynMap.VisibleRegions", new ArrayList<String>());
-        c.addComment("DynMap.HiddenRegions", "Hides region on map even if its not hidden in game");
+        c.addComment("DynMap.HiddenRegions", "即使没有隐藏在地图上的地图上的区域");
         DynMapHiddenRegions = c.get("DynMap.HiddenRegions", new ArrayList<String>());
 
         c.save();
