@@ -59,7 +59,6 @@ Language:
   Select:
     Points: '&e执行命令前需要先选中两个选取点!'
     Overlap: '&c选取点与区域 &6%1 &c重叠!'
-    WorldGuardOverlap: '&c选取点与 WorldGuard 区域 &6%1 &c重叠!'
     KingdomsOverlap: '&c你选择的坐标和 &6%1 &c王国的土地产生了冲突！'
     Success: '&e选取点成功!'
     Fail: '&c无效的选择命令...'
@@ -217,10 +216,8 @@ Language:
     NoResHere: '&c那个位置没有领地存在.'
     OwnerNoPermission: '&c领地所有者没有执行这个操作的权限.'
     ParentNoPermission: '&c你没有权限设置父区域.'
-    ChatDisabled: '&e领地内聊天已禁用.'
     DeleteConfirm: '&e如果你确定要删除领地 &6%1&e, 输入 &6/res confirm &e以确认操作.'
     ChangedMain: '&e已将主领地修改为 &6%1'
-    LwcRemoved: '&e已删除 &6%1 &e的LWC保护，耗时 &6%2ms'
     CanBeRented: '&6%1&e 可以出租给 &6%2 &e每 &6%3 &e天. &6/res market rent'
     CanBeBought: '&6%1&e 可以出售给 &6%2&e. &6/res market buy'
     IsForRent: '&6(出租)'
@@ -346,18 +343,6 @@ Language:
     GeneralList: '&2 %1 &6- &e%2'
     FlagsList: '&2 %1 &6- &e%2'
     SmallSeparator: '&6------'
-  Chat:
-    ChatChannelChange: '&e领地聊天频道已更改为 &6%1!'
-    ChatChannelLeave: '&e离开领地聊天'
-    ChatMessage: '%1 %2%3: %4%5'
-    ChatListeningMessage: '&2[倾听 %6]%1 %2%3: %4%5'
-    JoinFirst: '&4请先加入领地聊天频道.'
-    InvalidChannel: '&4无效频道.'
-    InvalidColor: '&4颜色代码错误'
-    NotInChannel: '&4玩家不在频道中'
-    Kicked: '&6%1 &e被 &6%2 &e频道踢出'
-    InvalidPrefixLength: '&4前缀过长. 最大长度: %1'
-    ChangedColor: '&e领地频道颜色更改为 %1'
     ChangedPrefix: '&e领地频道前缀更改为 %1'
   Shop:
     ListTopLine: '&6%1 &e商店列表 - 第 &6%2 &e页, 共 &6%3 %4'
@@ -472,7 +457,6 @@ Language:
     pageCount: '&2%1&7/&2%2'
     pageCountHover: '&e%1 条目'
     GenericPages: '&e页数 &6%1 &e/ &6%2 &e(&6%3&e)'
-    WorldEditNotFound: '&c未检测到 WorldEdit.'
     CoordsTop: '&eX:&6%1 &eY:&6%2 &eZ:&6%3'
     CoordsBottom: '&eX:&6%1 &eY:&6%2 &eZ:&6%3'
     CoordsLiner: '&7 (&3%1&7;%2&7)'
@@ -581,11 +565,6 @@ CommandHelp:
               Info:
               - '&e使用方法: &6/res select residence <领地名称>'
               - 选择 <领地名称> 中一个存在的区域
-            worldedit:
-              Description: 使用当前WorldEdit(创世神)的选择来设置选区
-              Info:
-              - '&e使用方法: &6/res select worldedit'
-              - 将 WorldEdit(创世神) 目前的选区作为领地选区
         padd:
           Info:
           - '&e使用方法: &6/res padd <领地名称> [玩家名称]'
@@ -769,32 +748,6 @@ CommandHelp:
               - '&e使用方法: &6/res market unrent [领地名称]'
               - 如果你是租用者，这个命令将为你释放领地的租金
               - 如果你是领地所有者，这个命令使领地不再出租
-        rc:
-          Info:
-          - '&e使用方法: &6/res rc (领地名称)'
-          - 加入领地领地的聊天频道
-          Description: 加入领地聊天频道
-          SubCommands:
-            leave:
-              Description: 离开领地聊天频道
-              Info:
-              - '&e使用方法: &6/res rc leave'
-              - 如果你在一个领地聊天频道内, 你将会离开此频道
-            setcolor:
-              Description: 设置领地聊天频道文字颜色
-              Info:
-              - '&e使用方法: &6/res rc setcolor [颜色代码]'
-              - 设置领地聊天频道文字颜色
-            setprefix:
-              Description: 设置领地聊天频道前缀
-              Info:
-              - '&e使用方法: &6/res rc setprefix [前缀]'
-              - 设置领地聊天频道前缀
-            kick:
-              Description: 从聊天频道中踢出玩家
-              Info:
-              - '&e使用方法: &6/res rc kick [玩家名称]'
-              - 从领地聊天频道中踢出某玩家
         expand:
           Info:
           - '&e使用方法: &6/res expand (领地名称) [扩展单位]'
@@ -1037,11 +990,6 @@ CommandHelp:
               Description: 允许或禁止使用紫颂果传送到领地
               Info:
               - '&e使用方法: &6/res set/pset <领地名称> chorustp true/false/remove=移除'
-            chat:
-              Translated: chat - 加入领地聊天频道
-              Description: 允许或禁止加入领地聊天频道
-              Info:
-              - '&e使用方法: &6/res set/pset <领地名称> chat true/false/remove=移除'
             cmonsters:
               Translated: cmonsters - 自定义怪物生成
               Description: 允许或禁止自定义怪物生成

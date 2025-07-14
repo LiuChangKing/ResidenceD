@@ -6,7 +6,7 @@ description: Cuboid Residence Plugin
 api-version: 1.13
 authors: [bekvon,nate302,t00thpick1]
 depend: [CMILib]
-softdepend: [Vault,WorldEdit,WorldGuard,CrackShot,Multiverse-Core,MultiWorld,My_Worlds,TheWorld,dynmap,LWC,Kingdoms,PlaceholderAPI,CMI,ServerControlReloaded,Slimefun,CS-CoreLib]
+softdepend: [Vault,CrackShot,Multiverse-Core,MultiWorld,dynmap,PlaceholderAPI,Slimefun,CS-CoreLib]
 contributors: [lemon42,smbarbour,inorixu,Shayana_fr,Zrips]
 commands:
   res:
@@ -22,9 +22,6 @@ commands:
   resload:
     description: Load the save file again after you have made modifications.
     usage: §c/resload
-  rc:
-    description: §cChat in current residence channel.
-    usage: §c/rc §eto toggle, §c/rc l §eto leave, §c/rc setprefix §eto set prefix, §c/rc setcolor §eto set color or §c/rc kick §eto kick player
 permissions:
   residence.admin:
     description: Gives you access to /resadmin
@@ -83,15 +80,6 @@ permissions:
   residence.select.auto.others:
     description: Allows to turn on auto selection for other players
     default: op
-  residence.chatcolor:
-    description: Allows to change residence chat color
-    default: true
-  residence.chatprefix:
-    description: Allows to change residence chat prefix
-    default: op
-  residence.chatkick:
-    description: Allows to kick players from residence chat
-    default: true
   residence.compass:
     description: Allows to set compass pointer to residence
     default: true
@@ -219,9 +207,6 @@ permissions:
     description: Allows to access particular command
     default: true
   residence.command.pset:
-    description: Allows to access particular command
-    default: true
-  residence.command.rc:
     description: Allows to access particular command
     default: true
   residence.command.reload:

@@ -2,7 +2,6 @@ package com.bekvon.bukkit.residence.listeners;
 
 import com.bekvon.bukkit.residence.ConfigManager;
 import com.bekvon.bukkit.residence.Residence;
-import com.bekvon.bukkit.residence.chat.ChatChannel;
 import com.bekvon.bukkit.residence.containers.*;
 import com.bekvon.bukkit.residence.economy.rent.RentableLand;
 import com.bekvon.bukkit.residence.economy.rent.RentedLand;
@@ -240,36 +239,6 @@ public class ResidencePlayerListener implements Listener {
         event.setFormat(format);
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onResidenceBackup(ResidenceFlagChangeEvent event) {
-        if (!event.getFlag().equalsIgnoreCase(Flags.backup.toString()))
-            return;
-        Player player = event.getPlayer();
-        if (!plugin.getConfigManager().RestoreAfterRentEnds)
-            return;
-        if (!plugin.getConfigManager().SchematicsSaveOnFlagChange)
-            return;
-        if (plugin.getSchematicManager() == null)
-            return;
-        if (player != null && !ResPerm.backup.hasPermission(player))
-            event.setCancelled(true);
-        else
-            plugin.getSchematicManager().save(event.getResidence());
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onResidenceBackupRename(ResidenceRenameEvent event) {
-        if (plugin.getSchematicManager() == null)
-            return;
-        plugin.getSchematicManager().rename(event.getResidence(), event.getNewResidenceName());
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onResidenceDelete(ResidenceDeleteEvent event) {
-        if (plugin.getSchematicManager() == null)
-            return;
-        plugin.getSchematicManager().delete(event.getResidence());
-    }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerFirstLogin(PlayerLoginEvent event) {
@@ -808,8 +777,6 @@ public class ResidencePlayerListener implements Listener {
         Player player = event.getPlayer();
         UUID uuid = player.getUniqueId();
 
-        plugin.getChatManager().removeFromChannel(player.getName());
-        plugin.getPlayerListener().removePlayerResidenceChat(player);
         plugin.addOfflinePlayerToChache(player);
         plugin.getAutoSelectionManager().getList().remove(uuid);
 
@@ -1232,8 +1199,7 @@ public class ResidencePlayerListener implements Listener {
             return;
         }
 
-        if (plugin.getWorldEditTool() == plugin.getConfigManager().getSelectionTool())
-            return;
+
 
         if (player.getGameMode() == GameMode.CREATIVE)
             event.setCancelled(true);
@@ -2805,38 +2771,6 @@ public class ResidencePlayerListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    public void onPlayerChat(AsyncPlayerChatEvent event) {
-        // disabling event on world
-        if (plugin.isDisabledWorldListener(event.getPlayer().getWorld()))
-            return;
-        String pname = event.getPlayer().getName();
-        if (!plugin.getConfigManager().chatEnabled() || playerPersistentData.get(event.getPlayer()).isChatEnabled())
-            return;
-
-        ChatChannel channel = plugin.getChatManager().getPlayerChannel(pname);
-        if (channel != null) {
-            channel.chat(pname, event.getMessage());
-        }
-        event.setCancelled(true);
-    }
-
-    public void tooglePlayerResidenceChat(Player player, String residence) {
-        playerPersistentData.get(player).setChatEnabled(false);
-        plugin.msg(player, lm.Chat_ChatChannelChange, residence);
-    }
-
-    @Deprecated
-    public void removePlayerResidenceChat(String pname) {
-        removePlayerResidenceChat(Bukkit.getPlayer(pname));
-    }
-
-    public void removePlayerResidenceChat(Player player) {
-        if (player == null)
-            return;
-        playerPersistentData.get(player).setChatEnabled(true);
-        plugin.msg(player, lm.Chat_ChatChannelLeave);
-    }
 
     @Deprecated
     public ClaimedResidence getCurrentResidence(UUID uuid) {

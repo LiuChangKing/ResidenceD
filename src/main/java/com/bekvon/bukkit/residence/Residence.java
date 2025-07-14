@@ -4,7 +4,6 @@ import com.bekvon.bukkit.residence.Placeholders.Placeholder;
 import com.bekvon.bukkit.residence.Placeholders.PlaceholderAPIHook;
 import com.bekvon.bukkit.residence.api.*;
 import com.bekvon.bukkit.residence.bigDoors.BigDoorsManager;
-import com.bekvon.bukkit.residence.chat.ChatManager;
 import com.bekvon.bukkit.residence.commands.padd;
 import com.bekvon.bukkit.residence.containers.*;
 import com.bekvon.bukkit.residence.dynmap.DynMapListeners;
@@ -45,8 +44,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.dynmap.DynmapAPI;
-import org.kingdoms.main.Kingdoms;
-import org.kingdoms.manager.game.GameManagement;
 
 import java.io.*;
 import java.lang.reflect.Method;
@@ -94,7 +91,6 @@ public class Residence extends JavaPlugin {
     public WorldItemManager imanager;
     public WorldFlagManager wmanager;
     protected RentManager rentmanager;
-    protected ChatManager chatmanager;
     protected Server server;
     public HelpEntry helppages;
     protected LocaleManager LocaleManager;
@@ -107,11 +103,7 @@ public class Residence extends JavaPlugin {
     protected DynMapManager DynManager;
     protected Sorting SortingManager;
     protected AutoSelection AutoSelectionManager;
-    protected WESchematicManager SchematicManager;
     private InformationPager InformationPagerManager;
-    private WorldGuardInterface worldGuardUtil;
-    private int wepVersion = 6;
-    private KingdomsUtil kingdomsUtil;
 
     protected CommandFiller cmdFiller;
 
@@ -130,7 +122,6 @@ public class Residence extends JavaPlugin {
 
     private boolean SlimeFun = false;
     private boolean BigDoors = false;
-    private boolean lwc = false;
     Metrics metrics = null;
 
     protected boolean initsuccess = false;
@@ -139,9 +130,6 @@ public class Residence extends JavaPlugin {
     private ConcurrentHashMap<String, OfflinePlayer> OfflinePlayerList = new ConcurrentHashMap<String, OfflinePlayer>();
     private Map<UUID, OfflinePlayer> cachedPlayerNameUUIDs = new HashMap<UUID, OfflinePlayer>();
     private Map<UUID, String> cachedPlayerNames = new HashMap<UUID, String>();
-    private com.sk89q.worldedit.bukkit.WorldEditPlugin wep = null;
-    private com.sk89q.worldguard.bukkit.WorldGuardPlugin wg = null;
-    private CMIMaterial wepid;
 
 //    private String ServerLandname = "Server_Land";
     private UUID ServerLandUUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
@@ -173,7 +161,6 @@ public class Residence extends JavaPlugin {
     private MarketRentInterface MarketRentAPI = null;
     private ResidencePlayerInterface PlayerAPI = null;
     private ResidenceInterface ResidenceAPI = null;
-    private ChatInterface ChatAPI = null;
 
     public ResidencePlayerInterface getPlayerManagerAPI() {
         if (PlayerAPI == null)
@@ -208,12 +195,6 @@ public class Residence extends JavaPlugin {
             MarketBuyAPI = tmanager;
         return MarketBuyAPI;
 
-    }
-
-    public ChatInterface getResidenceChatAPI() {
-        if (ChatAPI == null)
-            ChatAPI = chatmanager;
-        return ChatAPI;
     }
 
     public ResidenceCommandListener getCommandManager() {
@@ -401,7 +382,6 @@ public class Residence extends JavaPlugin {
             imanager = new WorldItemManager(this);
             wmanager = new WorldFlagManager(this);
 
-            chatmanager = new ChatManager();
             rentmanager = new RentManager(this);
 
             LocaleManager = new LocaleManager(this);
@@ -415,20 +395,6 @@ public class Residence extends JavaPlugin {
 
             zip = new ZipLibrary(this);
 
-            Plugin lwcp = Bukkit.getPluginManager().getPlugin("LWC");
-            try {
-                if (lwcp != null) {
-                    try {
-                        ResidenceLWCListener.register(this);
-                        Bukkit.getConsoleSender().sendMessage(this.getPrefix() + " LWC hooked.");
-                        lwc = true;
-                    } catch (Throwable e) {
-                        e.printStackTrace();
-                    }
-                }
-            } catch (Throwable e) {
-                e.printStackTrace();
-            }
 
             SlimeFun = Bukkit.getPluginManager().getPlugin("Slimefun") != null;
 
@@ -460,9 +426,6 @@ public class Residence extends JavaPlugin {
             if (this.getConfig().getBoolean("Global.EnableEconomy", false)) {
                 Bukkit.getConsoleSender().sendMessage(getPrefix() + " Scanning for economy systems...");
                 switch (this.getConfigManager().getEconomyType()) {
-                case CMIEconomy:
-                    this.loadCMIEconomy();
-                    break;
                 case None:
                     if (this.getPermissionManager().getPermissionsPlugin() instanceof ResidenceVaultAdapter) {
                         ResidenceVaultAdapter vault = (ResidenceVaultAdapter) this.getPermissionManager().getPermissionsPlugin();
@@ -473,9 +436,6 @@ public class Residence extends JavaPlugin {
                     }
                     if (economy == null) {
                         this.loadVaultEconomy();
-                    }
-                    if (economy == null) {
-                        this.loadCMIEconomy();
                     }
                     break;
                 case Vault:
@@ -573,10 +533,7 @@ public class Residence extends JavaPlugin {
                 FlagPermissions.initValidFlags();
 
                 if (smanager == null)
-                    setWorldEdit();
-                setWorldGuard();
-
-                setKingdoms();
+                    smanager = new SelectionManager(server, this);
 
                 PluginManager pm = getServer().getPluginManager();
 
@@ -778,63 +735,8 @@ public class Residence extends JavaPlugin {
         return name.equals(namecheck);
     }
 
-    private void setWorldEdit() {
-        try {
-            Plugin plugin = server.getPluginManager().getPlugin("WorldEdit");
-            if (plugin != null) {
-                this.wep = (com.sk89q.worldedit.bukkit.WorldEditPlugin) plugin;
-                try {
-                    Class.forName("com.sk89q.worldedit.bukkit.selections.Selection");
 
-                    if (getConfigManager().isWorldEditIntegration())
-                        smanager = new WorldEditSelectionManager(server, this);
-                    if (wep != null)
-                        SchematicManager = new SchematicsManager(this);
-                } catch (ClassNotFoundException e) {
-                    if (getConfigManager().isWorldEditIntegration())
-                        smanager = new WorldEdit7SelectionManager(server, this);
-                    if (wep != null)
-                        SchematicManager = new Schematics7Manager(this);
-                }
-                if (smanager == null)
-                    smanager = new SelectionManager(server, this);
-                if (this.getWorldEdit().getConfig().isInt("wand-item"))
-                    wepid = CMIMaterial.get(this.getWorldEdit().getConfig().getInt("wand-item"));
-                else
-                    wepid = CMIMaterial.get((String) this.getWorldEdit().getConfig().get("wand-item"));
 
-                Bukkit.getConsoleSender().sendMessage(getPrefix() + " Found WorldEdit " + this.getWorldEdit().getDescription().getVersion());
-            } else {
-                smanager = new SelectionManager(server, this);
-            }
-        } catch (Exception | Error e) {
-            e.printStackTrace();
-        }
-    }
-
-    private GameManagement kingdomsmanager = null;
-
-    private void setKingdoms() {
-        if (Bukkit.getPluginManager().getPlugin("Kingdoms") != null) {
-            try {
-                kingdomsmanager = Kingdoms.getManagers();
-            } catch (Throwable e) {
-                this.consoleMessage("Failed to recognize Kingdoms plugin. Compatability disabled");
-            }
-        }
-    }
-
-    public GameManagement getKingdomsManager() {
-        return kingdomsmanager;
-    }
-
-    private void setWorldGuard() {
-        Plugin wgplugin = server.getPluginManager().getPlugin("WorldGuard");
-        if (wgplugin != null) {
-            wg = (com.sk89q.worldguard.bukkit.WorldGuardPlugin) wgplugin;
-            Bukkit.getConsoleSender().sendMessage(getPrefix() + " Found WorldGuard " + wg.getDescription().getVersion());
-        }
-    }
 
     public Residence getPlugin() {
         return this;
@@ -868,7 +770,7 @@ public class Residence extends JavaPlugin {
 
     public SelectionManager getSelectionManager() {
         if (smanager == null)
-            setWorldEdit();
+            smanager = new SelectionManager(server, this);
         return smanager;
     }
 
@@ -892,10 +794,6 @@ public class Residence extends JavaPlugin {
         return DynManager;
     }
 
-
-    public WESchematicManager getSchematicManager() {
-        return SchematicManager;
-    }
 
     public AutoSelection getAutoSelectionManager() {
         return AutoSelectionManager;
@@ -980,10 +878,6 @@ public class Residence extends JavaPlugin {
         return elistener;
     }
 
-    public ChatManager getChatManager() {
-        return chatmanager;
-    }
-
     public String getResidenceVersion() {
         return ResidenceVersion;
     }
@@ -1012,16 +906,6 @@ public class Residence extends JavaPlugin {
         return wmanager.getPerms(loc.getWorld().getName());
     }
 
-
-    private void loadCMIEconomy() {
-        Plugin p = getServer().getPluginManager().getPlugin("CMI");
-        if (p != null) {
-            economy = new CMIEconomy();
-            consoleMessage("Successfully linked with &5CMIEconomy");
-        } else {
-            consoleMessage("CMIEconomy NOT found!");
-        }
-    }
 
     private void loadVaultEconomy() {
         Plugin p = getServer().getPluginManager().getPlugin("Vault");
@@ -1785,43 +1669,6 @@ public class Residence extends JavaPlugin {
         return InformationPagerManager;
     }
 
-    public com.sk89q.worldedit.bukkit.WorldEditPlugin getWorldEdit() {
-        return wep;
-    }
-
-    public com.sk89q.worldguard.bukkit.WorldGuardPlugin getWorldGuard() {
-        return wg;
-    }
-
-    public CMIMaterial getWorldEditTool() {
-        if (wepid == null)
-            wepid = CMIMaterial.NONE;
-        return wepid;
-    }
-
-    public WorldGuardInterface getWorldGuardUtil() {
-        if (worldGuardUtil == null) {
-
-            int version = 6;
-            try {
-                version = Integer.parseInt(wg.getDescription().getVersion().substring(0, 1));
-            } catch (Exception | Error e) {
-            }
-            if (version >= 7) {
-                wepVersion = version;
-                worldGuardUtil = new WorldGuard7Util(this);
-            } else {
-                worldGuardUtil = new WorldGuardUtil(this);
-            }
-        }
-        return worldGuardUtil;
-    }
-
-    public KingdomsUtil getKingdomsUtil() {
-        if (kingdomsUtil == null)
-            kingdomsUtil = new KingdomsUtil(this);
-        return kingdomsUtil;
-    }
 
     public static Residence getInstance() {
         return instance;
@@ -1837,16 +1684,8 @@ public class Residence extends JavaPlugin {
         return Arrays.copyOfRange(args, 1, args.length);
     }
 
-    public int getWorldGuardVersion() {
-        return wepVersion;
-    }
-
     public boolean isSlimefunPresent() {
         return SlimeFun;
-    }
-
-    public boolean isLwcPresent() {
-        return lwc;
     }
 
     public boolean isFullyLoaded() {

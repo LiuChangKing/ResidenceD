@@ -10,7 +10,6 @@ public class playerPersistentData {
 
     protected static ConcurrentHashMap<UUID, playerPersistentData> playersData = new ConcurrentHashMap<UUID, playerPersistentData>();
 
-    private boolean chatEnabled = true;
     private Location lastOutsideLoc = null;
 
     public Location getLastOutsideLoc() {
@@ -21,13 +20,6 @@ public class playerPersistentData {
         this.lastOutsideLoc = lastOutsideLoc;
     }
 
-    public boolean isChatEnabled() {
-        return chatEnabled;
-    }
-
-    public void setChatEnabled(boolean chatEnabled) {
-        this.chatEnabled = chatEnabled;
-    }
 
     public static playerPersistentData get(Player player) {
         return get(player.getUniqueId());

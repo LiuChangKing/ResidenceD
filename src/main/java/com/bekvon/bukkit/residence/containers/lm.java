@@ -69,7 +69,6 @@ public enum lm {
 
     Select_Points("&eSelect two points first before using this command!"),
     Select_Overlap("&cSelected points overlap with &6%1 &cregion!"),
-    Select_WorldGuardOverlap("&cSelected points overlap with &6%1 &cWorldGuard region!"),
     Select_KingdomsOverlap("&cSelected points overlap with &6%1 &cKingdoms land!"),
     Select_Success("&eSelection Successful!"),
     Select_Fail("&cInvalid select command..."),
@@ -238,10 +237,8 @@ public enum lm {
     Residence_NoResHere("&cThere is no residence in there."),
     Residence_OwnerNoPermission("&cThe owner does not have permission for this."),
     Residence_ParentNoPermission("&cYou don't have permission to make changes to the parent zone."),
-    Residence_ChatDisabled("&eResidence Chat Disabled..."),
     Residence_DeleteConfirm("&eAre you sure you want to delete residence &6%1&e, use &6/res confirm &eto confirm."),
     Residence_ChangedMain("&eChanged main residence to &6%1"),
-    Residence_LwcRemoved("&eRemoved &6%1 &eLwc protections in &6%2ms"),
 
     Residence_Balance("&eBalance: &6%1"),
 
@@ -375,20 +372,6 @@ public enum lm {
     InformationPage_FlagsList("&2 %1 &6- &e%2"),
     InformationPage_SmallSeparator("&6------"),
 
-    Chat_ChatChannelChange("&eChanged residence chat channel to &6%1!"),
-    Chat_ChatChannelLeave("&eLeft residence chat"),
-
-    Chat_ChatMessage("%1 %2%3: %4%5"),
-    Chat_ChatListeningMessage("&2[Listening %6]%1 %2%3: %4%5"),
-
-    Chat_JoinFirst("&4Join residence chat channel first..."),
-    Chat_InvalidChannel("&4Invalid Channel..."),
-    Chat_InvalidColor("&4Incorrect color code"),
-    Chat_NotInChannel("&4Player is not in channel"),
-    Chat_Kicked("&6%1 &ewas kicked from &6%2 &echannel"),
-    Chat_InvalidPrefixLength("&4Prefix is to long. Allowed length: %1"),
-    Chat_ChangedColor("&eResidence chat channel color changed to %1"),
-    Chat_ChangedPrefix("&eResidence chat channel prefix changed to %1"),
 
     Shop_ListTopLine("&6%1 &eShop list - Page &6%2 &eof &6%3 %4"),
     Shop_List(" &e%1. &6%2 &e(&6%3&e) %4"),
@@ -483,7 +466,6 @@ public enum lm {
     General_NotOnline("&eTarget player must be online."),
 
     General_GenericPages("&ePage &6%1 &eof &6%2 &e(&6%3&e)"),
-    General_WorldEditNotFound("&cWorldEdit was not detected."),
     General_CoordsTop("&eX:&6%1 &eY:&6%2 &eZ:&6%3"),
     General_CoordsBottom("&eX:&6%1 &eY:&6%2 &eZ:&6%3"),
     General_CoordsLiner("&7 (&3%1&7;%2&7)"),

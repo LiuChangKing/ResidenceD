@@ -8,7 +8,6 @@ import com.bekvon.bukkit.residence.containers.Visualizer;
 import com.bekvon.bukkit.residence.containers.lm;
 import com.bekvon.bukkit.residence.event.ResidenceRentEvent;
 import com.bekvon.bukkit.residence.event.ResidenceRentEvent.RentEventType;
-import com.bekvon.bukkit.residence.listeners.ResidenceLWCListener;
 import com.bekvon.bukkit.residence.permissions.PermissionGroup;
 import com.bekvon.bukkit.residence.permissions.PermissionManager.ResPerm;
 import com.bekvon.bukkit.residence.protection.ClaimedResidence;
@@ -311,12 +310,6 @@ public class RentManager implements MarketRentInterface {
                 res.getPermissions().applyDefaultRentedFlags();
                 plugin.msg(player, lm.Residence_RentSuccess, res.getName(), land.days);
 
-                if (plugin.getSchematicManager() != null &&
-                    plugin.getConfigManager().RestoreAfterRentEnds &&
-                    !plugin.getConfigManager().SchematicsSaveOnFlagChange &&
-                    res.getPermissions().has("backup", true)) {
-                    plugin.getSchematicManager().save(res);
-                }
 
             } else {
                 player.sendMessage(ChatColor.RED + "Error, unable to transfer money...");
@@ -427,18 +420,7 @@ public class RentManager implements MarketRentInterface {
                 res.setRentable(null);
             }
 
-            boolean backup = res.getPermissions().has("backup", false);
-
-            if (plugin.getConfigManager().isRemoveLwcOnUnrent() && plugin.isLwcPresent())
-                ResidenceLWCListener.removeLwcFromResidence(player, res);
-
             res.getPermissions().applyDefaultFlags();
-
-            if (plugin.getSchematicManager() != null && plugin.getConfigManager().RestoreAfterRentEnds && backup) {
-                plugin.getSchematicManager().load(res);
-                // set true if its already exists
-                res.getPermissions().setFlag("backup", FlagState.TRUE);
-            }
             plugin.getSignUtil().CheckSign(res);
 
             plugin.msg(player, lm.Residence_Unrent, res.getName());
@@ -728,18 +710,7 @@ public class RentManager implements MarketRentInterface {
             rentedLand.remove(res);
             res.setRented(null);
 
-            boolean backup = res.getPermissions().has("backup", false);
-
             res.getPermissions().applyDefaultFlags();
-
-            if (plugin.getSchematicManager() != null && plugin.getConfigManager().RestoreAfterRentEnds && backup) {
-                plugin.getSchematicManager().load(res);
-                plugin.getSignUtil().CheckSign(res);
-                // set true if its already exists
-                res.getPermissions().setFlag("backup", FlagState.TRUE);
-                // To avoid lag spikes on multiple residence restores at once, will limit to one residence at time
-                break;
-            }
             plugin.getSignUtil().CheckSign(res);
         }
     }

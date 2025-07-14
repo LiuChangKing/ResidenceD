@@ -47,9 +47,7 @@ public class area implements cmd {
 	    if (args.length != 3)
 		return false;
 
-	    if (plugin.getWorldEdit() != null && plugin.getWorldEditTool().equals(plugin.getConfigManager().getSelectionTool())) {
-		plugin.getSelectionManager().worldEdit(player);
-	    }
+
 
 	    if (!plugin.getSelectionManager().hasPlacedBoth(player)) {
 		plugin.msg(player, lm.Select_Points);
@@ -72,9 +70,7 @@ public class area implements cmd {
 	    if (args.length != 3)
 		return false;
 
-	    if (plugin.getWorldEdit() != null && plugin.getWorldEditTool().equals(plugin.getConfigManager().getSelectionTool())) {
-		plugin.getSelectionManager().worldEdit(player);
-	    }
+
 
 	    if (!plugin.getSelectionManager().hasPlacedBoth(player)) {
 		plugin.msg(player, lm.Select_Points);

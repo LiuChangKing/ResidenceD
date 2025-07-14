@@ -9,7 +9,6 @@ import com.bekvon.bukkit.residence.event.ResidenceCreationEvent;
 import com.bekvon.bukkit.residence.event.ResidenceDeleteEvent;
 import com.bekvon.bukkit.residence.event.ResidenceDeleteEvent.DeleteCause;
 import com.bekvon.bukkit.residence.event.ResidenceRenameEvent;
-import com.bekvon.bukkit.residence.listeners.ResidenceLWCListener;
 import com.bekvon.bukkit.residence.permissions.PermissionGroup;
 import com.bekvon.bukkit.residence.permissions.PermissionManager.ResPerm;
 import com.bekvon.bukkit.residence.protection.FlagPermissions.FlagCombo;
@@ -599,8 +598,6 @@ public class ResidenceManager implements ResidenceInterface {
 
             regenerateArea(res);
 
-            if (plugin.getConfigManager().isRemoveLwcOnDelete() && plugin.isLwcPresent())
-                ResidenceLWCListener.removeLwcFromResidence(player, res);
             if (regenerate) {
                 for (CuboidArea one : res.getAreaArray()) {
                     plugin.getSelectionManager().regenerate(one);

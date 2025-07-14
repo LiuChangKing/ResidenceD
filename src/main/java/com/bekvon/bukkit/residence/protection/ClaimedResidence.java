@@ -2,7 +2,6 @@ package com.bekvon.bukkit.residence.protection;
 
 import com.bekvon.bukkit.residence.ConfigManager;
 import com.bekvon.bukkit.residence.Residence;
-import com.bekvon.bukkit.residence.chat.ChatChannel;
 import com.bekvon.bukkit.residence.commands.padd;
 import com.bekvon.bukkit.residence.containers.*;
 import com.bekvon.bukkit.residence.economy.ResidenceBank;
@@ -54,8 +53,6 @@ public class ClaimedResidence {
     protected String enterMessage = null;
     protected String leaveMessage = null;
     protected String ShopDesc = null;
-    protected String ChatPrefix = "";
-    protected CMIChatColor ChannelColor = CMIChatColor.WHITE;
     protected ResidenceItemList ignorelist;
     protected ResidenceItemList blacklist;
     protected boolean mainRes = false;
@@ -475,13 +472,6 @@ public class ClaimedResidence {
                 return false;
             }
 
-            if (!resadmin) {
-                if (Residence.getInstance().getWorldGuard() != null && Residence.getInstance().getWorldGuardUtil().isSelectionInArea(player))
-                    return false;
-
-                if (Residence.getInstance().getKingdomsManager() != null && Residence.getInstance().getKingdomsUtil().isSelectionInArea(player))
-                    return false;
-            }
 
             if (Residence.getInstance().getConfigManager().isChargeOnAreaAdd() && chargeMoney && getParent() == null && Residence.getInstance().getConfigManager().enableEconomy() && !resadmin) {
                 double chargeamount = area.getCost(group);
@@ -644,12 +634,6 @@ public class ClaimedResidence {
             if (!isBiggerThanMin(player, newarea, resadmin))
                 return false;
 
-            if (!resadmin) {
-                if (Residence.getInstance().getWorldGuard() != null && Residence.getInstance().getWorldGuardUtil().isSelectionInArea(player))
-                    return false;
-                if (Residence.getInstance().getKingdomsManager() != null && Residence.getInstance().getKingdomsUtil().isSelectionInArea(player))
-                    return false;
-            }
 
             if (Residence.getInstance().getConfigManager().isChargeOnExpansion() && getParent() == null && Residence.getInstance().getConfigManager().enableEconomy() && !resadmin) {
                 double chargeamount = newarea.getCost(group) - oldarea.getCost(group);
@@ -1472,20 +1456,11 @@ public class ClaimedResidence {
             root.put("BlockSellPrice", BlockSellPrice);
 
         try {
-            if (!ChatPrefix.equals(""))
-                root.put("ChatPrefix", ChatPrefix);
         } catch (Throwable e) {
             e.printStackTrace();
         }
 
-        try {
-            if (!ChannelColor.getName().equalsIgnoreCase(Residence.getInstance().getConfigManager().getChatColor().getName())
-                && !ChannelColor.getName().equalsIgnoreCase("WHITE")) {
-                root.put("ChannelColor", ChannelColor.getName());
-            }
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
+
 
         try {
             Map<String, Object> map = blacklist.save();
@@ -1744,14 +1719,6 @@ public class ClaimedResidence {
         if (root.containsKey("cmdWhiteList"))
             res.cmdWhiteList = (List<String>) root.get("cmdWhiteList");
 
-        if (root.containsKey("ChatPrefix"))
-            res.ChatPrefix = (String) root.get("ChatPrefix");
-
-        if (root.containsKey("ChannelColor"))
-            res.ChannelColor = CMIChatColor.getColor((String) root.get("ChannelColor"));
-        else {
-            res.ChannelColor = Residence.getInstance().getConfigManager().getChatColor();
-        }
 
         return res;
     }
@@ -1911,25 +1878,6 @@ public class ClaimedResidence {
         return true;
     }
 
-    public void setChatPrefix(String ChatPrefix) {
-        this.ChatPrefix = ChatPrefix;
-    }
-
-    public String getChatPrefix() {
-        return this.ChatPrefix == null ? "" : this.ChatPrefix;
-    }
-
-    public void setChannelColor(CMIChatColor ChannelColor) {
-        this.ChannelColor = ChannelColor;
-    }
-
-    public ChatChannel getChatChannel() {
-        return Residence.getInstance().getChatManager().getChannel(this.getName());
-    }
-
-    public CMIChatColor getChannelColor() {
-        return ChannelColor;
-    }
 
     public UUID getOwnerUUID() {
         return perms.getOwnerUUID();

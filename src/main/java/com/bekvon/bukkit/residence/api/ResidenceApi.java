@@ -16,11 +16,7 @@ public class ResidenceApi {
 	return Residence.getInstance().getPlayerManagerAPI();
     }
 
-    public static ChatInterface getChatManager() {
-	return Residence.getInstance().getResidenceChatAPI();
-    }
-
     public static ResidenceInterface getResidenceManager() {
-	return Residence.getInstance().getResidenceManagerAPI();
+        return Residence.getInstance().getResidenceManagerAPI();
     }
 }
