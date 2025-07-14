@@ -6,6 +6,7 @@ import com.bekvon.bukkit.residence.containers.ResAdmin;
 import com.bekvon.bukkit.residence.containers.lm;
 import com.bekvon.bukkit.residence.protection.FlagPermissions;
 import com.bekvon.bukkit.residence.protection.FlagPermissions.FlagCombo;
+import net.Zrips.CMILib.CMILib;
 import net.Zrips.CMILib.Items.CMIMaterial;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
