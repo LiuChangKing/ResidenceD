@@ -1465,14 +1465,6 @@ public class ResidencePlayerListener implements Listener {
 
             ClaimedResidence res = plugin.getResidenceManager().getByLoc(block.getLocation());
 
-            if (res != null && res.getRaid().isUnderRaid() && res.getRaid().isDefender(player) && !ConfigManager.RaidDefenderContainerUsage) {
-                Flags result = FlagPermissions.getMaterialUseFlagList().get(mat);
-                if (result != null && result.equals(Flags.container)) {
-                    event.setCancelled(true);
-                    plugin.msg(player, lm.Raid_cantDo);
-                    return;
-                }
-            }
 
             if (res == null || !res.isOwner(player)) {
 
@@ -1483,9 +1475,6 @@ public class ResidencePlayerListener implements Listener {
 
                         if (hasuse || result.equals(Flags.container)) {
 
-                            if (res != null && res.getRaid().isUnderRaid() && res.getRaid().isAttacker(player)) {
-                                break main;
-                            }
                             if (!ResPerm.bypass_container.hasPermission(player, 10000L)) {
                                 event.setCancelled(true);
                                 plugin.msg(player, lm.Flag_Deny, result);
@@ -1494,11 +1483,6 @@ public class ResidencePlayerListener implements Listener {
                         }
 
                         if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-
-                            if (res != null && res.getRaid().isUnderRaid() && res.getRaid().isAttacker(player)) {
-                                break main;
-                            }
-
                             switch (result) {
                             case door:
                                 if (ResPerm.bypass_door.hasPermission(player, 10000L))
@@ -1515,10 +1499,6 @@ public class ResidencePlayerListener implements Listener {
                         }
 
                         if (isCanUseEntity_BothClick(mat, block)) {
-
-                            if (res != null && res.getRaid().isUnderRaid() && res.getRaid().isAttacker(player)) {
-                                break main;
-                            }
                             event.setCancelled(true);
                             plugin.msg(player, lm.Flag_Deny, result);
                         }
@@ -2517,8 +2497,6 @@ public class ResidencePlayerListener implements Listener {
 
         if (move && cantMove) {
 
-            if (res.getRaid().isUnderRaid() && (res.getRaid().isAttacker(player.getUniqueId()) || res.getRaid().isDefender(player.getUniqueId())))
-                return true;
 
             Location lastLoc = tempData.getLastValidLocation(player);
 

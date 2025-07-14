@@ -216,11 +216,6 @@ public class ResidenceBlockListener implements Listener {
 
         boolean hasdestroy = perms.playerHas(player, Flags.destroy, perms.playerHas(player, Flags.build, true));
 
-        if (res != null && res.getRaid().isUnderRaid()) {
-            if (res.getRaid().isAttacker(player.getUniqueId()) && ConfigManager.RaidAttackerBlockBreak || res.getRaid().isDefender(player.getUniqueId()) && ConfigManager.RaidDefenderBlockBreak) {
-                hasdestroy = true;
-            }
-        }
         Material mat = null;
 
         if (!hasdestroy) {
@@ -630,11 +625,6 @@ public class ResidenceBlockListener implements Listener {
         FlagPermissions perms = Residence.getInstance().getPermsByLocForPlayer(block.getLocation(), player);
         boolean hasplace = perms.playerHas(player, Flags.place, perms.playerHas(player, Flags.build, true));
 
-        if (res != null && res.getRaid().isUnderRaid()) {
-            if (res.getRaid().isAttacker(player.getUniqueId()) && ConfigManager.RaidAttackerBlockPlace || res.getRaid().isDefender(player.getUniqueId()) && ConfigManager.RaidDefenderBlockPlace) {
-                hasplace = true;
-            }
-        }
 
         if (!hasplace && !ResPerm.bypass_build.hasPermission(player, 10000L)) {
             if (informPlayer)

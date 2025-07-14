@@ -15,7 +15,6 @@ import com.bekvon.bukkit.residence.itemlist.ResidenceItemList;
 import com.bekvon.bukkit.residence.permissions.PermissionGroup;
 import com.bekvon.bukkit.residence.permissions.PermissionManager.ResPerm;
 import com.bekvon.bukkit.residence.protection.FlagPermissions.FlagCombo;
-import com.bekvon.bukkit.residence.raid.ResidenceRaid;
 import com.bekvon.bukkit.residence.shopStuff.ShopVote;
 import com.bekvon.bukkit.residence.signsStuff.Signs;
 import com.bekvon.bukkit.residence.utils.*;
@@ -74,7 +73,6 @@ public class ClaimedResidence {
 
     protected int sellPrice = -1;
 
-    private ResidenceRaid raid;
 
     private Set<Signs> signsInResidence = Collections.synchronizedSet(new HashSet<Signs>());
 
@@ -1178,14 +1176,8 @@ public class ClaimedResidence {
 
         boolean isAdmin = ResAdmin.isResAdmin(reqPlayer) || resadmin;
 
-        if (this.getRaid().isRaidInitialized()) {
-            if (this.getRaid().isAttacker(targetPlayer) || this.getRaid().isDefender(targetPlayer) && !ConfigManager.RaidDefenderTeleport || !isAdmin) {
-                Residence.getInstance().msg(reqPlayer, lm.Raid_cantDo);
-                return;
-            }
-        } else {
-            if (!isAdmin && !ResPerm.bypass_tp.hasPermission(reqPlayer, 10000L) && !ResPerm.admin_tp.hasPermission(reqPlayer, 10000L)
-                && (!this.isOwner(targetPlayer) || this.isOwner(targetPlayer) && Residence.getInstance().getConfigManager().isCanTeleportIncludeOwner())) {
+        if (!isAdmin && !ResPerm.bypass_tp.hasPermission(reqPlayer, 10000L) && !ResPerm.admin_tp.hasPermission(reqPlayer, 10000L)
+            && (!this.isOwner(targetPlayer) || this.isOwner(targetPlayer) && Residence.getInstance().getConfigManager().isCanTeleportIncludeOwner())) {
                 ResidencePlayer rPlayer = Residence.getInstance().getPlayerManager().getResidencePlayer(reqPlayer);
                 PermissionGroup group = rPlayer.getGroup();
                 if (!group.hasTpAccess()) {
@@ -1424,13 +1416,6 @@ public class ClaimedResidence {
         if (createTime != 0L)
             root.put("CreatedOn", createTime);
 
-        if (this.isTopArea() && raid != null && this.getRaid().isUnderRaidCooldown()) {
-            root.put("LastRaid", this.getRaid().getEndsAt());
-        }
-
-        if (this.isTopArea() && raid != null && this.getRaid().isImmune()) {
-            root.put("Immunity", this.getRaid().getImmunityUntil());
-        }
 
 //	if (this.getTown() != null && !this.isSubzone()) {
 //	    if (this.getTown().getMainResidence().equals(this))
@@ -1599,13 +1584,6 @@ public class ClaimedResidence {
         else
             res.createTime = System.currentTimeMillis();
 
-        if (root.containsKey("LastRaid")) {
-            res.getRaid().setEndsAt(((Long) root.get("LastRaid")));
-        }
-
-        if (root.containsKey("Immunity")) {
-            res.getRaid().setImmunityUntil(((Long) root.get("Immunity")));
-        }
 
         if (root.containsKey("ShopDescription"))
             res.setShopDesc((String) root.get("ShopDescription"));
@@ -1835,10 +1813,6 @@ public class ClaimedResidence {
             return false;
         }
 
-        if (this.getRaid().isRaidInitialized() && !resadmin) {
-            Residence.getInstance().msg(player, lm.Raid_cantDo);
-            return false;
-        }
 
         if (player == null || perms.hasResidencePermission(player, true) || resadmin) {
             if (areas.containsKey(newName)) {
@@ -2092,11 +2066,6 @@ public class ClaimedResidence {
 //	this.town = town;
 //    }
 
-    public ResidenceRaid getRaid() {
-        if (raid == null)
-            raid = new ResidenceRaid(this);
-        return raid;
-    }
 
     @Override
     public boolean equals(Object obj) {

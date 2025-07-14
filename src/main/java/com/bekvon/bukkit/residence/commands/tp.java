@@ -37,10 +37,6 @@ public class tp implements cmd {
             return true;
         }
 
-        if (res.getRaid().isRaidInitialized() && res.getRaid().isAttacker(player)) {
-            plugin.msg(player, lm.Raid_cantDo);
-            return true;
-        }
 
         if (plugin.getConfigManager().getTeleportBlockedWorlds().contains(res.getPermissions().getWorldName().toLowerCase())) {
             plugin.msg(player, lm.Residence_TeleportBlockedWorlds);

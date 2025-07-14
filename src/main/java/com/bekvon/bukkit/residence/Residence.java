@@ -2,10 +2,6 @@ package com.bekvon.bukkit.residence;
 
 import com.bekvon.bukkit.residence.Placeholders.Placeholder;
 import com.bekvon.bukkit.residence.Placeholders.PlaceholderAPIHook;
-import com.bekvon.bukkit.residence.allNms.v1_10Events;
-import com.bekvon.bukkit.residence.allNms.v1_13Events;
-import com.bekvon.bukkit.residence.allNms.v1_8Events;
-import com.bekvon.bukkit.residence.allNms.v1_9Events;
 import com.bekvon.bukkit.residence.api.*;
 import com.bekvon.bukkit.residence.bigDoors.BigDoorsManager;
 import com.bekvon.bukkit.residence.chat.ChatManager;
@@ -22,7 +18,6 @@ import com.bekvon.bukkit.residence.permissions.PermissionManager;
 import com.bekvon.bukkit.residence.persistance.YMLSaveHelper;
 import com.bekvon.bukkit.residence.protection.*;
 import com.bekvon.bukkit.residence.protection.FlagPermissions.FlagCombo;
-import com.bekvon.bukkit.residence.raid.ResidenceRaidListener;
 import com.bekvon.bukkit.residence.selection.*;
 import com.bekvon.bukkit.residence.shopStuff.ShopListener;
 import com.bekvon.bukkit.residence.shopStuff.ShopSignUtil;
@@ -33,11 +28,8 @@ import com.bekvon.bukkit.residence.text.help.HelpEntry;
 import com.bekvon.bukkit.residence.text.help.InformationPager;
 import com.bekvon.bukkit.residence.utils.*;
 import com.bekvon.bukkit.residence.vaultinterface.ResidenceVaultAdapter;
-import com.earth2me.essentials.Essentials;
 import com.residence.mcstats.Metrics;
 import com.residence.zip.ZipLibrary;
-import fr.crafter.tickleman.realeconomy.RealEconomy;
-import fr.crafter.tickleman.realplugin.RealPlugin;
 import net.Zrips.CMILib.Colors.CMIChatColor;
 import net.Zrips.CMILib.Items.CMIMaterial;
 import net.Zrips.CMILib.Util.CMIVersionChecker;
@@ -471,9 +463,6 @@ public class Residence extends JavaPlugin {
                 case CMIEconomy:
                     this.loadCMIEconomy();
                     break;
-                case Essentials:
-                    this.loadEssentialsEconomy();
-                    break;
                 case None:
                     if (this.getPermissionManager().getPermissionsPlugin() instanceof ResidenceVaultAdapter) {
                         ResidenceVaultAdapter vault = (ResidenceVaultAdapter) this.getPermissionManager().getPermissionsPlugin();
@@ -488,18 +477,6 @@ public class Residence extends JavaPlugin {
                     if (economy == null) {
                         this.loadCMIEconomy();
                     }
-                    if (economy == null) {
-                        this.loadEssentialsEconomy();
-                    }
-                    if (economy == null) {
-                        this.loadRealEconomy();
-                    }
-                    if (economy == null) {
-                        this.loadIConomy();
-                    }
-                    break;
-                case RealEconomy:
-                    this.loadRealEconomy();
                     break;
                 case Vault:
                     if (this.getPermissionManager().getPermissionsPlugin() instanceof ResidenceVaultAdapter) {
@@ -512,9 +489,6 @@ public class Residence extends JavaPlugin {
                     if (economy == null) {
                         this.loadVaultEconomy();
                     }
-                    break;
-                case iConomy:
-                    this.loadIConomy();
                     break;
                 default:
                     break;
@@ -606,20 +580,7 @@ public class Residence extends JavaPlugin {
 
                 PluginManager pm = getServer().getPluginManager();
 
-                if (Version.isCurrentEqualOrHigher(Version.v1_9_R1))
-                    pm.registerEvents(new ResidencePlayerListener1_9(this), this);
-                if (Version.isCurrentEqualOrHigher(Version.v1_12_R1))
-                    pm.registerEvents(new ResidencePlayerListener1_12(this), this);
-                if (Version.isCurrentEqualOrHigher(Version.v1_13_R1))
-                    pm.registerEvents(new ResidencePlayerListener1_13(this), this);
-                if (Version.isCurrentEqualOrHigher(Version.v1_14_R1))
-                    pm.registerEvents(new ResidencePlayerListener1_14(this), this);
-                if (Version.isCurrentEqualOrHigher(Version.v1_15_R1))
-                    pm.registerEvents(new ResidencePlayerListener1_15(this), this);
-                if (Version.isCurrentEqualOrHigher(Version.v1_16_R1))
-                    pm.registerEvents(new ResidencePlayerListener1_16(this), this);
-                if (Version.isCurrentEqualOrHigher(Version.v1_17_R1))
-                    pm.registerEvents(new ResidencePlayerListener1_17(this), this);
+                // Minimum supported version is 1.18.2, register only listeners for newer versions
                 if (Version.isCurrentEqualOrHigher(Version.v1_19_R1))
                     pm.registerEvents(new ResidencePlayerListener1_19(this), this);
                 if (Version.isCurrentEqualOrHigher(Version.v1_20_R1))
@@ -636,23 +597,7 @@ public class Residence extends JavaPlugin {
                 pm.registerEvents(elistener, this);
                 pm.registerEvents(new ResidenceFixesListener(), this);
                 pm.registerEvents(new ShopListener(this), this);
-                pm.registerEvents(new ResidenceRaidListener(), this);
-
-                // 1.8 event
-                if (Version.isCurrentEqualOrHigher(Version.v1_8_R1))
-                    pm.registerEvents(new v1_8Events(), this);
-
-                // 1.9 event
-                if (Version.isCurrentEqualOrHigher(Version.v1_9_R1))
-                    pm.registerEvents(new v1_9Events(), this);
-
-                // 1.10 event
-                if (Version.isCurrentEqualOrHigher(Version.v1_10_R1))
-                    pm.registerEvents(new v1_10Events(), this);
-
-                // 1.13 event
-                if (Version.isCurrentEqualOrHigher(Version.v1_13_R1))
-                    pm.registerEvents(new v1_13Events(this), this);
+                // Events for old versions removed
 
                 firstenable = false;
             } else {
@@ -1067,31 +1012,6 @@ public class Residence extends JavaPlugin {
         return wmanager.getPerms(loc.getWorld().getName());
     }
 
-    private void loadIConomy() {
-        Plugin p = getServer().getPluginManager().getPlugin("iConomy");
-        if (p != null) {
-            if (p.getDescription().getVersion().startsWith("6")) {
-                economy = new IConomy6Adapter((com.iCo6.iConomy) p);
-            } else {
-                consoleMessage("UNKNOWN iConomy version!");
-                return;
-            }
-            consoleMessage("Successfully linked with &5iConomy");
-            consoleMessage("Version: " + p.getDescription().getVersion());
-        } else {
-            consoleMessage("iConomy NOT found!");
-        }
-    }
-
-    private void loadEssentialsEconomy() {
-        Plugin p = getServer().getPluginManager().getPlugin("Essentials");
-        if (p != null) {
-            economy = new EssentialsEcoAdapter((Essentials) p);
-            consoleMessage("Successfully linked with &5Essentials Economy");
-        } else {
-            consoleMessage("Essentials Economy NOT found!");
-        }
-    }
 
     private void loadCMIEconomy() {
         Plugin p = getServer().getPluginManager().getPlugin("CMI");
@@ -1100,16 +1020,6 @@ public class Residence extends JavaPlugin {
             consoleMessage("Successfully linked with &5CMIEconomy");
         } else {
             consoleMessage("CMIEconomy NOT found!");
-        }
-    }
-
-    private void loadRealEconomy() {
-        Plugin p = getServer().getPluginManager().getPlugin("RealPlugin");
-        if (p != null) {
-            economy = new RealShopEconomy(new RealEconomy((RealPlugin) p));
-            consoleMessage("Successfully linked with &5RealShop Economy");
-        } else {
-            consoleMessage("RealShop Economy NOT found!");
         }
     }
 
@@ -1128,10 +1038,6 @@ public class Residence extends JavaPlugin {
         }
     }
 
-    @Deprecated
-    /**
-    * @deprecated Use {@link ResAdmin#isResAdmin(CommandSender)} instead.
-    */
     public boolean isResAdminOn(CommandSender sender) {
         return ResAdmin.isResAdmin(sender);
     }

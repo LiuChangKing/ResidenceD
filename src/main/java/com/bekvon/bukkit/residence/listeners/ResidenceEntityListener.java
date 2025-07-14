@@ -1541,14 +1541,6 @@ public class ResidenceEntityListener implements Listener {
             if (!(victim instanceof Player))
                 return true;
 
-            if (srcarea != null && area != null && srcarea.equals(area) && attacker != null && area.getRaid().isUnderRaid() && area.getRaid().onSameTeam(attacker, (Player) victim)
-                && !ConfigManager.RaidFriendlyFire) {
-                return false;
-            }
-
-            if (srcarea != null && area != null && srcarea.equals(area) && attacker != null && area.getRaid().isUnderRaid() && !area.getRaid().onSameTeam(attacker, (Player) victim)) {
-                return true;
-            }
 
             if (srcarea != null && area != null && srcarea.equals(area) && attacker != null &&
                 srcarea.getPermissions().playerHas((Player) victim, Flags.friendlyfire, FlagCombo.OnlyFalse) &&
@@ -1690,14 +1682,6 @@ public class ResidenceEntityListener implements Listener {
                 if (!(ent instanceof Player))
                     return;
 
-                if (srcarea != null && area != null && srcarea.equals(area) && attacker != null && area.getRaid().isUnderRaid() && area.getRaid().onSameTeam(attacker, (Player) ent)
-                    && !ConfigManager.RaidFriendlyFire) {
-                    event.setCancelled(true);
-                }
-
-                if (srcarea != null && area != null && srcarea.equals(area) && attacker != null && area.getRaid().isUnderRaid() && !area.getRaid().onSameTeam(attacker, (Player) ent)) {
-                    return;
-                }
 
                 if (srcarea != null && area != null && srcarea.equals(area) && attacker != null &&
                     srcarea.getPermissions().playerHas((Player) ent, Flags.friendlyfire, FlagCombo.OnlyFalse) &&

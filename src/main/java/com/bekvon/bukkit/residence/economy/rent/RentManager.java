@@ -184,10 +184,6 @@ public class RentManager implements MarketRentInterface {
             return;
         }
 
-        if (res.getRaid().isRaidInitialized() && !resadmin) {
-            plugin.msg(player, lm.Raid_cantDo);
-            return;
-        }
 
         if (!plugin.getConfigManager().enabledRentSystem()) {
             plugin.msg(player, lm.Economy_MarketDisabled);
@@ -256,10 +252,6 @@ public class RentManager implements MarketRentInterface {
             return;
         }
 
-        if (res.getRaid().isRaidInitialized() && !resadmin) {
-            plugin.msg(player, lm.Raid_cantDo);
-            return;
-        }
 
         if (!plugin.getConfigManager().enabledRentSystem()) {
             plugin.msg(player, lm.Rent_Disabled);
@@ -415,10 +407,6 @@ public class RentManager implements MarketRentInterface {
             return;
         }
 
-        if (res.getRaid().isRaidInitialized() && !resadmin) {
-            plugin.msg(player, lm.Raid_cantDo);
-            return;
-        }
 
         RentedLand rent = res.getRentedLand();
         if (rent == null) {

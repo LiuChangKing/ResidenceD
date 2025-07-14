@@ -39,10 +39,6 @@ public class subzone implements cmd {
 	    return true;
 	}
 
-	if (res.getRaid().isRaidInitialized()) {
-	    plugin.msg(sender, lm.Raid_cantDo);
-	    return true;
-	}
 
 	if (plugin.getWorldEdit() != null) {
 	    if (plugin.getWorldEditTool() == plugin.getConfigManager().getSelectionTool()) {
