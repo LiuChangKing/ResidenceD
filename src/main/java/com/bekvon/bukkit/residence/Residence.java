@@ -339,7 +339,6 @@ public class Residence extends JavaPlugin {
             this.getCommand("resadmin").setExecutor(getCommandManager());
             this.getCommand("residence").setExecutor(getCommandManager());
 
-            this.getCommand("rc").setExecutor(getCommandManager());
             this.getCommand("resreload").setExecutor(getCommandManager());
             this.getCommand("resload").setExecutor(getCommandManager());
 
