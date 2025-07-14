@@ -1160,8 +1160,14 @@ public class ClaimedResidence {
 
         boolean isAdmin = ResAdmin.isResAdmin(reqPlayer) || resadmin;
 
-        if (!isAdmin && !ResPerm.bypass_tp.hasPermission(reqPlayer, 10000L) && !ResPerm.admin_tp.hasPermission(reqPlayer, 10000L)
-            && (!this.isOwner(targetPlayer) || this.isOwner(targetPlayer) && Residence.getInstance().getConfigManager().isCanTeleportIncludeOwner())) {
+        if (!isAdmin
+                && !ResPerm.bypass_tp.hasPermission(reqPlayer, 10000L)
+                && !ResPerm.admin_tp.hasPermission(reqPlayer, 10000L)) {
+            boolean ownerCheck = !this.isOwner(targetPlayer)
+                    || (this.isOwner(targetPlayer)
+                            && Residence.getInstance().getConfigManager().isCanTeleportIncludeOwner());
+
+            if (ownerCheck) {
                 ResidencePlayer rPlayer = Residence.getInstance().getPlayerManager().getResidencePlayer(reqPlayer);
                 PermissionGroup group = rPlayer.getGroup();
                 if (!group.hasTpAccess()) {
