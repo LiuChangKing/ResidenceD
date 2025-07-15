@@ -351,7 +351,7 @@ Global:
   PreventSubZoneRemoval: true
   # 将其设置为False，即使在保存文件中检测到错误，也会导致住宅继续加载。
   StopOnSaveFault: true
-  ResidenceNameRegex: '[^a-zA-Z0-9\-\_]'
+  ResidenceNameRegex: '[^\\p{IsHan}a-zA-Z0-9\\-_]'
   # 将其设置为TRUE，每次居住时都会在控制台记录信息
   ShowIntervalMessages: false
   # 将其设置为True，将胸部放在地面上时，将其发送给新玩家的教程消息。
