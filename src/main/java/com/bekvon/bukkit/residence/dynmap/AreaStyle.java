@@ -6,7 +6,6 @@ class AreaStyle {
     String strokecolor;
     String forrentstrokecolor;
     String rentedstrokecolor;
-    String forsalestrokecolor;
     double strokeopacity;
     int strokeweight;
     String fillcolor;
@@ -17,7 +16,6 @@ class AreaStyle {
 	strokecolor = Residence.getInstance().getConfigManager().DynMapBorderColor;
 	forrentstrokecolor = Residence.getInstance().getConfigManager().DynMapFillForRent;
 	rentedstrokecolor = Residence.getInstance().getConfigManager().DynMapFillRented;
-	forsalestrokecolor = Residence.getInstance().getConfigManager().DynMapFillForSale;
 	strokeopacity = Residence.getInstance().getConfigManager().DynMapBorderOpacity;
 	strokeweight = Residence.getInstance().getConfigManager().DynMapBorderWeight;
 	fillcolor = Residence.getInstance().getConfigManager().DynMapFillColor;

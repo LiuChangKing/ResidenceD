@@ -628,15 +628,9 @@ public class ResidencePlayerListener implements Listener {
 
         ClaimedResidence res = s.getResidence();
 
-        boolean ForSale = res.isForSell();
         boolean ForRent = res.isForRent();
         String landName = res.getName();
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            if (ForSale) {
-                Bukkit.dispatchCommand(player, "res market buy " + landName);
-                return;
-            }
-
             if (ForRent) {
                 if (res.isRented() && player.isSneaking())
                     Bukkit.dispatchCommand(player, "res market release " + landName);
@@ -2547,17 +2541,6 @@ public class ResidencePlayerListener implements Listener {
             return;
         }
 
-        if (res != from.getParent() && plugin.getConfigManager().isExtraEnterMessage() && !res.isOwner(player) && (plugin.getRentManager().isForRent(from) || plugin
-            .getTransactionManager().isForSale(from))) {
-            if (plugin.getRentManager().isForRent(from) && !plugin.getRentManager().isRented(from)) {
-                RentableLand rentable = plugin.getRentManager().getRentableLand(from);
-                if (rentable != null)
-                    CMIActionBar.send(player, plugin.msg(lm.Residence_CanBeRented, from.getName(), rentable.cost, rentable.days));
-            } else if (plugin.getTransactionManager().isForSale(from) && !res.isOwner(player)) {
-                int sale = plugin.getTransactionManager().getSaleAmount(from);
-                CMIActionBar.send(player, plugin.msg(lm.Residence_CanBeBought, from.getName(), sale));
-            }
-        }
     }
 
     private StuckInfo updateStuckTeleport(Player player, Location loc) {

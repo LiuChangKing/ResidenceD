@@ -171,7 +171,7 @@ public class SignUtil {
         if (res == null)
             return false;
 
-        boolean ForSale = res.isForSell();
+        boolean ForSale = false;
         boolean ForRent = res.isForRent();
 
         Location nloc = Sign.getLocation();
@@ -196,7 +196,7 @@ public class SignUtil {
             String landName = res.getName();
             if (landName == null)
                 return;
-            if (!ForRent && !ForSale) {
+            if (!ForRent) {
                 String shortName = fixResName(landName);
                 String secondLine = null;
                 if (shortName.contains("~")) {
@@ -254,26 +254,6 @@ public class SignUtil {
                 sign.update();
             }
 
-            if (ForSale) {
-                String shortName = fixResName(landName);
-                String secondLine = null;
-                if (shortName.contains("~")) {
-                    String[] lines = fixDoubleResName(landName);
-                    shortName = lines[0];
-                    secondLine = lines[1];
-                }
-
-                sign.setLine(0, plugin.msg(lm.Sign_ForSaleTopLine));
-                String infoLine = plugin.msg(lm.Sign_ForSalePriceLine, res.getSellPrice());
-                sign.setLine(1, infoLine);
-                sign.setLine(2, plugin.msg(lm.Sign_RentedResName, shortName));
-
-                if (secondLine != null)
-                    sign.setLine(3, plugin.msg(lm.Sign_RentedResName, secondLine));
-                else
-                    sign.setLine(3, plugin.msg(lm.Sign_ForSaleBottom, res.getTotalSize()));
-                sign.update();
-            }
         });
 
         return true;

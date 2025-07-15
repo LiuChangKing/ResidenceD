@@ -43,7 +43,6 @@ public class ConfigManager {
     protected boolean chargeOnExpansion;
     protected boolean chargeOnAreaAdd;
     private EconomyType VaultEconomy;
-    protected boolean ExtraEnterMessage;
     protected boolean adminsOnly;
     protected boolean allowEmptyResidences;
     protected boolean NoLava;
@@ -52,7 +51,6 @@ public class ConfigManager {
     protected boolean useBlockFall;
     protected boolean NoWaterPlace;
     protected boolean AutoCleanUp;
-    protected boolean SellSubzone;
     protected boolean UseClean = false;
     protected boolean PvPFlagPrevent;
     protected boolean OverridePvp;
@@ -78,7 +76,6 @@ public class ConfigManager {
     protected boolean leaseAutoRenew;
     protected boolean ShortInfoUse;
     private boolean InfoExcludeDFlags;
-    protected boolean OnlyLike;
     protected int RentInformBefore;
     protected int RentInformDelay;
     protected int rentCheckInterval;
@@ -140,11 +137,9 @@ public class ConfigManager {
     protected boolean visualizer;
     protected int minMoveUpdate;
 
-    protected int VoteRangeFrom;
     protected int HealInterval;
     protected int FeedInterval;
     protected int SafeZoneInterval;
-    protected int VoteRangeTo;
     protected FlagPermissions globalCreatorDefaults;
     protected FlagPermissions globalRentedDefaults;
     protected FlagPermissions globalResidenceDefaults;
@@ -260,7 +255,6 @@ public class ConfigManager {
     public double DynMapFillOpacity;
     public String DynMapFillForRent;
     public String DynMapFillRented;
-    public String DynMapFillForSale;
     public List<String> DynMapVisibleRegions;
     public List<String> DynMapHiddenRegions;
     // DynMap
@@ -764,13 +758,7 @@ public class ConfigManager {
             "将设置为flags.yl文件中设置的true默认居住标志时，将从info命令输出中排除，不会显示", "如果标志获得不同的状态，则将显示");
         InfoExcludeDFlags = c.get("Global.Optimizations.InfoCommand.ExcludeDefaultFlags", false);
 
-        // Vote range
-        c.addComment("Global.Optimizations.Vote.RangeFrom", "范围玩家可以投票给，默认情况下为0到10分");
-        VoteRangeFrom = c.get("Global.Optimizations.Vote.RangeFrom", 0);
-        VoteRangeTo = c.get("Global.Optimizations.Vote.RangeTo", 10);
 
-        c.addComment("Global.Optimizations.Vote.OnlyLike", "如果这是真的，玩家只能为商店而不是投票而付出");
-        OnlyLike = c.get("Global.Optimizations.Vote.OnlyLike", false);
 
         c.addComment("Global.Optimizations.ConsoleLogs.ShowFlagChanges", "如果此真实，将在控制台中记录Flag更改GUI的GUI");
         ConsoleLogsShowFlagChanges = c.get("Global.Optimizations.ConsoleLogs.ShowFlagChanges", true);
@@ -1077,11 +1065,7 @@ public class ConfigManager {
             VaultEconomy = EconomyType.None;
         }
 
-        c.addComment("Global.ExtraEnterMessage", "启用后，若领地可租或出售将在聊天中额外提示如何租用或购买");
-        ExtraEnterMessage = c.get("Global.ExtraEnterMessage", true);
-
-        c.addComment("Global.Sell.Subzone", "如果设置为真，这将允许出售子区域。建议将其保留为假");
-        SellSubzone = c.get("Global.Sell.Subzone", false);
+        // Extra enter message and selling functionality removed
 
         // Rent system removed
         enableRentSystem = false;
@@ -1364,7 +1348,6 @@ public class ConfigManager {
         DynMapFillColor = c.get("DynMap.Fill.Color", "#FFFF00");
         DynMapFillForRent = c.get("DynMap.Fill.ForRent", "#33cc33");
         DynMapFillRented = c.get("DynMap.Fill.Rented", "#99ff33");
-        DynMapFillForSale = c.get("DynMap.Fill.ForSale", "#0066ff");
 
         c.addComment("DynMap.VisibleRegions", "仅在此列表中显示区域");
         DynMapVisibleRegions = c.get("DynMap.VisibleRegions", new ArrayList<String>());
@@ -1466,10 +1449,6 @@ public class ConfigManager {
 
     public boolean isRentStayInMarket() {
         return RentStayInMarket;
-    }
-
-    public boolean isSellSubzone() {
-        return SellSubzone;
     }
 
     public boolean isRentAllowRenewing() {
@@ -1592,10 +1571,6 @@ public class ConfigManager {
         return namefix;
     }
 
-    public boolean isExtraEnterMessage() {
-        return ExtraEnterMessage;
-    }
-
     public boolean enableEconomy() {
         return enableEconomy && plugin.getEconomyManager() != null;
     }
@@ -1711,9 +1686,6 @@ public class ConfigManager {
         return ShortInfoUse;
     }
 
-    public boolean isOnlyLike() {
-        return OnlyLike;
-    }
 
     public int getRentCheckInterval() {
         return rentCheckInterval;
@@ -1806,9 +1778,6 @@ public class ConfigManager {
         return minMoveUpdate;
     }
 
-    public int getVoteRangeFrom() {
-        return VoteRangeFrom;
-    }
 
     public int getHealInterval() {
         return HealInterval;
@@ -1822,9 +1791,6 @@ public class ConfigManager {
         return SafeZoneInterval;
     }
 
-    public int getVoteRangeTo() {
-        return VoteRangeTo;
-    }
 
     public FlagPermissions getGlobalCreatorDefaultFlags() {
         return globalCreatorDefaults;

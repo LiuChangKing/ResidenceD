@@ -135,10 +135,6 @@ public class InformationPager {
                 StringB.append("\n").append(plugin.msg(lm.Rentable_AllowAutoPay, rentable.AllowAutoPay));
             }
 
-            if (res.isForSell()) {
-                ExtraString = " " + plugin.msg(lm.Residence_IsForSale);
-                StringB.append("\n " + plugin.msg(lm.Economy_LandForSale) + " " + res.getSellPrice());
-            }
 
             String tpFlag = "";
             String moveFlag = "";
@@ -214,10 +210,6 @@ public class InformationPager {
                 StringB.append("\n" + plugin.msg(lm.Rentable_AllowAutoPay, rentable.AllowAutoPay));
             }
 
-            if (res.isForSell()) {
-                ExtraString = " " + plugin.msg(lm.Residence_IsForSale);
-                StringB.append("\n" + plugin.msg(lm.Economy_LandForSale) + " " + res.getSellPrice());
-            }
 
             String msg = plugin.msg(lm.Residence_ResList, i, res.getName(), res.getWorld(), "", ExtraString);
 
@@ -274,10 +266,7 @@ public class InformationPager {
                     StringB.append("\n " + plugin.msg(lm.Rentable_AllowAutoPay, rentable.AllowAutoPay));
                 }
 
-                if (res.isForSell()) {
-                    ExtraString = " " + plugin.msg(lm.Residence_IsForSale);
-                    StringB.append("\n " + plugin.msg(lm.Economy_LandForSale) + " " + res.getSellPrice());
-                }
+
 
                 String msg = plugin.msg(lm.Residence_ResList, y, res.getName(), res.getWorld(), "", ExtraString);
 

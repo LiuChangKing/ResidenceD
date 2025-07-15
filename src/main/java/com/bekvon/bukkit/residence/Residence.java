@@ -83,7 +83,6 @@ public class Residence extends JavaPlugin {
 
     protected ResidenceCommandListener commandManager;
 
-    protected TransactionManager tmanager;
     protected PermissionListManager pmanager;
     protected LeaseManager leasemanager;
     public WorldItemManager imanager;
@@ -154,7 +153,6 @@ public class Residence extends JavaPlugin {
 
     // API
     private ResidenceApi API = new ResidenceApi();
-    private MarketBuyInterface MarketBuyAPI = null;
     private MarketRentInterface MarketRentAPI = null;
     private ResidencePlayerInterface PlayerAPI = null;
     private ResidenceInterface ResidenceAPI = null;
@@ -185,13 +183,6 @@ public class Residence extends JavaPlugin {
         if (MarketRentAPI == null)
             MarketRentAPI = rentmanager;
         return MarketRentAPI;
-    }
-
-    public MarketBuyInterface getMarketBuyManagerAPI() {
-        if (MarketBuyAPI == null)
-            MarketBuyAPI = tmanager;
-        return MarketBuyAPI;
-
     }
 
     public ResidenceCommandListener getCommandManager() {
@@ -481,8 +472,6 @@ public class Residence extends JavaPlugin {
             rmanager = new ResidenceManager(this);
 
             leasemanager = new LeaseManager(this);
-
-            tmanager = new TransactionManager(this);
 
             pmanager = new PermissionListManager(this);
 
@@ -820,10 +809,6 @@ public class Residence extends JavaPlugin {
         if (configManager == null)
             configManager = new ConfigManager(this);
         return configManager;
-    }
-
-    public TransactionManager getTransactionManager() {
-        return tmanager;
     }
 
     public WorldItemManager getItemManager() {

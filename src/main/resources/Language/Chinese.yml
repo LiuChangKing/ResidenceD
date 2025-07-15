@@ -140,9 +140,6 @@ Language:
   Residence:
     DontOwn: '&e没有什么可展示的'
     Hidden: ' &e(&6隐藏&e)'
-    Bought: '&e成功购买领地 &6%1'
-    Buy: '&6%1 &e购买了你的 &6%2 &e领地.'
-    BuyTooBig: '&c你无法购买尺寸这么大的领地.'
     TooMany: '&c你拥有的领地数量达到了上限.'
     AlreadyExists: '&c已存在名称为 &6%1 &c的领地.'
     Create: '&e已创建领地 &6%1&e!'
