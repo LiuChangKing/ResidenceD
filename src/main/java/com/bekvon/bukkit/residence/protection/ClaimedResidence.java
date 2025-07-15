@@ -63,7 +63,6 @@ public class ClaimedResidence {
     protected RentableLand rentableland = null;
     protected RentedLand rentedland = null;
 
-    protected int sellPrice = -1;
 
 
     private Set<Signs> signsInResidence = Collections.synchronizedSet(new HashSet<Signs>());
@@ -87,17 +86,6 @@ public class ClaimedResidence {
         return createTime;
     }
 
-    public Integer getSellPrice() {
-        return sellPrice;
-    }
-
-    public void setSellPrice(Integer amount) {
-        sellPrice = amount;
-    }
-
-    public boolean isForSell() {
-        return false;
-    }
 
     public boolean isForRent() {
         return Residence.getInstance().getRentManager().isForRent(this);
@@ -139,11 +127,6 @@ public class ClaimedResidence {
         return false;
     }
 
-    public boolean isParentForSell() {
-        if (this.getParent() != null)
-            return this.getParent().isForSell() ? true : this.getParent().isParentForSell();
-        return false;
-    }
 
     public boolean isRented() {
         return Residence.getInstance().getRentManager().isRented(this);
