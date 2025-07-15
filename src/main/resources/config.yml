@@ -127,12 +127,6 @@ Global:
       # 将设置为flags.yl文件中设置的true默认居住标志时，将从info命令输出中排除，不会显示
       # 如果标志获得不同的状态，则将显示
       ExcludeDefaultFlags: false
-    Vote:
-      # 范围玩家可以投票给，默认情况下为0到10分
-      RangeFrom: 0
-      RangeTo: 10
-      # 如果这是真的，玩家只能为商店而不是投票而付出
-      OnlyLike: false
     ConsoleLogs:
       # 如果此真实，将在控制台中记录Flag更改GUI的GUI
       ShowFlagChanges: true
@@ -326,8 +320,6 @@ Global:
   # 也可以自定义经济接口以直接接入经济系统
   # 可用值: Vault, None
   Type: None
-  # 启用后，将在聊天中额外提示相关信息
-  ExtraEnterMessage: true
   Messages:
     # 定义要发送居住地的位置，请输入/离开/拒绝移动和类似消息。可能的选项： ActionBar, TitleBar, ChatBox
     # titlebar可以具有％subtitle％变量来定义第二行

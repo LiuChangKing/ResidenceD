@@ -96,7 +96,7 @@ public class ClaimedResidence {
     }
 
     public boolean isForSell() {
-        return Residence.getInstance().getTransactionManager().isForSale(this.getName());
+        return false;
     }
 
     public boolean isForRent() {
@@ -469,9 +469,18 @@ public class ClaimedResidence {
 
             if (Residence.getInstance().getConfigManager().isChargeOnAreaAdd() && chargeMoney && getParent() == null && Residence.getInstance().getConfigManager().enableEconomy() && !resadmin) {
                 double chargeamount = area.getCost(group);
-                if (!Residence.getInstance().getTransactionManager().chargeEconomyMoney(player, chargeamount)) {
+                EconomyInterface econ = Residence.getInstance().getEconomyManager();
+                if (econ == null) {
+                    Residence.getInstance().msg(player, lm.Economy_MarketDisabled);
                     return false;
                 }
+                if (!econ.canAfford(player.getName(), chargeamount)) {
+                    Residence.getInstance().msg(player, lm.Economy_NotEnoughMoney);
+                    return false;
+                }
+                econ.subtract(player.getName(), chargeamount);
+                if (chargeamount != 0D)
+                    Residence.getInstance().msg(player, lm.Economy_MoneyCharged, Residence.getInstance().getEconomyManager().format(chargeamount), econ.getName());
             }
         }
 
@@ -631,8 +640,18 @@ public class ClaimedResidence {
 
             if (Residence.getInstance().getConfigManager().isChargeOnExpansion() && getParent() == null && Residence.getInstance().getConfigManager().enableEconomy() && !resadmin) {
                 double chargeamount = newarea.getCost(group) - oldarea.getCost(group);
-                if (chargeamount > 0 && !Residence.getInstance().getTransactionManager().chargeEconomyMoney(player, chargeamount)) {
-                    return false;
+                if (chargeamount > 0) {
+                    EconomyInterface econ = Residence.getInstance().getEconomyManager();
+                    if (econ == null) {
+                        Residence.getInstance().msg(player, lm.Economy_MarketDisabled);
+                        return false;
+                    }
+                    if (!econ.canAfford(player.getName(), chargeamount)) {
+                        Residence.getInstance().msg(player, lm.Economy_NotEnoughMoney);
+                        return false;
+                    }
+                    econ.subtract(player.getName(), chargeamount);
+                    Residence.getInstance().msg(player, lm.Economy_MoneyCharged, Residence.getInstance().getEconomyManager().format(chargeamount), econ.getName());
                 }
             }
         }
@@ -646,8 +665,13 @@ public class ClaimedResidence {
             int chargeamount = (int) Math
                 .ceil((newarea.getSize() - oldarea.getSize()) * getBlockSellPrice().doubleValue());
             if ((chargeamount < 0) && (Residence.getInstance().getConfigManager().useResMoneyBack())) {
-                if (!this.isServerLand())
-                    Residence.getInstance().getTransactionManager().giveEconomyMoney(player, -chargeamount);
+                if (!this.isServerLand()) {
+                    EconomyInterface econ = Residence.getInstance().getEconomyManager();
+                    if (econ != null) {
+                        econ.add(player.getName(), -chargeamount);
+                        Residence.getInstance().msg(player, lm.Economy_MoneyAdded, Residence.getInstance().getEconomyManager().format(-chargeamount), econ.getName());
+                    }
+                }
             }
         }
 

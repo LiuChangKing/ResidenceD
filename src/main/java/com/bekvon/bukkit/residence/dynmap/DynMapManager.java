@@ -2,7 +2,6 @@ package com.bekvon.bukkit.residence.dynmap;
 
 import com.bekvon.bukkit.residence.Residence;
 import com.bekvon.bukkit.residence.containers.lm;
-import com.bekvon.bukkit.residence.economy.TransactionManager;
 import com.bekvon.bukkit.residence.economy.rent.RentManager;
 import com.bekvon.bukkit.residence.protection.ClaimedResidence;
 import com.bekvon.bukkit.residence.protection.CuboidArea;
@@ -108,12 +107,6 @@ public class DynMapManager {
                 + CMIChatColor.stripColor(plugin.msg(lm.Rentable_AllowRenewing, "")) + "<span style=\"font-weight:bold;\">%renew%</span><br /> "
                 + CMIChatColor.stripColor(plugin.msg(lm.Rent_Expire, "")) + "<span style=\"font-weight:bold;\">%expire%</span></div></div>";
 
-        if (plugin.getTransactionManager().isForSale(res.getName()))
-            v = "<div class=\"regioninfo\"><div class=\"infowindow\">"
-                + CMIChatColor.stripColor(plugin.msg(lm.Economy_LandForSale, " "))
-                + "<span style=\"font-size:140%;font-weight:bold;\">%regionname%</span><br /> "
-                + CMIChatColor.stripColor(plugin.msg(lm.General_Owner, "")) + "<span style=\"font-weight:bold;\">%playerowners%</span><br />"
-                + CMIChatColor.stripColor(plugin.msg(lm.Economy_SellAmount, "")) + "<span style=\"font-weight:bold;\">%price%</span><br /></div></div>";
 
         v = v.replace("%regionname%", resName);
         v = v.replace("%playerowners%", res.getOwner());
@@ -123,7 +116,6 @@ public class DynMapManager {
         v = v.replace("%leavemsg%", (m != null) ? m : "");
 
         RentManager rentmgr = plugin.getRentManager();
-        TransactionManager transmgr = plugin.getTransactionManager();
 
         if (rentmgr.isForRent(res.getName())) {
             boolean isrented = rentmgr.isRented(resid);
@@ -146,14 +138,6 @@ public class DynMapManager {
             v = v.replace("%expire%", expire);
         }
 
-        if (transmgr.isForSale(res.getName())) {
-            boolean forsale = transmgr.isForSale(resid);
-            v = v.replace("%isforsale%", Boolean.toString(transmgr.isForSale(resid)));
-            String price = "";
-            if (forsale)
-                price = Integer.toString(transmgr.getSaleAmount(resid));
-            v = v.replace("%price%", price);
-        }
 
         return v;
     }
@@ -180,8 +164,6 @@ public class DynMapManager {
                 fc = Integer.parseInt(as.forrentstrokecolor.substring(1), 16);
             else if (plugin.getRentManager().isForRent(resid) && plugin.getRentManager().isRented(resid))
                 fc = Integer.parseInt(as.rentedstrokecolor.substring(1), 16);
-            else if (plugin.getTransactionManager().isForSale(resid))
-                fc = Integer.parseInt(as.forsalestrokecolor.substring(1), 16);
             else
                 fc = Integer.parseInt(as.fillcolor.substring(1), 16);
         } catch (NumberFormatException nfx) {

@@ -239,11 +239,20 @@ public class ResidenceManager implements ResidenceInterface {
 
         if (Residence.getInstance().getConfigManager().isChargeOnCreation() && !newRes.isSubzone() && plugin.getConfigManager().enableEconomy() && !resadmin) {
             double chargeamount = newArea.getCost(group);
-
-            if (chargeamount > 0 && !plugin.getTransactionManager().chargeEconomyMoney(player, chargeamount)) {
-                // Need to remove area if we can't create residence
-                newRes.removeArea("main");
-                return false;
+            if (chargeamount > 0) {
+                EconomyInterface econ = plugin.getEconomyManager();
+                if (econ == null) {
+                    plugin.msg(player, lm.Economy_MarketDisabled);
+                    newRes.removeArea("main");
+                    return false;
+                }
+                if (!econ.canAfford(player.getName(), chargeamount)) {
+                    plugin.msg(player, lm.Economy_NotEnoughMoney);
+                    newRes.removeArea("main");
+                    return false;
+                }
+                econ.subtract(player.getName(), chargeamount);
+                plugin.msg(player, lm.Economy_MoneyCharged, plugin.getEconomyManager().format(chargeamount), econ.getName());
             }
         }
 
@@ -585,13 +594,16 @@ public class ResidenceManager implements ResidenceInterface {
         if (!res.isServerLand()) {
             if (parent == null && plugin.getConfigManager().enableEconomy() && plugin.getConfigManager().useResMoneyBack()) {
                 double chargeamount = res.getWorth();
-                if (!res.isOwner(player)) {
-                    plugin.getTransactionManager().giveEconomyMoney(res.getOwner(), chargeamount);
-                } else {
-                    if (player != null)
-                        plugin.getTransactionManager().giveEconomyMoney(player, chargeamount);
-                    else if (rPlayer != null)
-                        plugin.getTransactionManager().giveEconomyMoney(rPlayer.getPlayerName(), chargeamount);
+                EconomyInterface econ = plugin.getEconomyManager();
+                if (econ != null) {
+                    if (!res.isOwner(player)) {
+                        econ.add(res.getOwner(), chargeamount);
+                    } else {
+                        if (player != null)
+                            econ.add(player.getName(), chargeamount);
+                        else if (rPlayer != null)
+                            econ.add(rPlayer.getPlayerName(), chargeamount);
+                    }
                 }
             }
 
@@ -817,10 +829,6 @@ public class ResidenceManager implements ResidenceInterface {
                 rm.show(sender);
             } else
                 plugin.msg(sender, RentedMsg);
-        } else if (plugin.getTransactionManager().isForSale(areaname)) {
-            int amount = plugin.getTransactionManager().getSaleAmount(areaname);
-            String SellMsg = plugin.msg(lm.Economy_LandForSale) + " " + amount;
-            plugin.msg(sender, SellMsg);
         }
 
         plugin.msg(sender, lm.General_Separator);
@@ -1446,11 +1454,10 @@ public class ResidenceManager implements ResidenceInterface {
         for (ClaimedResidence oneSub : res.getSubzones()) {
             plugin.getPlayerManager().removeResFromPlayer(res.getOwnerUUID(), oneSub);
             plugin.getRentManager().removeRentable(ClaimedResidence.getByName(name + "." + oneSub.getResidenceName()), removeSigns);
-            plugin.getTransactionManager().removeFromSale(ClaimedResidence.getByName(name + "." + oneSub.getResidenceName()), removeSigns);
         }
         plugin.getPlayerManager().removeResFromPlayer(res.getOwnerUUID(), res);
         plugin.getRentManager().removeRentable(ClaimedResidence.getByName(name), removeSigns);
-        plugin.getTransactionManager().removeFromSale(ClaimedResidence.getByName(name), removeSigns);
+        
     }
 
     public int getResidenceCount() {
