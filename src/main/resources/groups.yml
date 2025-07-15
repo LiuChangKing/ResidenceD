@@ -69,33 +69,10 @@ Groups:
            # Use %zone if you want to include only current residence name without including parent zones into name
            # Leaving the message blank will disable it.
            DefaultLeave: "Now leaving %residence."
-       # Options relating to the Lease system.
-       Lease:
-          # The maximum number of days to allow leases.
-          MaxDays: 16
-          # The number of days to add to the lease following a '/res lease renew' command.
-          RenewIncrement: 14
-       #Options related to the rent system
-       Rent:
-           #determines how many residences can be rented by players of this group at once
-           MaxRents: 3
-           #determines how many residences can be set for rent by players of this group at once
-           MaxRentables: 3
-           # determines max days player can rent residence at once
-           MaxRentDays: 31
        # Options relating to the Residence Economy.
        Economy:
-          # Whether or not players in this group can buy other Residences that are for sale.
-          CanBuy: true
-          # Whether or not players in this group can sell their Residences.
-          CanSell: false
-          # Whether or not to ignore the Residence size/count limits when buying a residence.
-          IgnoreLimits: false
           # The cost, per block, of making a new Residence or adding a area to it.
           BuyCost: 0.5
-          # The cost, per block, player will be getting back when removing residence. 
-          # ATTENTION ResMoneyBack needs to be enabled in config file for this to work
-          SellCost: 0.25
           # The cost, per block, of renewing a Residence lease (if the lease system is enabled).
           RenewCost: 0.2
        # Flags are checked in the order:
@@ -146,19 +123,8 @@ Groups:
            CanChange: true
            DefaultEnter: "Welcome %player to %residence, owned by %owner."
            DefaultLeave: "Now leaving %residence."
-       Lease:
-          MaxDays: 16
-          RenewIncrement: 14
-       Rent:
-           MaxRents: 3
-           MaxRentables: 3
-           MaxRentDays: 31
        Economy:
-          CanBuy: true
-          CanSell: false
-          IgnoreLimits: false
           BuyCost: 0.7
-          SellCost: 0.3
           RenewCost: 0.3
 
 # You can manually specify the group a player is in below, this overrides their permissions group.

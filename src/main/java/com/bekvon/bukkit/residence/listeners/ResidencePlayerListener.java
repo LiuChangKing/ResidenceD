@@ -239,7 +239,6 @@ public class ResidencePlayerListener implements Listener {
         event.setFormat(format);
     }
 
-
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerFirstLogin(PlayerLoginEvent event) {
         Player player = event.getPlayer();
@@ -247,31 +246,6 @@ public class ResidencePlayerListener implements Listener {
             ResidenceBlockListener.newPlayers.add(player.getUniqueId());
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onPlayerLogin(PlayerLoginEvent event) {
-        if (!plugin.getConfigManager().isRentInformOnEnding())
-            return;
-        final Player player = event.getPlayer();
-        CMIScheduler.runTaskLater(plugin, () -> {
-            if (!player.isOnline())
-                return;
-            List<String> list = plugin.getRentManager().getRentedLandsList(player.getName());
-            if (list.isEmpty())
-                return;
-            for (String one : list) {
-                RentedLand rentedland = plugin.getRentManager().getRentedLand(one);
-                if (rentedland == null)
-                    continue;
-                if (rentedland.AutoPay)
-                    continue;
-                if (rentedland.endTime - System.currentTimeMillis() < plugin.getConfigManager().getRentInformBefore() * 60 * 24 * 7) {
-                    plugin.msg(player, lm.Residence_EndingRent, one, GetTime.getTime(rentedland.endTime));
-                }
-            }
-        }, plugin.getConfigManager().getRentInformDelay() * 20L);
-    }
-
-    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onFishingRodUse(PlayerFishEvent event) {
         // Disabling listener if flag disabled globally
         if (!Flags.hook.isGlobalyEnabled())

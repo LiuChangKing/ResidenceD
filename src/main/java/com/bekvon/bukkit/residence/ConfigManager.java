@@ -38,7 +38,6 @@ public class ConfigManager {
     protected String defaultGroup;
     protected boolean useLeases;
     protected boolean ResMoneyBack;
-    private boolean ResBankBack;
     protected boolean enableEconomy;
     protected boolean chargeOnCreation;
     protected boolean chargeOnExpansion;
@@ -71,8 +70,6 @@ public class ConfigManager {
     protected String multiworldPlugin;
     protected boolean enableRentSystem;
     protected boolean RentPreventRemoval;
-    private boolean DeductFromBank;
-    private boolean DeductFromBankThenPlayer;
     protected boolean RentInformOnEnding;
     protected boolean RentAllowRenewing;
     protected boolean RentStayInMarket;
@@ -109,10 +106,8 @@ public class ConfigManager {
     protected int BackupAutoCleanUpDays;
     protected boolean UseZipBackup;
     protected boolean BackupWorldFiles;
-    protected boolean BackupforsaleFile;
     protected boolean BackupleasesFile;
     protected boolean BackuppermlistsFile;
-    protected boolean BackuprentFile;
     protected boolean BackupflagsFile;
     protected boolean BackupgroupsFile;
     protected boolean BackupconfigFile;
@@ -270,7 +265,6 @@ public class ConfigManager {
     public List<String> DynMapHiddenRegions;
     // DynMap
 
-    public double BankCapacity = 0D;
     // Schematics
     public boolean RestoreAfterRentEnds;
     public boolean SchematicsSaveOnFlagChange;
@@ -911,10 +905,8 @@ public class ConfigManager {
         UseZipBackup = c.get("Global.Backup.UseZip", true);
 
         BackupWorldFiles = c.get("Global.Backup.IncludeFiles.Worlds", true);
-        BackupforsaleFile = c.get("Global.Backup.IncludeFiles.forsale", true);
-        BackupleasesFile = c.get("Global.Backup.IncludeFiles.leases", true);
+        BackupleasesFile = false;
         BackuppermlistsFile = c.get("Global.Backup.IncludeFiles.permlists", true);
-        BackuprentFile = c.get("Global.Backup.IncludeFiles.rent", true);
         BackupflagsFile = c.get("Global.Backup.IncludeFiles.flags", true);
         BackupgroupsFile = c.get("Global.Backup.IncludeFiles.groups", true);
         BackupconfigFile = c.get("Global.Backup.IncludeFiles.config", true);
@@ -1044,16 +1036,10 @@ public class ConfigManager {
         c.addComment("Global.DefaultGroup", "如果权限无法连接或您不使用权限，则使用的默认组使用。");
         defaultGroup = c.get("Global.DefaultGroup", "default");
 
-        c.addComment("Global.UseLeaseSystem", "启用 /禁用租赁系统。");
-        useLeases = c.get("Global.UseLeaseSystem", false);
+        useLeases = false;
 
-        c.addComment("Global.DateFormat", "设置租赁或租金到期日期的显示格式",
-            "具体用法可参考: http://www.tutorialspoint.com/java/java_date_time.htm");
-        DateFormat = c.get("Global.DateFormat", "E yyyy.MM.dd 'at' hh:mm:ss a zzz");
-
-        c.addComment("Global.DateFormatShort", "设置租赁或租金到期日期的简短格式",
-            "具体用法可参考: http://www.tutorialspoint.com/java/java_date_time.htm");
-        DateFormatShort = c.get("Global.DateFormatShort", "MM.dd hh:mm");
+        DateFormat = "E yyyy.MM.dd 'at' hh:mm:ss a zzz";
+        DateFormatShort = "MM.dd hh:mm";
 
         c.addComment("Global.TimeZone", "设置日期显示所使用的时区，当服务器位置与玩家分布地区不同时尤其有用",
             "完整时区列表可在 http://www.mkyong.com/java/java-display-list-of-timezone-with-gmt/ 查看");
@@ -1062,14 +1048,9 @@ public class ConfigManager {
         c.addComment("Global.ResMoneyBack", "启用或禁用移除领地时返还金钱");
         ResMoneyBack = c.get("Global.ResMoneyBack", false);
 
-        c.addComment("Global.ResBankBack", "启用或禁用移除领地时返还其银行余额");
-        ResBankBack = c.get("Global.ResBankBack", true);
 
-        c.addComment("Global.LeaseCheckInterval", "租赁到期检查的间隔时间（分钟），仅在启用租赁系统时生效");
-        leaseCheckInterval = c.get("Global.LeaseCheckInterval", 10);
-
-        c.addComment("Global.LeaseAutoRenew", "若玩家资金充足则自动续租，经济系统关闭时此设置无效");
-        leaseAutoRenew = c.get("Global.LeaseAutoRenew", true);
+        leaseCheckInterval = 0;
+        leaseAutoRenew = false;
 
         c.addComment("Global.EnablePermissions", "是否启用权限系统");
         c.get("Global.EnablePermissions", true);
@@ -1102,8 +1083,8 @@ public class ConfigManager {
         c.addComment("Global.Sell.Subzone", "如果设置为真，这将允许出售子区域。建议将其保留为假");
         SellSubzone = c.get("Global.Sell.Subzone", false);
 
-        c.addComment("Global.EnableRentSystem", "启用或禁用租金系统");
-        enableRentSystem = c.get("Global.EnableRentSystem", true);
+        // Rent system removed
+        enableRentSystem = false;
 
 //	TownEnabled = c.get("Global.Town.Enabled", true);
 //	c.addComment("Global.Town.MinRange", "住宅之间的范围","如果所有者不属于同一城镇");
@@ -1112,12 +1093,6 @@ public class ConfigManager {
         c.addComment("Global.Rent.PreventRemoval", "如果某些人仍在租用居住地，则防止住所/subzone拆除");
         RentPreventRemoval = c.get("Global.Rent.PreventRemoval", true);
 
-        c.addComment("Global.Rent.DeductFromBank", "设置为真正的居住租金时，可以从居住银行续签");
-        DeductFromBank = c.get("Global.Rent.DeductFromBank", false);
-        c.addComment("Global.Rent.DeductFromBankThenPlayer",
-            "当设置为真正的居住租金时，可以从居住银行续签，如果没有足够的钱，我们将其余的钱从玩家中扣除",
-            "这将覆盖扣除炸弹的行为");
-        DeductFromBankThenPlayer = c.get("Global.Rent.DeductFromBankThenPlayer", false);
 
         c.addComment("Global.Rent.Inform.OnEnding", "告知玩家租金时间结束");
         RentInformOnEnding = c.get("Global.Rent.Inform.OnEnding", true);
@@ -1141,11 +1116,9 @@ public class ConfigManager {
             "注意设为 false 会略微增加服务器负荷");
         SchematicsSaveOnFlagChange = c.get("Global.Rent.Schematics.SaveOnFlagChange", true);
 
-        c.addComment("Global.Bank.Capacity", "定义最大金额可以持有", "设置为0将禁用限制");
-        BankCapacity = c.get("Global.Bank.Capacity", 0D);
 
-        c.addComment("Global.RentCheckInterval", "在居住租金到期支票之间（如果启用租金系统）之间的间隔（如果启用了租金）。");
-        rentCheckInterval = c.get("Global.RentCheckInterval", 10);
+        // Rent system removed, interval not used
+        rentCheckInterval = 0;
 
         ELMessageType old = c.getC().isBoolean("Global.ActionBar.General") && c.getC().getBoolean("Global.ActionBar.General") ? ELMessageType.ActionBar
             : ELMessageType.ActionBar;
@@ -1354,7 +1327,7 @@ public class ConfigManager {
 
         enforceAreaInsideArea = c.get("Global.EnforceAreaInsideArea", false);
         spoutEnable = c.get("Global.EnableSpout", false);
-        enableLeaseMoneyAccount = c.get("Global.EnableLeaseMoneyAccount", true);
+        enableLeaseMoneyAccount = false;
 
         c.addComment("Global.Couldroncompatibility",
             "通过将其设置为真实，将启用Kcouldron服务器的部分兼容性。动作栏消息和选择可视化器将自动禁用，因为不正确的兼容性");
@@ -1775,9 +1748,6 @@ public class ConfigManager {
         return BackupWorldFiles;
     }
 
-    public boolean BackupforsaleFile() {
-        return BackupforsaleFile;
-    }
 
     public boolean BackupleasesFile() {
         return BackupleasesFile;
@@ -1785,10 +1755,6 @@ public class ConfigManager {
 
     public boolean BackuppermlistsFile() {
         return BackuppermlistsFile;
-    }
-
-    public boolean BackuprentFile() {
-        return BackuprentFile;
     }
 
     public boolean BackupflagsFile() {
@@ -2092,13 +2058,6 @@ public class ConfigManager {
         return EnterAnimation;
     }
 
-    public boolean isDeductFromBank() {
-        return DeductFromBank;
-    }
-
-    public boolean isDeductFromBankThenPlayer() {
-        return DeductFromBankThenPlayer;
-    }
 
     public ItemStack getGuiBottonStates(FlagState state) {
         return guiBottonStates.get(state);
@@ -2182,10 +2141,6 @@ public class ConfigManager {
 
     public int getSignsMaxPerResidence() {
         return SignsMaxPerResidence;
-    }
-
-    public boolean isResBankBack() {
-        return ResBankBack;
     }
 
     public boolean isAutoCleanTrasnferToUser() {

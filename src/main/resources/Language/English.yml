@@ -80,20 +80,6 @@ Language:
     Updated: '&6%1 &e木牌已更新!'
     TopLine: '[领地市场]'
     DateFormat: YY/MM/dd HH:mm
-    ForRentTopLine: '&0出租'
-    ForRentPriceLine: '&0%1&f/&0%2&f/&0%3'
-    ForRentResName: '&0%1'
-    ForRentBottomLine: '&9可用'
-    RentedAutorenewTrue: '&2%1'
-    RentedAutorenewFalse: '&c%1'
-    RentedTopLine: '%1'
-    RentedPriceLine: '&0%1&f/&0%2&f/&0%3'
-    RentedResName: '&0%1'
-    RentedBottomLine: '&1%1'
-    ForSaleTopLine: '&0出售'
-    ForSalePriceLine: '&0%1'
-    ForSaleResName: '&0%1'
-    ForSaleBottom: '&0%1m³'
     LookAt: '&c请将鼠标准星对准木牌'
     ResName: '&0%1'
     Owner: '&0%1'
@@ -134,13 +120,6 @@ Language:
     ChangedFor: '&e改变了 &6%1 &e权限来自 &6%2 &e检查的领地'
     reset: '&e重置权限，用于 &6%1 &e领地'
     resetAll: '&e重置权限，用于 &6%1 &e领地'
-  Bank:
-    NoAccess: '&c你没有权限使用银行.'
-    Name: ' &e银行: &6%1'
-    NoMoney: '&c你的银行存款不足.'
-    Deposit: '&e你向领地银行存款 &6%1 &e元.'
-    Withdraw: '&e你从领地银行中取出 &6%1 &e元.'
-    rentedWithdraw: '&c不能从租用的领地银行提款.'
   Subzone:
     Rename: '&e领地子区域 &6%1 &e已被重命名为 &6%2'
     Remove: '&e已删除领地子区域 &6%1&e.'
@@ -164,27 +143,11 @@ Language:
     Bought: '&e成功购买领地 &6%1'
     Buy: '&6%1 &e购买了你的 &6%2 &e领地.'
     BuyTooBig: '&c你无法购买尺寸这么大的领地.'
-    NotForSale: '&c该领地目前并未出售.'
-    ForSale: '&e领地 &6%1 &e现在正以 &6%2 &e的价格出售.'
-    StopSelling: '&c该领地已不再出售.'
     TooMany: '&c你拥有的领地数量达到了上限.'
-    MaxRent: '&c你租用的领地数量达到了上限.'
-    AlreadyRent: '&c领地已经被租用.'
-    NotForRent: '&c领地没有在出租.'
-    NotForRentOrSell: '&c领地没有在出售或出租.'
-    NotRented: '&c领地尚未被租出.'
-    Unrent: '&e领地 &6%1 &e已取消出租.'
-    RemoveRentable: '&e领地 &6%1 &e不再可出租.'
-    ForRentSuccess: '&e领地 &6%1 &e已被设置为每 &6%3 &e天以 &6%2 &e出租.'
-    RentSuccess: '&e你租用了 &6%1 &e领地 &6%2 &e天.'
-    EndingRent: '&e租用时间已经过期 &6%1 &eon &6%2'
-    AlreadyRented: '&e领地 &6%1 &e已出租给 &6%2'
-    CantAutoPay: '&e领地不允许自动支付，已设置为 &6false'
     AlreadyExists: '&c已存在名称为 &6%1 &c的领地.'
     Create: '&e已创建领地 &6%1&e!'
     Rename: '&e领地 &6%1 &e已被重命名为 &6%2'
     Remove: '&e领地 &6%1 &e已删除.'
-    CantRemove: '&c领地 &6%1 &c无法被删除，因为 &6%2 &c子领地正在被出租给玩家 &6%3'
     MoveDeny: '&c你没有领地 &6%1 &c的移动权限.'
     TeleportNoFlag: '&c你没有该领地的传送权限.'
     FlagDeny: '&c你没有领地 &6%2 &c的 &6%1 &c权限.'
@@ -208,40 +171,6 @@ Language:
     OwnerChange: '&e已将领地 &6%1 &e的所有者更改为 &6%2'
     NonAdmin: '&c你没有领地的管理员权限.'
     Line: '&e领地: &6%1 '
-    RentedBy: '&e租用者: &6%1'
-    MessageChange: '&e消息文本已设置.'
-    CantDeleteResidence: '&c你没有删除此领地的权限.'
-    CantExpandResidence: '&c你没有扩大此领地的权限.'
-    CantContractResidence: '&c你没有缩小此领地的权限.'
-    NoResHere: '&c那个位置没有领地存在.'
-    OwnerNoPermission: '&c领地所有者没有执行这个操作的权限.'
-    ParentNoPermission: '&c你没有权限设置父区域.'
-    DeleteConfirm: '&e如果你确定要删除领地 &6%1&e, 输入 &6/res confirm &e以确认操作.'
-    ChangedMain: '&e已将主领地修改为 &6%1'
-    CanBeRented: '&6%1&e 可以出租给 &6%2 &e每 &6%3 &e天. &6/res market rent'
-    CanBeBought: '&6%1&e 可以出售给 &6%2&e. &6/res market buy'
-    IsForRent: '&6(出租)'
-    IsForSale: '&6(出售)'
-    IsRented: '&6(已出租)'
-  Rent:
-    Disabled: '&c领地出租已禁用.'
-    DisableRenew: '&e领地 &6%1 &e不会在租约到期时自动续期.'
-    EnableRenew: '&e领地 &6%1 &e将会在租约到期时自动续期.'
-    NotByYou: '&c领地没有出租给你.'
-    isForRent: '&2这个领地可以被租用'
-    MaxRentDays: '&c你无法一次租用超过 &6%1 &c天'
-    OneTime: '&c你目前无法续费租用时长'
-    Extended: '&e租用时长增加了 &6%1 &e天给领地 &6%2'
-    Expire: '&e租约到期时间: &6%1'
-    AutoPayTurnedOn: '&e自动支付设置为&2开启'
-    AutoPayTurnedOff: '&e自动支付设置为 &c关闭'
-    ModifyDeny: '&c无法修改租用的领地.'
-    Days: '&e租用天数: &6%1'
-    Rented: ' &6(已出租)'
-    RentList: ' &6%1&e. &6%2 &e(&6%3&e/&6%4&e/&6%5&e) - &6%6 &6%7'
-    EvictConfirm: '&e输入 &6/res market confirm &e来确认租用领地 &6%1'
-    UnrentConfirm: '&e输入 &6/res market confirm &e来确认取消租用领地 &6%1'
-    ReleaseConfirm: '&e输入 &6/res market confirm &e来确认从市场内删除领地 &6%1'
   command:
     addedAllow: '&e增加了一个新的允许的命令给 &6%1 &e领地'
     removedAllow: '&e删除了一个允许的命令给 &6%1 &e领地'
@@ -249,39 +178,12 @@ Language:
     removedBlock: '&e删除了一个禁用的命令给 &6%1 &e领地'
     Blocked: '&e禁用的命令: &6%1'
     Allowed: '&e允许的命令: &6%1'
-  Rentable:
-    Land: '&e出租领地: &6'
-    AllowRenewing: '&e可以续费: &6%1'
-    StayInMarket: '&e可以出租: &6%1'
-    AllowAutoPay: '&e可以自动支付: &6%1'
-    DisableRenew: '&6%1 &e不会在到期时自动更新租用状态.'
-    EnableRenew: '&6%1 &e将会在到期时自动更新租用状态.'
   Economy:
-    LandForSale: '&e出售领地:'
     NotEnoughMoney: '&c你没有足够的金钱.'
     MoneyCharged: '&e已从你的 &6%2 &e账户中支出 &6%1 &e元.'
     MoneyAdded: '&e你的 &6%2 &e账户增加了 &6%1 &e元.'
     MoneyCredit: '&e你的 &6%2 &e账户收入了 &6%1 &e元.'
-    RentReleaseInvalid: '&e领地 &6%1 &e没有被租用或者出租.'
-    RentSellFail: '&c无法出售正在出租的领地.'
-    SubzoneRentSellFail: '&c无法出售领地，因为其中一个子领地正在出租'
-    ParentRentSellFail: '&c无法出租领地，因为其中的一部分正在出售/出租'
-    SubzoneSellFail: '&c无法出售一个子领地'
-    SellRentFail: '&c无法出租正在出售的领地.'
-    ParentSellRentFail: '&c由于这个领地的一部分正在被出售，所以无法出租'
-    OwnerBuyFail: '&c不能购买自己的领地!'
-    OwnerRentFail: '&c不能租用自己的领地!'
-    AlreadySellFail: '&e领地已在出售中!'
-    LeaseRenew: '&e租约有效期到 &6%1'
-    LeaseRenewMax: '&e允许的最大租约续期'
-    LeaseNotExpire: '&e租约不存在或者未过期.'
-    LeaseRenewalCost: '&e续租 &6%1 &e的花费为 &6%2'
-    LeaseInfinite: '&e出租时间已设置为无限.'
     MarketDisabled: '&c领地经济已禁用!'
-    SellAmount: '&e出售数量: &2%1'
-    SellList: ' &6%1&e. &6%2 &e(&6%3&e) - &6%4'
-    LeaseExpire: '&e租约到期时间: &2%1'
-    LeaseList: '&6%1. &e%2 &2%3 &e%4'
   Expanding:
     North: '&e向北方扩展 &6%1 &e个方块'
     West: '&e向西方扩展 &6%1 &e个方块'
@@ -315,16 +217,9 @@ Language:
     MinMax: '&7- &e最小/最大高度:&3 %1 到 %2'
     MaxSubzones: '&7- &e最大子领地数量:&3 %1'
     MaxSubDepth: '&7- &e最大子领地深度:&3 %1'
-    MaxRents: '&7- &e最多租用:&3 %1'
-    MaxRentDays: ' &e最大出租天数:&3 %1'
-    EnterLeave: '&7- &e可设置加入离开信息:&3 %1'
     NumberOwn: '&7- &e拥有的领地数量:&3 %1'
     Cost: '&7- &e领地每方块花费:&3 %1'
-    Sell: '&7- &e领地出售每方块花费:&3 %1'
     Flag: '&7- &e允许的领地权限:&3 %1'
-    MaxDays: '&7- &e最大租约时间:&3 %1'
-    LeaseTime: '&7- &e租约续期时间:&3 %1'
-    RenewCost: '&7- &e续租每方块花费:&3 %1'
   Gui:
     Set:
       Title: '&6%1 的权限'
@@ -344,40 +239,6 @@ Language:
     FlagsList: '&2 %1 &6- &e%2'
     SmallSeparator: '&6------'
     ChangedPrefix: '&e领地频道前缀更改为 %1'
-  Shop:
-    ListTopLine: '&6%1 &e商店列表 - 第 &6%2 &e页, 共 &6%3 %4'
-    List: ' &e%1. &6%2 &e(&6%3&e) %4'
-    ListVoted: '&e%1 (&6%2&e)'
-    ListLiked: '&7赞: &7%1'
-    VotesTopLine: '&6%1 &e%2 评分列表 &6- &e第 &6%3 &e页, 共 &6%4 %5'
-    VotesList: ' &e%1. &6%2 &e%3 &7%4'
-    NoDesc: '&6没有描述'
-    Desc: |-
-      &6描述:
-      %1
-    DescChange: '&6描述已更改为: %1'
-    ChantChange: '&4当商店标志被设置为"true"时，不能改变.'
-    NewBoard: '&6成功添加商店宣传板'
-    BoardExist: '&c商店宣传板已经存在'
-    DeleteBoard: '&6右击要删除的宣传板'
-    DeletedBoard: '&6宣传板已移除'
-    IncorrectBoard: '&c宣传板不正确, 请重新点击正确的宣传板'
-    InvalidSelection: '&c使用选取工具, 先点击左上角的告示牌, 再点击右下角的告示牌'
-    ToBigSelection: '&c你选择的范围太大了，最大允许16格'
-    ToDeapSelection: '&c你选择的太深了，最大允许16X1X16'
-    VoteChanged: '&6领地 &e%3 &6的评分由 &e%1 &6更改为 &e%2&6.'
-    Voted: '&6你给 &e%2 &6评了 &e%1 &6分.'
-    Liked: '&6你赞了 &e%1 &6领地.'
-    AlreadyLiked: '&6你已经赞过 &e%1 &6领地了.'
-    NoVotes: '&c该领地还没有评分.'
-    CantVote: '&c该领地不是商店.'
-    VotedRange: '&6只能给出 &e%1 &6分到 &e%2 &6分.'
-    SignLines:
-      '1': '&e--== &8%1 &e==--'
-      '2': '&9%1'
-      '3': '&4%1'
-      '4': '&8%1&e (&8%2&e)'
-      Likes4: '&9赞: &8%2'
   RandomTeleport:
     TpLimit: '&e请等待 &6%1 &e秒后再传送'
     TeleportSuccess: '&e传送到 X:&6%1&e, Y:&6%2&e, Z:&6%3 &e位置'
@@ -580,12 +441,6 @@ CommandHelp:
           - '&e使用方法: &6/res listhidden <页码>'
           - 显示所有玩家的隐藏领地
           Description: 显示所有隐藏领地
-        bank:
-          Info:
-          - '&e使用方法: &6/res bank [deposit=存入/withdraw=撤销] <领地名称> [数额]'
-          - 你必须站在领地中或者指定领地名字
-          - 你必须拥有领地 bank 权限
-          Description: 管理领地银行
         create:
           Info:
           - '&e使用方法: &6/res create [领地名称]'
@@ -675,79 +530,8 @@ CommandHelp:
         market:
           Info:
           - '&e使用方法: &6/res market ? 了解更多信息'
-          Description: 购买, 出售和出租领地
+          Description: 经济信息已停用
           SubCommands:
-            Info:
-              Description: 查看领地的经济信息
-              Info:
-              - '&e使用方法: &6/res market Info [领地名称]'
-              - 显示领地是否正在出租或出售, 以及领地的费用
-            list:
-              Description: 显示可出租与可出售的领地
-              Info:
-              - '&e使用方法: &6/res market list [rent=租金/sell=出售]'
-              SubCommands:
-                rent:
-                  Description: 列出可以租用的领地
-                  Info:
-                  - '&e使用方法: &6/res market list rent'
-                sell:
-                  Description: 列出可以出售的领地
-                  Info:
-                  - '&e使用方法: &6/res market list sell'
-            sell:
-              Description: 出售领地
-              Info:
-              - '&e使用方法: &6/res market sell [领地名称] [售价]'
-              - 将领地以 [售价] 元的价格出售
-              - 其他玩家可以执行 /res market buy 命令购买
-            sign:
-              Description: 设置市场木牌
-              Info:
-              - '&e使用方法: &6/res market sign [领地名称]'
-              - 将看向的木牌设置为领地市场木牌
-            buy:
-              Description: 购买领地
-              Info:
-              - '&e使用方法: &6/res market buy [领地名称]'
-              - 如果该领地正在出售, 则购买这个领地
-            unsell:
-              Description: 取消出售领地
-              Info:
-              - '&e使用方法: &6/res market unsell [领地名称]'
-            rent:
-              Description: 租用领地
-              Info:
-              - '&e使用方法: &6/res market rent [领地名称] <自动续租>'
-              - 租用一个领地. <自动续租> 可以是 true 或 false.  如果是 true,
-                并且领地所有者允许, 领地将会在租约到期之前自动续租.
-            rentable:
-              Description: 将领地设置为可出租
-              Info:
-              - '&e使用方法: &6/res market rentable [领地名称] [价格] [天数] <允许续租>
-                <留在市场> <允许自动付款>'
-              - 以 [价格] 出租领地 [天数]
-              - 如果 <允许续租> 等于 "teue" 在租金到期之前，领地能够再次被租用
-              - 如果 <留在市场> 等于 "teue" 在玩家退租后，领地将继续留在市场上出租
-              - 如果 <允许自动付款> 等于 "teue" 如果玩家在租用时选择了这个选项，租用的费用就会自动从玩家的余额中扣除
-            autopay:
-              Description: 开关领地自动支付
-              Info:
-              - '&e使用方法: &6/res market autopay [领地名称] [true/false]'
-            payrent:
-              Description: 支付租用的领地
-              Info:
-              - '&e使用方法: &6/res market payrent [领地名称]'
-            confirm:
-              Description: 领地市场的确认操作
-              Info:
-              - '&e使用方法: &6/res market confirm'
-            unrent:
-              Description: 将领地从出租或可出租中移除
-              Info:
-              - '&e使用方法: &6/res market unrent [领地名称]'
-              - 如果你是租用者，这个命令将为你释放领地的租金
-              - 如果你是领地所有者，这个命令使领地不再出租
         expand:
           Info:
           - '&e使用方法: &6/res expand (领地名称) [扩展单位]'
@@ -828,52 +612,6 @@ CommandHelp:
           - '&e使用方法: &6/res mirror [来源领地] [目标领地]'
           - 从一个领地到另一个领地的权限克隆, 你必须是两个领地的所有人或管理员才能做到这一点
           Description: 克隆权限
-        shop:
-          Description: 管理领地商店
-          Info:
-          - 管理领地商店的功能
-          SubCommands:
-            list:
-              Description: 显示领地商店列表
-              Info:
-              - '&e使用方法: &6/res shop list'
-              - 显示所有作为商店的领地
-            vote:
-              Description: 为领地商店评分
-              Info:
-              - '&e使用方法: &6/res shop vote <领地名称> [分数]'
-              - 为当前或指定领地商店评分
-            like:
-              Description: 为领地商店点赞
-              Info:
-              - '&e使用方法: &6/res shop like <领地名称>'
-              - 为领地商店点一个赞
-            votes:
-              Description: 显示领地商店评分
-              Info:
-              - '&e使用方法: &6/res shop votes <领地名称> <页码>'
-              - 显示当前或指定领地商店的评分列表
-            likes:
-              Description: 显示领地商店的赞
-              Info:
-              - '&e使用方法: &6/res shop likes <领地名称> <页码>'
-              - 显示当前或指定领地商店的赞列表
-            setdesc:
-              Description: 设置领地商店描述
-              Info:
-              - '&e使用方法: &6/res shop setdesc [描述文字]'
-              - 设置领地商店描述, 支持颜色代码
-                使用 /n 可以换行
-            createboard:
-              Description: 创建商店宣传板
-              Info:
-              - '&e使用方法: &6/res shop createboard [位置]'
-              - 在选区位置建立商店宣传板. [位置] 表示宣传板的起始位置
-            deleteboard:
-              Description: 删除商店宣传板
-              Info:
-              - '&e使用方法: &6/res shop deleteboard'
-              - 右击宣传板的告示牌以删除宣传板
         lset:
           Description: 更改黑名单和忽略名单选项
           Info:
@@ -930,11 +668,6 @@ CommandHelp:
               Description: 开启或关闭铁砧损坏
               Info:
               - '&e使用方法: &6/res set <领地名称> anvilbreak true/false/remove=移除'
-            bank:
-              Translated: bank - 使用领地银行
-              Description: 允许或禁止从领地银行存/取钱
-              Info:
-              - '&e使用方法: &6/res set/pset <领地名称> bank true/false/remove=移除'
             bed:
               Translated: bed - 使用床(睡觉)
               Description: 允许或禁止使用床(睡觉)
@@ -1360,11 +1093,6 @@ CommandHelp:
               Description: 设置领地天气为晴天
               Info:
               - '&e使用方法: &6/res set <领地名称> sun true/false/remove=移除'
-            shop:
-              Translated: shop - 将领地添加到特殊领地商店列表中
-              Description: 将领地添加到特殊领地商店列表中
-              Info:
-              - '&e使用方法: &6/res set <领地名称> shop true/false/remove=移除'
             snowtrail:
               Translated: snowtrail - 雪傀儡生成雪迹
               Description: 允许或禁止雪傀儡生成雪迹
@@ -1601,38 +1329,6 @@ CommandHelp:
           Info:
           - '&e使用方法: &6/res setallfor [玩家名称] [权限] [true/false/remove=移除]'
           Description: 在特定玩家拥有的所有住宅上设置一般权限
-        lease:
-          Info:
-          - '&e使用方法: &6/res lease [renew/cost] [领地名称]'
-          - /res lease cost 显示续租领地的费用
-          - /res lease renew 将会续租指定的领地
-          Description: 管理领地租约
-          SubCommands:
-            set:
-              Description: 设置租约时间
-              Info:
-              - '&e使用方法: &6/resadmin lease set [领地名称] [#days=天数/infinite=无期限]'
-              - 将租约时间设置为指定天数或者无期限
-            renew:
-              Description: 续期租约时间
-              Info:
-              - '&e使用方法: &6/resadmin lease renew <领地名称>'
-              - 续期当前或指定的领地租约
-            list:
-              Description: 显示当前领地的租赁列表
-              Info:
-              - '&e使用方法: &6/resadmin lease list <领地名称> <页码>'
-              - 列出所有子区域的租赁时间
-            expires:
-              Description: 租约过期时间
-              Info:
-              - '&e使用方法: &6/resadmin lease expires <领地名称>'
-              - 显示领地租约过期的时间
-            cost:
-              Description: 显示续租费用
-              Info:
-              - '&e使用方法: &6/resadmin lease cost <领地名称>'
-              - 显示续租领地所需的费用
         tp:
           Info:
           - '&e使用方法: &6/res tp [领地名称]'

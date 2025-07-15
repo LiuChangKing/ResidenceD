@@ -129,24 +129,7 @@ public class ResidencePlayer {
 
     public void recountMaxRents() {
 
-        if (getPlayer() != null) {
-            if (ResPerm.max_rents_unlimited.hasSetPermission(getPlayer())) {
-                getMaxData().setMaxRents(maxValue);
-                return;
-            }
-        } else {
-            if (Residence.getInstance().getOfflinePlayer(this.getUniqueId()) != null &&
-                Residence.getInstance().getPermissionManager().getPermissionsPlugin().hasPermission(Residence.getInstance().getOfflinePlayer(this.getUniqueId()), ResPerm.max_rents_unlimited
-                    .getPermission(), Residence.getInstance().getConfigManager().getDefaultWorld())) {
-                getMaxData().setMaxRents(maxValue);
-                return;
-            }
-        }
-
-        int m = this.getGroup().getMaxRents();
-        m = m == -1 ? maxValue : m;
-
-        getMaxData().setMaxRents(Residence.getInstance().getPermissionManager().getPermissionInfo(this.getUniqueId(), ResPerm.max_rents_$1).getMaxValue(m));
+        getMaxData().setMaxRents(0);
     }
 
     public int getMaxRents() {

@@ -92,9 +92,6 @@ permissions:
   residence.command.area:
     description: Allows to access particular command
     default: true
-  residence.command.bank:
-    description: Allows to access particular command
-    default: true
   residence.command.check:
     description: Allows to access particular command
     default: true
@@ -141,9 +138,6 @@ permissions:
     description: Allows to access particular command
     default: true
   residence.command.kick:
-    description: Allows to access particular command
-    default: true
-  residence.command.lease:
     description: Allows to access particular command
     default: true
   residence.command.limits:
@@ -230,9 +224,6 @@ permissions:
   residence.command.resadmin:
     description: Allows to access particular command
     default: op
-  residence.command.resbank:
-    description: Allows to access particular command
-    default: true
   residence.command.reset:
     description: Allows to access particular command
     default: true
@@ -254,9 +245,6 @@ permissions:
   residence.command.setowner:
     description: Allows to access particular command
     default: op
-  residence.command.shop:
-    description: Allows to access particular command
-    default: true
   residence.command.signconvert:
     description: Allows to access particular command
     default: op

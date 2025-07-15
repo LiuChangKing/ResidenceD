@@ -40,23 +40,12 @@ public class Placeholder {
         residence_user_maxud,
         residence_user_maxsub,
         residence_user_maxsubdepth,
-        residence_user_maxrents,
-        residence_user_maxrentdays,
         residence_user_blockcost,
-        residence_user_blocksell,
         residence_user_current_owner,
         residence_user_current_res,
         residence_user_current_resname,
-        residence_user_current_bank,
         residence_user_current_qsize,
         residence_user_current_ssize,
-        residence_user_current_forsale,
-        residence_user_current_saleprice,
-        residence_user_current_forrent,
-        residence_user_current_rentprice,
-        residence_user_current_rentedby,
-        residence_user_current_rentdays,
-        residence_user_current_rentends,
         residence_user_current_flag_$1("Get flags from current residence by flag name", "flagName"),
         ;
 
@@ -380,11 +369,6 @@ public class Placeholder {
                         result = String.valueOf(user.getGroup().getCostperarea());
                     }
                     break;
-                case residence_user_blocksell:
-                    if (Residence.getInstance().getEconomyManager() != null) {
-                        result = String.valueOf(user.getGroup().getSellperarea());
-                    }
-                    break;
                 case residence_user_cancreate:
                     result = variable(user.getGroup().canCreateResidences());
                     break;
@@ -398,12 +382,6 @@ public class Placeholder {
                 case residence_user_maxns:
                     group = user.getGroup();
                     result = group.getMinZ() + "-" + user.getMaxZ();
-                    break;
-                case residence_user_maxrentdays:
-                    result = String.valueOf(user.getGroup().getMaxRentDays());
-                    break;
-                case residence_user_maxrents:
-                    result = String.valueOf(user.getMaxRents());
                     break;
                 case residence_user_maxres:
                     result = String.valueOf(user.getMaxRes());
@@ -430,10 +408,6 @@ public class Placeholder {
                     res = plugin.getResidenceManager().getByLoc(user.getPlayer().getLocation());
                     result = res == null ? "" : res.getResidenceName();
                     break;
-                case residence_user_current_bank:
-                    res = plugin.getResidenceManager().getByLoc(user.getPlayer().getLocation());
-                    result = res == null ? "0" : res.getBank().getStoredMoneyFormated();
-                    break;
                 case residence_user_current_qsize:
                     res = plugin.getResidenceManager().getByLoc(user.getPlayer().getLocation());
                     result = res == null ? "0" : String.valueOf(res.getTotalSize());
@@ -441,34 +415,6 @@ public class Placeholder {
                 case residence_user_current_ssize:
                     res = plugin.getResidenceManager().getByLoc(user.getPlayer().getLocation());
                     result = res == null ? "0" : String.valueOf(res.getXZSize());
-                    break;
-                case residence_user_current_forsale:
-                    res = plugin.getResidenceManager().getByLoc(user.getPlayer().getLocation());
-                    result = res == null ? "" : String.valueOf(res.isForSell());
-                    break;
-                case residence_user_current_saleprice:
-                    res = plugin.getResidenceManager().getByLoc(user.getPlayer().getLocation());
-                    result = res == null || !res.isForSell() ? "" : String.valueOf(res.getSellPrice());
-                    break;
-                case residence_user_current_rentprice:
-                    res = plugin.getResidenceManager().getByLoc(user.getPlayer().getLocation());
-                    result = res == null || !res.isForRent() ? "" : String.valueOf(res.getRentable().cost);
-                    break;
-                case residence_user_current_rentdays:
-                    res = plugin.getResidenceManager().getByLoc(user.getPlayer().getLocation());
-                    result = res == null || !res.isForRent() ? "" : String.valueOf(res.getRentable().days);
-                    break;
-                case residence_user_current_rentedby:
-                    res = plugin.getResidenceManager().getByLoc(user.getPlayer().getLocation());
-                    result = res == null || !res.isForRent() || res.getRentedLand() == null || res.getRentedLand().player == null ? "" : res.getRentedLand().player;
-                    break;
-                case residence_user_current_rentends:
-                    res = plugin.getResidenceManager().getByLoc(user.getPlayer().getLocation());
-                    result = res == null || !res.isForRent() || res.getRentedLand() == null || res.getRentedLand().player == null ? "" : GetTime.getTime(res.getRentedLand().endTime, true);
-                    break;
-                case residence_user_current_forrent:
-                    res = plugin.getResidenceManager().getByLoc(user.getPlayer().getLocation());
-                    result = res == null ? "" : String.valueOf(res.isForRent());
                     break;
                 default:
                     break;

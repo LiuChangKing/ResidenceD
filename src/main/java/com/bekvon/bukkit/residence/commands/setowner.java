@@ -41,11 +41,7 @@ public class setowner implements cmd {
 	    return null;
 	}
 
-	area.getPermissions().setOwner(args[1], !keepFlags);
-	if (plugin.getRentManager().isForRent(area))
-	    plugin.getRentManager().removeRentable(area);
-	if (plugin.getTransactionManager().isForSale(area))
-	    plugin.getTransactionManager().removeFromSale(area);
+        area.getPermissions().setOwner(args[1], !keepFlags);
 
 	if (!keepFlags)
 	    area.getPermissions().applyDefaultFlags();

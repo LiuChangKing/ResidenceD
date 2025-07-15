@@ -4,7 +4,6 @@ import com.bekvon.bukkit.residence.ConfigManager;
 import com.bekvon.bukkit.residence.Residence;
 import com.bekvon.bukkit.residence.commands.padd;
 import com.bekvon.bukkit.residence.containers.*;
-import com.bekvon.bukkit.residence.economy.ResidenceBank;
 import com.bekvon.bukkit.residence.economy.rent.RentableLand;
 import com.bekvon.bukkit.residence.economy.rent.RentedLand;
 import com.bekvon.bukkit.residence.event.*;
@@ -14,7 +13,6 @@ import com.bekvon.bukkit.residence.itemlist.ResidenceItemList;
 import com.bekvon.bukkit.residence.permissions.PermissionGroup;
 import com.bekvon.bukkit.residence.permissions.PermissionManager.ResPerm;
 import com.bekvon.bukkit.residence.protection.FlagPermissions.FlagCombo;
-import com.bekvon.bukkit.residence.shopStuff.ShopVote;
 import com.bekvon.bukkit.residence.signsStuff.Signs;
 import com.bekvon.bukkit.residence.utils.*;
 import net.Zrips.CMILib.Colors.CMIChatColor;
@@ -46,13 +44,11 @@ public class ClaimedResidence {
     protected Map<String, CuboidArea> areas;
     protected Map<String, ClaimedResidence> subzones;
     protected ResidencePermissions perms;
-    protected ResidenceBank bank;
     protected double BlockSellPrice = 0.0;
     public Vector tpLoc;
     public Vector PitchYaw;
     protected String enterMessage = null;
     protected String leaveMessage = null;
-    protected String ShopDesc = null;
     protected ResidenceItemList ignorelist;
     protected ResidenceItemList blacklist;
     protected boolean mainRes = false;
@@ -63,7 +59,6 @@ public class ClaimedResidence {
     protected List<String> cmdWhiteList = new ArrayList<String>();
     protected List<String> cmdBlackList = new ArrayList<String>();
 
-    List<ShopVote> ShopVoteList = new ArrayList<ShopVote>();
 
     protected RentableLand rentableland = null;
     protected RentedLand rentedland = null;
@@ -197,7 +192,6 @@ public class ClaimedResidence {
     private void initialize() {
         subzones = new HashMap<>();
         areas = new HashMap<>();
-        bank = new ResidenceBank(this);
         blacklist = new ResidenceItemList(Residence.getInstance(), this, ListType.BLACKLIST);
         ignorelist = new ResidenceItemList(Residence.getInstance(), this, ListType.IGNORELIST);
     }
@@ -947,9 +941,6 @@ public class ClaimedResidence {
         return leaveMessage;
     }
 
-    public String getShopDesc() {
-        return ShopDesc;
-    }
 
     public void setEnterMessage(String message) {
         enterMessage = message;
@@ -959,9 +950,6 @@ public class ClaimedResidence {
         leaveMessage = message;
     }
 
-    public void setShopDesc(String message) {
-        ShopDesc = message;
-    }
 
     public void setEnterLeaveMessage(CommandSender sender, String message, boolean enter, boolean resadmin) {
         if (message != null) {
@@ -1449,15 +1437,6 @@ public class ClaimedResidence {
 //	    root.put("LeaveMessage", id);
 //	}
 
-        try {
-            if (ShopDesc != null)
-                root.put("ShopDescription", ShopDesc);
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
-
-        if (bank.getStoredMoneyD() != 0)
-            root.put("StoredMoney", bank.getStoredMoneyD());
         if (BlockSellPrice != 0D)
             root.put("BlockSellPrice", BlockSellPrice);
 
@@ -1566,15 +1545,6 @@ public class ClaimedResidence {
             res.createTime = System.currentTimeMillis();
 
 
-        if (root.containsKey("ShopDescription"))
-            res.setShopDesc((String) root.get("ShopDescription"));
-
-        if (root.containsKey("StoredMoney")) {
-            if (root.get("StoredMoney") instanceof Double)
-                res.bank.setStoredMoney((Double) root.get("StoredMoney"));
-            else
-                res.bank.setStoredMoney((Integer) root.get("StoredMoney"));
-        }
 
         if (root.containsKey("BlackList"))
             res.blacklist = ResidenceItemList.load(plugin, res, (Map<String, Object>) root.get("BlackList"));
@@ -1828,10 +1798,6 @@ public class ClaimedResidence {
         Residence.getInstance().getPlayerManager().removeResFromPlayer(this);
     }
 
-    public ResidenceBank getBank() {
-        return bank;
-    }
-
     @Deprecated
     public String getWorld() {
         return perms.getWorldName();
@@ -1941,26 +1907,6 @@ public class ClaimedResidence {
         return within;
     }
 
-    @Deprecated
-    public List<ShopVote> GetShopVotes() {
-        return getAllShopVotes();
-    }
-
-    public List<ShopVote> getAllShopVotes() {
-        return ShopVoteList;
-    }
-
-    public void clearShopVotes() {
-        ShopVoteList.clear();
-    }
-
-    public void addShopVote(List<ShopVote> ShopVotes) {
-        ShopVoteList.addAll(ShopVotes);
-    }
-
-    public void addShopVote(ShopVote ShopVote) {
-        ShopVoteList.add(ShopVote);
-    }
 
     public Long getLeaseExpireTime() {
         return leaseExpireTime;

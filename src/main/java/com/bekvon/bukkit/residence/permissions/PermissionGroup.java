@@ -37,7 +37,6 @@ public class PermissionGroup {
 
     protected int resmax = 0;
     private double costperarea = 0;
-    private double sellperarea = 0;
     protected boolean tpaccess = false;
     protected int subzonedepth = 0;
     protected int maxSubzones = 3;
@@ -212,14 +211,6 @@ public class PermissionGroup {
             maxLeaseTime = limits.getInt("Lease.MaxDays", 16);
         if (limits.contains("Lease.RenewIncrement"))
             leaseGiveTime = limits.getInt("Lease.RenewIncrement", 14);
-        if (limits.contains("Rent.MaxRents"))
-            maxRents = limits.getInt("Rent.MaxRents", 0);
-
-        if (limits.contains("Rent.MaxRentDays"))
-            MaxRentDays = limits.getInt("Rent.MaxRentDays", -1);
-
-        if (limits.contains("Rent.MaxRentables"))
-            maxRentables = limits.getInt("Rent.MaxRentables", 0);
         if (limits.contains("Economy.RenewCost"))
             renewcostperarea = limits.getDouble("Economy.RenewCost", 0.02D);
         if (limits.contains("Economy.CanBuy"))
@@ -231,8 +222,6 @@ public class PermissionGroup {
         if (limits.contains("Economy.BuyCost"))
             costperarea = limits.getDouble("Economy.BuyCost", 0);
 
-        if (limits.contains("Economy.SellCost"))
-            sellperarea = limits.getDouble("Economy.SellCost", 0);
 
         if (limits.isBoolean("Residence.Unstuck"))
             unstuck = limits.getBoolean("Residence.Unstuck", false);
@@ -409,9 +398,6 @@ public class PermissionGroup {
         return costperarea;
     }
 
-    public double getSellPerBlock() {
-        return sellperarea;
-    }
 
     public boolean hasTpAccess() {
         return tpaccess;
@@ -462,15 +448,15 @@ public class PermissionGroup {
     }
 
     public int getMaxRents() {
-        return maxRents;
+        return 0;
     }
 
     public int getMaxRentDays() {
-        return MaxRentDays;
+        return -1;
     }
 
     public int getMaxRentables() {
-        return maxRentables;
+        return 0;
     }
 
     public boolean buyLandIgnoreLimits() {
@@ -561,12 +547,9 @@ public class PermissionGroup {
         Residence.getInstance().msg(player, lm.Limits_MinMax, group.getMinHeight(), group.getMaxHeight());
         Residence.getInstance().msg(player, lm.Limits_MaxSubzones, rPlayer.getMaxSubzones());
         Residence.getInstance().msg(player, lm.Limits_MaxSubDepth, rPlayer.getMaxSubzoneDepth());
-        Residence.getInstance().msg(player, lm.Limits_MaxRents, rPlayer.getMaxRents() + (getMaxRentDays() != -1 ? Residence.getInstance().msg(lm.Limits_MaxRentDays, getMaxRentDays())
-            : ""));
         Residence.getInstance().msg(player, lm.Limits_EnterLeave, group.messageperms);
         if (Residence.getInstance().getEconomyManager() != null) {
             Residence.getInstance().msg(player, lm.Limits_Cost, group.costperarea);
-            Residence.getInstance().msg(player, lm.Limits_Sell, group.sellperarea);
         }
         Residence.getInstance().msg(player, lm.Limits_Flag, group.flagPerms.listFlags());
         if (Residence.getInstance().getConfigManager().useLeases()) {
@@ -581,9 +564,6 @@ public class PermissionGroup {
         return costperarea;
     }
 
-    public double getSellperarea() {
-        return sellperarea;
-    }
 
     @Deprecated
     public int getXmin() {
