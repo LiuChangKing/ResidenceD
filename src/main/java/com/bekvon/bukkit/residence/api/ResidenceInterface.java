@@ -4,7 +4,6 @@ import com.bekvon.bukkit.residence.protection.ClaimedResidence;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import java.util.List;
 
 public interface ResidenceInterface {
     public ClaimedResidence getByLoc(Location loc);
@@ -13,15 +12,6 @@ public interface ResidenceInterface {
 
     public String getSubzoneNameByRes(ClaimedResidence res);
 
-    public void addShop(ClaimedResidence res);
-
-    public void addShop(String res);
-
-    public void removeShop(ClaimedResidence res);
-
-    public void removeShop(String res);
-
-    public List<ClaimedResidence> getShops();
 
     public boolean addResidence(String name, Location loc1, Location loc2);
 

@@ -426,11 +426,6 @@ public class HelpEntry {
                         }
                     }
                     break;
-                case "[residenceshop]":
-                    for (ClaimedResidence one : Residence.getInstance().getResidenceManager().getShops()) {
-                        subCommands.add(one.getName());
-                    }
-                    break;
                 case "[placeholder]":
                     for (CMIPlaceHolders one : CMIPlaceHolders.values()) {
                         subCommands.add(one.getFull());

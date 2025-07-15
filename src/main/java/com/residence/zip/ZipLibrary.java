@@ -68,14 +68,10 @@ public class ZipLibrary {
 		}
 	    }
 
-	if (plugin.getConfigManager().BackupforsaleFile())
-	    sources.add(new File(saveFolder, "forsale.yml"));
-	if (plugin.getConfigManager().BackupleasesFile())
-	    sources.add(new File(saveFolder, "leases.yml"));
-	if (plugin.getConfigManager().BackuppermlistsFile())
-	    sources.add(new File(saveFolder, "permlists.yml"));
-	if (plugin.getConfigManager().BackuprentFile())
-	    sources.add(new File(saveFolder, "rent.yml"));
+        if (plugin.getConfigManager().BackupleasesFile())
+            sources.add(new File(saveFolder, "leases.yml"));
+        if (plugin.getConfigManager().BackuppermlistsFile())
+            sources.add(new File(saveFolder, "permlists.yml"));
 
 	if (plugin.getConfigManager().BackupflagsFile())
 	    sources.add(new File(plugin.getDataLocation(), "flags.yml"));

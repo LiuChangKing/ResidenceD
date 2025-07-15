@@ -210,10 +210,7 @@ Global:
     UseZip: true
     IncludeFiles:
       Worlds: true
-      forsale: true
-      leases: true
       permlists: true
-      rent: true
       flags: true
       groups: true
       config: true
@@ -308,25 +305,11 @@ Global:
       - pvp
   # 如果权限无法连接或您不使用权限，则使用的默认组使用。
   DefaultGroup: default
-  # 启用 /禁用租赁系统。
-  UseLeaseSystem: false
-  # 设置租赁或租金到期日期的显示格式
-  # 具体用法可参考: http://www.tutorialspoint.com/java/java_date_time.htm
-  DateFormat: E yyyy.MM.dd 'at' hh:mm:ss a zzz
-  # 设置租赁或租金到期日期的简短格式
-  # 具体用法可参考: http://www.tutorialspoint.com/java/java_date_time.htm
-  DateFormatShort: MM.dd hh:mm
   # 设置日期显示所使用的时区，当服务器位置与玩家分布地区不同时尤其有用
   # 完整时区列表可在 http://www.mkyong.com/java/java-display-list-of-timezone-with-gmt/ 查看
   TimeZone: Asia/Shanghai
   # 启用或禁用移除领地时返还金钱
   ResMoneyBack: false
-  # 启用或禁用移除领地时返还其银行余额
-  ResBankBack: true
-  # 租赁到期检查的间隔时间（分钟），仅在启用租赁系统时生效
-  LeaseCheckInterval: 10
-  # 若玩家资金充足则自动续租，经济系统关闭时此设置无效
-  LeaseAutoRenew: true
   # 是否启用权限系统
   EnablePermissions: true
   # 启用或禁用 Residence 的经济系统（支持 Vault）
@@ -343,49 +326,8 @@ Global:
   # 也可以自定义经济接口以直接接入经济系统
   # 可用值: Vault, None
   Type: None
-  # 启用后，若领地可租或出售将在聊天中额外提示如何租用或购买
+  # 启用后，将在聊天中额外提示相关信息
   ExtraEnterMessage: true
-  Sell:
-    # 如果设置为真，这将允许出售子区域。建议将其保留为假
-    Subzone: false
-  # 启用或禁用租金系统
-  EnableRentSystem: false
-  Rent:
-    # 如果某些人仍在租用居住地，则防止住所/subzone拆除
-    PreventRemoval: true
-    # 设置为真正的居住租金时，可以从居住银行续签
-    DeductFromBank: false
-    # 当设置为真正的居住租金时，可以从居住银行续签，如果没有足够的钱，我们将其余的钱从玩家中扣除
-    # 这将覆盖扣除炸弹的行为
-    DeductFromBankThenPlayer: false
-    Inform:
-      # 告知玩家租金时间结束
-      OnEnding: true
-      # 时间范围为几分钟，开始通知结束租金
-      Before: 1440
-      # 时间范围为几秒钟，在玩家登录后等待多长时间才能告知租金
-      Delay: 60
-    DefaultValues:
-      # 租金时使用的默认值
-      AllowRenewing: true
-      StayInMarket: true
-      AllowAutoPay: true
-      # 若设为 true，当玩家未指定是否自动支付租金时默认启用
-      PlayerAutoPay: true
-    Schematics:
-      # 实验功能！若设为 true，租约结束后将恢复为设置 backup 标志时的状态
-      # 出于安全原因，仅拥有额外 residence.backup 权限的玩家可设置 backup 标志
-      RestoreAfterRentEnds: true
-      # 设为 true 时，仅在将 backup 旗帜改为 true 时保存区域状态
-      # 设为 false 时，玩家每次租用都会保存一次区域，以便保持最新外观
-      # 注意设为 false 会略微增加服务器负荷
-      SaveOnFlagChange: true
-  Bank:
-    # 定义最大金额可以持有
-    # 设置为0将禁用限制
-    Capacity: 0.0
-  # 在居住租金到期支票之间（如果启用租金系统）之间的间隔（如果启用了租金）。
-  RentCheckInterval: 10
   Messages:
     # 定义要发送居住地的位置，请输入/离开/拒绝移动和类似消息。可能的选项： ActionBar, TitleBar, ChatBox
     # titlebar可以具有％subtitle％变量来定义第二行
@@ -405,14 +347,12 @@ Global:
   MultiWorldPlugin: Multiverse-Core
   # 将其设置为真实会导致子区域从其父区域继承标志。
   ResidenceFlagsInherit: true
-  # 将此设置为false将允许租赁参与者修改租用的住所。
-  PreventRentModify: true
   # 当Subzone所有者与父级所有者不同时，将其设置为true将防止子区删除。
   PreventSubZoneRemoval: true
   # 将其设置为False，即使在保存文件中检测到错误，也会导致住宅继续加载。
   StopOnSaveFault: true
   ResidenceNameRegex: '[^a-zA-Z0-9\-\_]'
-  # 将其设置为TRUE，每次居住时都会将消息发送到控制台，或者租金到期或租赁过期支票。
+  # 将其设置为TRUE，每次居住时都会在控制台记录信息
   ShowIntervalMessages: false
   # 将其设置为True，将胸部放在地面上时，将其发送给新玩家的教程消息。
   ShowNoobMessage: true
@@ -486,7 +426,6 @@ Global:
     Interval: 5
   EnforceAreaInsideArea: false
   EnableSpout: false
-  EnableLeaseMoneyAccount: true
   # 通过将其设置为真实，将启用Kcouldron服务器的部分兼容性。动作栏消息和选择可视化器将自动禁用，因为不正确的兼容性
   Couldroncompatibility: false
 DynMap:
@@ -516,9 +455,6 @@ DynMap:
   Fill:
     Opacity: 0.3
     Color: '#FFFF00'
-    ForRent: '#33cc33'
-    Rented: '#99ff33'
-    ForSale: '#0066ff'
   # 仅在此列表中显示区域
   VisibleRegions: []
   # 即使没有隐藏在地图上的地图上的区域

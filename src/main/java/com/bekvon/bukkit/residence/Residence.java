@@ -18,8 +18,6 @@ import com.bekvon.bukkit.residence.persistance.YMLSaveHelper;
 import com.bekvon.bukkit.residence.protection.*;
 import com.bekvon.bukkit.residence.protection.FlagPermissions.FlagCombo;
 import com.bekvon.bukkit.residence.selection.*;
-import com.bekvon.bukkit.residence.shopStuff.ShopListener;
-import com.bekvon.bukkit.residence.shopStuff.ShopSignUtil;
 import com.bekvon.bukkit.residence.signsStuff.SignUtil;
 import com.bekvon.bukkit.residence.slimeFun.SlimefunManager;
 import com.bekvon.bukkit.residence.text.Language;
@@ -97,7 +95,6 @@ public class Residence extends JavaPlugin {
     protected Language newLanguageManager;
     protected PlayerManager PlayerManager;
     protected FlagUtil FlagUtilManager;
-    protected ShopSignUtil ShopSignUtilManager;
 //    private TownManager townManager;
     protected RandomTp RandomTpManager;
     protected DynMapManager DynManager;
@@ -267,8 +264,6 @@ public class Residence extends JavaPlugin {
 
         this.getSelectionManager().onDisable();
 
-        this.getShopSignUtilManager().forceSaveIfPending();
-
         if (this.metrics != null)
             try {
                 metrics.disable();
@@ -386,7 +381,6 @@ public class Residence extends JavaPlugin {
             LocaleManager = new LocaleManager(this);
 
             PlayerManager = new PlayerManager(this);
-            ShopSignUtilManager = new ShopSignUtil(this);
             RandomTpManager = new RandomTp(this);
 //	    townManager = new TownManager(this);
 
@@ -552,7 +546,6 @@ public class Residence extends JavaPlugin {
                 pm.registerEvents(plistener, this);
                 pm.registerEvents(elistener, this);
                 pm.registerEvents(new ResidenceFixesListener(), this);
-                pm.registerEvents(new ShopListener(this), this);
                 // Events for old versions removed
 
                 firstenable = false;
@@ -646,9 +639,6 @@ public class Residence extends JavaPlugin {
             Bukkit.getServer().shutdown();
         }
 
-        getShopSignUtilManager().LoadShopVotes();
-        getShopSignUtilManager().LoadSigns();
-        getShopSignUtilManager().boardUpdate();
 
         CMIVersionChecker.VersionCheck(null, 11480, this.getDescription());
         fullyLoaded = true;
@@ -749,11 +739,6 @@ public class Residence extends JavaPlugin {
         return dataFolder;
     }
 
-    public ShopSignUtil getShopSignUtilManager() {
-        if (ShopSignUtilManager == null)
-            ShopSignUtilManager = new ShopSignUtil(this);
-        return ShopSignUtilManager;
-    }
 
     public CommandFiller getCommandFiller() {
         if (cmdFiller == null) {
@@ -1012,26 +997,9 @@ public class Residence extends JavaPlugin {
         }
 
         YMLSaveHelper yml;
-        // For Sale save
-        File ymlSaveLoc = new File(saveFolder, "forsale.yml");
-        File tmpFile = new File(saveFolder, "tmp_forsale.yml");
-        yml = new YMLSaveHelper(tmpFile);
-        yml.save();
-        yml.getRoot().put("Economy", tmanager.save());
-        yml.save();
-        if (ymlSaveLoc.isFile()) {
-            File backupFolder = new File(saveFolder, "Backup");
-            backupFolder.mkdirs();
-            File backupFile = new File(backupFolder, "forsale.yml");
-            if (backupFile.isFile()) {
-                backupFile.delete();
-            }
-            ymlSaveLoc.renameTo(backupFile);
-        }
-        tmpFile.renameTo(ymlSaveLoc);
 
         // Leases save
-        ymlSaveLoc = new File(saveFolder, "leases.yml");
+        File ymlSaveLoc = new File(saveFolder, "leases.yml");
         tmpFile = new File(saveFolder, "tmp_leases.yml");
         yml = new YMLSaveHelper(tmpFile);
         yml.getRoot().put("Leases", leasemanager.save());
@@ -1064,22 +1032,7 @@ public class Residence extends JavaPlugin {
         }
         tmpFile.renameTo(ymlSaveLoc);
 
-        // rent save
-        ymlSaveLoc = new File(saveFolder, "rent.yml");
-        tmpFile = new File(saveFolder, "tmp_rent.yml");
-        yml = new YMLSaveHelper(tmpFile);
-        yml.getRoot().put("RentSystem", rentmanager.save());
-        yml.save();
-        if (ymlSaveLoc.isFile()) {
-            File backupFolder = new File(saveFolder, "Backup");
-            backupFolder.mkdirs();
-            File backupFile = new File(backupFolder, "rent.yml");
-            if (backupFile.isFile()) {
-                backupFile.delete();
-            }
-            ymlSaveLoc.renameTo(backupFile);
-        }
-        tmpFile.renameTo(ymlSaveLoc);
+
 
         if (getConfigManager().showIntervalMessages()) {
             System.out.println("[Residence] - Saved Residences...");
@@ -1183,25 +1136,11 @@ public class Residence extends JavaPlugin {
 
             getResidenceManager().load(worlds);
 
-            // Getting shop residences
-            Map<String, ClaimedResidence> resList = rmanager.getResidences();
-            for (Entry<String, ClaimedResidence> one : resList.entrySet()) {
-                addShops(one.getValue());
-            }
 
             if (getConfigManager().isUUIDConvertion()) {
                 getConfigManager().ChangeConfig("Global.UUIDConvertion", false);
             }
 
-            loadFile = new File(saveFolder, "forsale.yml");
-            if (loadFile.isFile()) {
-                yml = new YMLSaveHelper(loadFile);
-                yml.load();
-                tmanager = new TransactionManager(this);
-                Map<String, Object> root = yml.getRoot();
-                if (root != null)
-                    tmanager.load((Map) root.get("Economy"));
-            }
             loadFile = new File(saveFolder, "leases.yml");
             if (loadFile.isFile()) {
                 yml = new YMLSaveHelper(loadFile);
@@ -1218,14 +1157,6 @@ public class Residence extends JavaPlugin {
                 if (root != null)
                     pmanager = getPermissionListManager().load((Map) root.get("PermissionLists"));
             }
-            loadFile = new File(saveFolder, "rent.yml");
-            if (loadFile.isFile()) {
-                yml = new YMLSaveHelper(loadFile);
-                yml.load();
-                Map<String, Object> root = yml.getRoot();
-                if (root != null)
-                    rentmanager.load((Map) root.get("RentSystem"));
-            }
 
 //	    for (Player one : Bukkit.getOnlinePlayers()) {
 //		ResidencePlayer rplayer = getPlayerManager().getResidencePlayer(one);
@@ -1241,14 +1172,6 @@ public class Residence extends JavaPlugin {
         }
     }
 
-    private void addShops(ClaimedResidence res) {
-        ResidencePermissions perms = res.getPermissions();
-        if (perms.has(Flags.shop, FlagCombo.OnlyTrue, false))
-            rmanager.addShop(res);
-        for (ClaimedResidence one : res.getSubzones()) {
-            addShops(one);
-        }
-    }
 
     private void writeDefaultGroupsFromJar() {
         if (this.writeDefaultFileFromJar(new File(this.getDataFolder(), "groups.yml"), "groups.yml", true)) {

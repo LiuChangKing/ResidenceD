@@ -29,7 +29,6 @@ Global:
     # Applies to: Residence
     backup: false
     # Applies to: Both
-    bank: true
     # Applies to: Both
     beacon: true
     # Applies to: Both
@@ -203,8 +202,6 @@ Global:
     # Applies to: Residence
     shoot: true
     # Applies to: Residence
-    shop: true
-    # Applies to: Residence
     smonsters: true
     # Applies to: Residence
     snowball: true
@@ -253,7 +250,6 @@ Global:
     anvil: ANVIL
     anvilbreak: ANVIL
     backup: BOOKSHELF
-    bank: ENDER_CHEST
     beacon: BEACON
     bed: WHITE_BED
     brew: BREWING_STAND
@@ -340,7 +336,6 @@ Global:
     sanimals: RABBIT_SPAWN_EGG
     shear: SHEARS
     shoot: ARROW
-    shop: ITEM_FRAME
     smonsters: ZOMBIE_SPAWN_EGG
     snowball: SNOWBALL
     snowtrail: SNOW
@@ -395,22 +390,6 @@ Global:
     trade: true
     shear: true
     leash: true
-    harvest: true
-  # These are default flags applied to the residence renter of any group.
-  RentedDefault:
-    container: true
-    ignite: true
-    move: true
-    trade: true
-    mobkilling: true
-    shear: true
-    build: true
-    use: true
-    destroy: true
-    vehicledestroy: true
-    leash: true
-    animalkilling: true
-    admin: true
     harvest: true
   # These are grouped flags, so when using /res pset nickname redstone true, player will get all flags in list, same when setting to false or removing them.
   GroupedFlags:

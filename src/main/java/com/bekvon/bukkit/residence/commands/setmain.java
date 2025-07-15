@@ -39,12 +39,9 @@ public class setmain implements cmd {
 	    return false;
 	}
 
-	if (res.isOwner(player)) {
-	    res.setMainResidence(res.isMainResidence() ? false : true);
-	} else if (plugin.getRentManager().isRented(res.getName()) && !plugin.getRentManager().getRentingPlayer(res.getName()).equalsIgnoreCase(player.getName())) {
-	    plugin.msg(sender, lm.Invalid_Residence);
-	    return false;
-	}
+        if (res.isOwner(player)) {
+            res.setMainResidence(res.isMainResidence() ? false : true);
+        }
 
 	plugin.msg(player, lm.Residence_ChangedMain, res.getTopParentName());
 

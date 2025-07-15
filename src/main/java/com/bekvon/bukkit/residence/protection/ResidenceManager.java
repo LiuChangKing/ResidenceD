@@ -35,13 +35,11 @@ import java.util.logging.Logger;
 public class ResidenceManager implements ResidenceInterface {
     protected ConcurrentHashMap<String, ClaimedResidence> residences;
     protected Map<String, Map<ChunkRef, List<ClaimedResidence>>> chunkResidences;
-    protected List<ClaimedResidence> shops = new ArrayList<ClaimedResidence>();
     private Residence plugin;
 
     public ResidenceManager(Residence plugin) {
         residences = new ConcurrentHashMap<String, ClaimedResidence>();
         chunkResidences = new HashMap<String, Map<ChunkRef, List<ClaimedResidence>>>();
-        shops = new ArrayList<ClaimedResidence>();
         this.plugin = plugin;
     }
 
@@ -151,37 +149,6 @@ public class ResidenceManager implements ResidenceInterface {
         return null;
     }
 
-    @Override
-    public void addShop(String resName) {
-        ClaimedResidence res = getByName(resName);
-        if (res != null)
-            shops.add(res);
-    }
-
-    @Override
-    public void addShop(ClaimedResidence res) {
-        shops.add(res);
-    }
-
-    @Override
-    public void removeShop(ClaimedResidence res) {
-        shops.remove(res);
-    }
-
-    @Override
-    public void removeShop(String resName) {
-        for (ClaimedResidence one : shops) {
-            if (one.getName().equalsIgnoreCase(resName)) {
-                shops.remove(one);
-                break;
-            }
-        }
-    }
-
-    @Override
-    public List<ClaimedResidence> getShops() {
-        return shops;
-    }
 
     @Override
     public boolean addResidence(String name, Location loc1, Location loc2) {
@@ -628,9 +595,6 @@ public class ResidenceManager implements ResidenceInterface {
                 }
             }
 
-            if (res.getBank().getStoredMoneyD() > 0 && plugin.getConfigManager().isResBankBack()) {
-                plugin.getTransactionManager().giveEconomyMoney(res.getOwner(), res.getBank().getStoredMoneyD());
-            }
         }
 
         for (ClaimedResidence sub : res.getSubzones()) {
@@ -729,10 +693,7 @@ public class ResidenceManager implements ResidenceInterface {
 
         String resNameOwner = "&e" + plugin.msg(lm.Residence_Line, areaname);
         resNameOwner += plugin.msg(lm.General_Owner, perms.getOwner());
-        if (plugin.getConfigManager().enableEconomy()) {
-            if (res.isOwner(sender) || !(sender instanceof Player) || resadmin)
-                resNameOwner += plugin.msg(lm.Bank_Name, res.getBank().getStoredMoneyFormated());
-        }
+
         resNameOwner = CMIChatColor.translate(resNameOwner);
 
         String worldInfo = plugin.msg(lm.General_World, perms.getWorldName());
