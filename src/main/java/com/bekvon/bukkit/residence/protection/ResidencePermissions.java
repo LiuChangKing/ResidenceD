@@ -309,19 +309,6 @@ public class ResidencePermissions extends FlagPermissions {
         if (par != null && par.getPermissions().playerHas(player, Flags.admin, FlagCombo.OnlyTrue))
             return true;
 
-        if (Residence.getInstance().getConfigManager().enabledRentSystem()) {
-            String resname = residence.getName();
-            if (Residence.getInstance().getRentManager().isRented(resname)) {
-                if (requireOwner) {
-                    return false;
-                }
-                String renter = Residence.getInstance().getRentManager().getRentingPlayer(resname);
-                if (sender.getName().equals(renter)) {
-                    return true;
-                }
-                return (playerHas(player, Flags.admin, FlagCombo.OnlyTrue));
-            }
-        }
 
         if (requireOwner) {
             return (this.getOwner().equals(sender.getName()));

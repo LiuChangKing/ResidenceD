@@ -3,8 +3,6 @@ package com.bekvon.bukkit.residence.listeners;
 import com.bekvon.bukkit.residence.ConfigManager;
 import com.bekvon.bukkit.residence.Residence;
 import com.bekvon.bukkit.residence.containers.*;
-import com.bekvon.bukkit.residence.economy.rent.RentableLand;
-import com.bekvon.bukkit.residence.economy.rent.RentedLand;
 import com.bekvon.bukkit.residence.event.*;
 import com.bekvon.bukkit.residence.permissions.PermissionGroup;
 import com.bekvon.bukkit.residence.permissions.PermissionManager.ResPerm;
@@ -628,11 +626,8 @@ public class ResidencePlayerListener implements Listener {
 
         ClaimedResidence res = s.getResidence();
 
-        boolean ForRent = res.isForRent();
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK && ForRent) {
+        if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             return;
-        } else if (event.getAction() == Action.LEFT_CLICK_BLOCK && ForRent && res.isRented() && plugin.getRentManager().getRentingPlayer(res.getName()).equals(player.getName())) {
-            plugin.getRentManager().payRent(player, res.getName(), false);
         }
     }
 
@@ -1801,13 +1796,6 @@ public class ResidencePlayerListener implements Listener {
 
         ClaimedResidence res = plugin.getResidenceManager().getByLoc(loc);
         if (res != null) {
-            if (plugin.getConfigManager().preventRentModify() && plugin.getConfigManager().enabledRentSystem()) {
-                if (plugin.getRentManager().isRented(res.getName())) {
-                    plugin.msg(player, lm.General_NoPermission);
-                    event.setCancelled(true);
-                    return;
-                }
-            }
 
             Material mat = event.getBucket();
             if ((res.getPermissions().playerHas(player, Flags.build, FlagCombo.OnlyFalse))
@@ -1857,11 +1845,6 @@ public class ResidencePlayerListener implements Listener {
             return;
 
         ClaimedResidence res = plugin.getResidenceManager().getByLoc(event.getBlockClicked().getLocation());
-        if (res != null && plugin.getConfigManager().preventRentModify() && plugin.getConfigManager().enabledRentSystem() && plugin.getRentManager().isRented(res.getName())) {
-            plugin.msg(player, lm.General_NoPermission);
-            event.setCancelled(true);
-            return;
-        }
 
         FlagPermissions perms = plugin.getPermsByLocForPlayer(event.getBlockClicked().getLocation(), player);
         boolean hasdestroy = perms.playerHas(player, Flags.destroy, perms.playerHas(player, Flags.build, true));

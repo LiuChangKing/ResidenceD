@@ -4,8 +4,6 @@ import com.bekvon.bukkit.residence.ConfigManager;
 import com.bekvon.bukkit.residence.Residence;
 import com.bekvon.bukkit.residence.commands.padd;
 import com.bekvon.bukkit.residence.containers.*;
-import com.bekvon.bukkit.residence.economy.rent.RentableLand;
-import com.bekvon.bukkit.residence.economy.rent.RentedLand;
 import com.bekvon.bukkit.residence.event.*;
 import com.bekvon.bukkit.residence.event.ResidenceDeleteEvent.DeleteCause;
 import com.bekvon.bukkit.residence.itemlist.ItemList.ListType;
@@ -59,8 +57,6 @@ public class ClaimedResidence {
     protected List<String> cmdBlackList = new ArrayList<String>();
 
 
-    protected RentableLand rentableland = null;
-    protected RentedLand rentedland = null;
 
 
 
@@ -86,66 +82,7 @@ public class ClaimedResidence {
     }
 
 
-    public boolean isForRent() {
-        return Residence.getInstance().getRentManager().isForRent(getName());
-    }
 
-    public boolean isSubzoneForRent() {
-        for (Entry<String, ClaimedResidence> one : subzones.entrySet()) {
-            if (one.getValue().isForRent())
-                return true;
-            if (one.getValue().isSubzoneForRent())
-                return true;
-        }
-        return false;
-    }
-
-    public boolean isSubzoneRented() {
-        for (Entry<String, ClaimedResidence> one : subzones.entrySet()) {
-            if (one.getValue().isRented())
-                return true;
-            if (one.getValue().isSubzoneRented())
-                return true;
-        }
-        return false;
-    }
-
-    public ClaimedResidence getRentedSubzone() {
-        for (Entry<String, ClaimedResidence> one : subzones.entrySet()) {
-            if (one.getValue().isRented())
-                return one.getValue();
-            if (one.getValue().getRentedSubzone() != null)
-                return one.getValue().getRentedSubzone();
-        }
-        return null;
-    }
-
-    public boolean isParentForRent() {
-        if (this.getParent() != null)
-            return this.getParent().isForRent() ? true : this.getParent().isParentForRent();
-        return false;
-    }
-
-
-    public boolean isRented() {
-        return Residence.getInstance().getRentManager().isRented(getName());
-    }
-
-    public void setRentable(RentableLand rl) {
-        this.rentableland = rl;
-    }
-
-    public RentableLand getRentable() {
-        return this.rentableland;
-    }
-
-    public void setRented(RentedLand rl) {
-        this.rentedland = rl;
-    }
-
-    public RentedLand getRentedLand() {
-        return this.rentedland;
-    }
 
     public ClaimedResidence() {
         initialize();

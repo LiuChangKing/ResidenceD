@@ -120,15 +120,6 @@ public class ResidencePlayer {
         getMaxData().setMaxRes(Residence.getInstance().getPermissionManager().getPermissionInfo(this.getUniqueId(), ResPerm.max_res_$1).getMaxValue(m));
     }
 
-    public void recountMaxRents() {
-
-        getMaxData().setMaxRents(0);
-    }
-
-    public int getMaxRents() {
-        recountMaxRents();
-        return getMaxData().getMaxRents();
-    }
 
     public void recountMaxSubzones() {
 

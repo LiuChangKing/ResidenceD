@@ -3,8 +3,6 @@ package com.bekvon.bukkit.residence.protection;
 import com.bekvon.bukkit.residence.Residence;
 import com.bekvon.bukkit.residence.api.ResidenceInterface;
 import com.bekvon.bukkit.residence.containers.*;
-import com.bekvon.bukkit.residence.economy.rent.RentableLand;
-import com.bekvon.bukkit.residence.economy.rent.RentedLand;
 import com.bekvon.bukkit.residence.event.ResidenceCreationEvent;
 import com.bekvon.bukkit.residence.event.ResidenceDeleteEvent;
 import com.bekvon.bukkit.residence.event.ResidenceDeleteEvent.DeleteCause;
@@ -535,19 +533,6 @@ public class ResidenceManager implements ResidenceInterface {
         }
 
         String name = res.getName();
-
-        if (plugin.getConfigManager().isRentPreventRemoval() && !resadmin) {
-            ClaimedResidence rented = res.getRentedSubzone();
-            if (rented != null) {
-                plugin.msg(player, lm.Residence_CantRemove, res.getName(), rented.getName(), rented.getRentedLand().player);
-                return;
-            }
-            if (player != null && res.isRented() && !player.getName().equalsIgnoreCase(res.getRentedLand().player)) {
-                plugin.msg(player, lm.Residence_CantRemove, res.getName(), res.getName(), res.getRentedLand().player);
-                return;
-            }
-        }
-
         if (player != null && !resadmin) {
             if (!res.getPermissions().hasResidencePermission(player, true) && !resadmin && res.getParent() != null && !res.getParent().isOwner(player)) {
                 plugin.msg(player, lm.General_NoPermission);

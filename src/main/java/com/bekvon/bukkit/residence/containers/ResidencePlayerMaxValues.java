@@ -12,7 +12,6 @@ public class ResidencePlayerMaxValues {
     }
 
     private int maxRes = -1;
-    private int maxRents = -1;
     private int maxSubzones = -1;
     private int maxSubzoneDepth = -1;
     private int maxX = -1;
@@ -26,13 +25,6 @@ public class ResidencePlayerMaxValues {
         this.maxRes = maxRes;
     }
 
-    public int getMaxRents() {
-        return maxRents;
-    }
-
-    public void setMaxRents(int maxRents) {
-        this.maxRents = maxRents;
-    }
 
     public int getMaxSubzones() {
         return maxSubzones;

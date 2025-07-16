@@ -216,15 +216,13 @@ public class LeaseManager {
                 }
             }
             if (!renewed) {
-                if (!plugin.getConfigManager().enabledRentSystem() || !plugin.getRentManager().isRented(resname)) {
-                    ResidenceDeleteEvent resevent = new ResidenceDeleteEvent(null, res, DeleteCause.LEASE_EXPIRE);
-                    plugin.getServ().getPluginManager().callEvent(resevent);
-                    if (!resevent.isCancelled()) {
-                        manager.removeResidence(res);
-                        leaseExpireTime.remove(res);
-                        if (plugin.getConfigManager().debugEnabled())
-                            System.out.println("Lease NOT removed, Removing: " + resname);
-                    }
+                ResidenceDeleteEvent resevent = new ResidenceDeleteEvent(null, res, DeleteCause.LEASE_EXPIRE);
+                plugin.getServ().getPluginManager().callEvent(resevent);
+                if (!resevent.isCancelled()) {
+                    manager.removeResidence(res);
+                    leaseExpireTime.remove(res);
+                    if (plugin.getConfigManager().debugEnabled())
+                        System.out.println("Lease NOT removed, Removing: " + resname);
                 }
             } else {
                 if (plugin.getConfigManager().enableEconomy() && plugin.getConfigManager().enableLeaseMoneyAccount()) {

@@ -17,7 +17,6 @@ public interface ResidencePlayerInterface {
 
     public int getMaxSubzones(String player);
 
-    public int getMaxRents(String player);
 
     public ResidencePlayer getResidencePlayer(String player);
 

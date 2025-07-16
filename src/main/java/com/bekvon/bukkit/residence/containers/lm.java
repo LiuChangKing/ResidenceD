@@ -191,7 +191,6 @@ public enum lm {
     Residence_OwnerChange("&eResidence &6%1 &eowner changed to &6%2"),
     Residence_NonAdmin("&cYou are not a Residence admin."),
     Residence_Line("&eResidence: &6%1 "),
-    Residence_RentedBy("&eRented by: &6%1"),
     Residence_MessageChange("&eMessage Set..."),
     Residence_CantDeleteResidence("&cYou don't have permission to delete residence."),
     Residence_CantExpandResidence("&cYou don't have permission to expand residence."),

@@ -3,7 +3,6 @@ package com.bekvon.bukkit.residence.signsStuff;
 import com.bekvon.bukkit.residence.CommentedYamlConfiguration;
 import com.bekvon.bukkit.residence.Residence;
 import com.bekvon.bukkit.residence.containers.lm;
-import com.bekvon.bukkit.residence.economy.rent.RentedLand;
 import com.bekvon.bukkit.residence.protection.ClaimedResidence;
 import com.bekvon.bukkit.residence.utils.Utils;
 import net.Zrips.CMILib.Items.CMIMaterial;
@@ -171,7 +170,7 @@ public class SignUtil {
         if (res == null)
             return false;
 
-        boolean ForRent = false; // rent system removed
+        // rent system removed
 
         Location nloc = Sign.getLocation();
 
@@ -195,32 +194,21 @@ public class SignUtil {
             String landName = res.getName();
             if (landName == null)
                 return;
-            if (!ForRent) {
-                String shortName = fixResName(landName);
-                String secondLine = null;
-                if (shortName.contains("~")) {
-                    String[] lines = fixDoubleResName(landName);
-                    shortName = lines[0];
-                    secondLine = lines[1];
-                }
-                sign.setLine(0, plugin.msg(lm.Sign_ResName, shortName));
-                if (secondLine != null)
-                    sign.setLine(1, plugin.msg(lm.Sign_ResName, secondLine));
-                sign.setLine(2, "");
-                sign.setLine(3, "");
-                sign.setLine(secondLine == null ? 1 : 2, plugin.msg(lm.Sign_Owner, res.getOwner()));
-                sign.update();
-
-                return;
+            String shortName = fixResName(landName);
+            String secondLine = null;
+            if (shortName.contains("~")) {
+                String[] lines = fixDoubleResName(landName);
+                shortName = lines[0];
+                secondLine = lines[1];
             }
-
-            if (ForRent) {
-                sign.setLine(0, plugin.msg(lm.Sign_TopLine));
-                sign.setLine(1, plugin.msg(lm.General_NoPermission));
-                sign.setLine(2, "");
-                sign.setLine(3, "");
-                sign.update();
-            }
+            sign.setLine(0, plugin.msg(lm.Sign_ResName, shortName));
+            if (secondLine != null)
+                sign.setLine(1, plugin.msg(lm.Sign_ResName, secondLine));
+            sign.setLine(2, "");
+            sign.setLine(3, "");
+            sign.setLine(secondLine == null ? 1 : 2, plugin.msg(lm.Sign_Owner, res.getOwner()));
+            sign.update();
+            return;
 
         });
 

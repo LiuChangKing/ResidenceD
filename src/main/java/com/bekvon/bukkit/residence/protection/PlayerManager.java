@@ -271,14 +271,6 @@ public class PlayerManager implements ResidencePlayerInterface {
         return -1;
     }
 
-    @Override
-    public int getMaxRents(String player) {
-        ResidencePlayer resPlayer = getResidencePlayerIfExist(player);
-        if (resPlayer != null) {
-            return resPlayer.getMaxRents();
-        }
-        return -1;
-    }
 
     public ResidencePlayer getResidencePlayer(OfflinePlayer player) {
         if (player == null)

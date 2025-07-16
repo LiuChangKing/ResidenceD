@@ -81,8 +81,6 @@ public class FileCleanUp {
 
                 if (plugin.getConfigManager().isAutoCleanTrasnferToUser() && !res.getOwner().equalsIgnoreCase(plugin.getConfigManager().getAutoCleanUserName())) {
                     res.getPermissions().setOwner(plugin.getConfigManager().getAutoCleanUserName(), true);
-                    if (plugin.getRentManager().isForRent(res.getName()))
-                        plugin.getRentManager().removeRentable(res.getName());
                 } else
                     plugin.getResidenceManager().removeResidence(rPlayer, oneName.getValue(), true, plugin.getConfigManager().isAutoCleanUpRegenerate());
                 i++;

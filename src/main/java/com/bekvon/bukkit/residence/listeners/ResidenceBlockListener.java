@@ -203,15 +203,6 @@ public class ResidenceBlockListener implements Listener {
         }
 
         ClaimedResidence res = Residence.getInstance().getResidenceManager().getByLoc(loc);
-
-        if (Residence.getInstance().getConfigManager().enabledRentSystem() && res != null) {
-            if (Residence.getInstance().getConfigManager().preventRentModify() && res.isRented()) {
-                if (inform)
-                    Residence.getInstance().msg(player, lm.General_NoPermission);
-                return false;
-            }
-        }
-
         FlagPermissions perms = Residence.getInstance().getPermsByLocForPlayer(loc, player);
 
         boolean hasdestroy = perms.playerHas(player, Flags.destroy, perms.playerHas(player, Flags.build, true));
@@ -608,16 +599,7 @@ public class ResidenceBlockListener implements Listener {
         if (Residence.getInstance().getItemManager().isIgnored(mat, group, world)) {
             return true;
         }
-        ClaimedResidence res = Residence.getInstance().getResidenceManager().getByLoc(block.getLocation());
-        if (Residence.getInstance().getConfigManager().enabledRentSystem() && res != null) {
-            String resname = res.getName();
-            if (Residence.getInstance().getConfigManager().preventRentModify() && Residence.getInstance().getRentManager().isRented(resname)) {
-                if (informPlayer)
-                    Residence.getInstance().msg(player, lm.General_NoPermission);
-                return false;
-            }
-        }
-        if (!CMIMaterial.get(mat).isNone() && res != null && !res.getItemBlacklist().isAllowed(mat)) {
+        ClaimedResidence res = Residence.getInstance().getResidenceManager().getByLoc(block.getLocation());        if (!CMIMaterial.get(mat).isNone() && res != null && !res.getItemBlacklist().isAllowed(mat)) {
             if (informPlayer)
                 Residence.getInstance().msg(player, lm.General_ItemBlacklisted);
             return false;
