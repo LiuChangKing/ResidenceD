@@ -886,6 +886,7 @@ public class Residence extends JavaPlugin {
             worldFolder.mkdirs();
         YMLSaveHelper syml;
         File tmpFile = null;
+        File ymlSaveLoc = null;
         Map<String, Object> save = rmanager.save();
         for (Entry<String, Object> entry : save.entrySet()) {
 
@@ -896,7 +897,7 @@ public class Residence extends JavaPlugin {
             } catch (Throwable e) {
             }
 
-            File ymlSaveLoc = new File(worldFolder, "res_" + entry.getKey() + ".yml");
+            ymlSaveLoc = new File(worldFolder, "res_" + entry.getKey() + ".yml");
 
             if (emptyRecord) {
                 saveBackup(ymlSaveLoc, entry.getKey(), worldFolder);
