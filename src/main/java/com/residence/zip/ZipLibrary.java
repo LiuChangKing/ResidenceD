@@ -68,8 +68,6 @@ public class ZipLibrary {
 		}
 	    }
 
-        if (plugin.getConfigManager().BackupleasesFile())
-            sources.add(new File(saveFolder, "leases.yml"));
         if (plugin.getConfigManager().BackuppermlistsFile())
             sources.add(new File(saveFolder, "permlists.yml"));
 

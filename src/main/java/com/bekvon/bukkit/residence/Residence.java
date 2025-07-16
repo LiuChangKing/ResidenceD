@@ -83,7 +83,6 @@ public class Residence extends JavaPlugin {
     protected ResidenceCommandListener commandManager;
 
     protected PermissionListManager pmanager;
-    protected LeaseManager leasemanager;
     public WorldItemManager imanager;
     public WorldFlagManager wmanager;
     protected Server server;
@@ -106,7 +105,6 @@ public class Residence extends JavaPlugin {
     protected boolean firstenable = true;
     protected EconomyInterface economy;
     public File dataFolder;
-    protected CMITask leaseBukkitId = null;
     protected CMITask healBukkitId = null;
     protected CMITask feedBukkitId = null;
     protected CMITask effectRemoveBukkitId = null;
@@ -190,12 +188,6 @@ public class Residence extends JavaPlugin {
 
     private Runnable DespawnMobs = () -> plistener.DespawnMobs();
 
-    private Runnable leaseExpire = () -> {
-        leasemanager.doExpirations();
-        if (getConfigManager().showIntervalMessages()) {
-            Bukkit.getConsoleSender().sendMessage(getPrefix() + " - Lease Expirations checked!");
-        }
-    };
 
     private Runnable autoSave = () -> {
         if (!initsuccess)
@@ -240,9 +232,6 @@ public class Residence extends JavaPlugin {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        if (getConfigManager().useLeases() && leaseBukkitId != null) {
-            leaseBukkitId.cancel();
-        }
 
         if (getDynManager() != null && getDynManager().getMarkerSet() != null)
             getDynManager().getMarkerSet().deleteMarkerSet();
@@ -444,8 +433,6 @@ public class Residence extends JavaPlugin {
 
             rmanager = new ResidenceManager(this);
 
-            leasemanager = new LeaseManager(this);
-
             pmanager = new PermissionListManager(this);
 
             getLocaleManager().LoadLang(getConfigManager().getLanguage());
@@ -563,14 +550,6 @@ public class Residence extends JavaPlugin {
                 despawnMobsBukkitId = CMIScheduler.scheduleSyncRepeatingTask(this, DespawnMobs, 20 * getConfigManager().AutoMobRemovalInterval(), 20
                     * getConfigManager().AutoMobRemovalInterval());
 
-            if (getConfigManager().useLeases()) {
-                int leaseInterval = getConfigManager().getLeaseCheckInterval();
-                if (leaseInterval < 1) {
-                    leaseInterval = 1;
-                }
-                leaseInterval = leaseInterval * 60 * 20;
-                leaseBukkitId = CMIScheduler.scheduleSyncRepeatingTask(this, leaseExpire, leaseInterval, leaseInterval);
-            }
             for (Player player : Bukkit.getServer().getOnlinePlayers()) {
                 if (getPermissionManager().isResidenceAdmin(player)) {
                     ResAdmin.turnResAdminOn(player);
@@ -751,10 +730,6 @@ public class Residence extends JavaPlugin {
 
     public Server getServ() {
         return server;
-    }
-
-    public LeaseManager getLeaseManager() {
-        return leasemanager;
     }
 
     public PlayerManager getPlayerManager() {
@@ -946,22 +921,6 @@ public class Residence extends JavaPlugin {
 
         YMLSaveHelper yml;
 
-        // Leases save
-        File ymlSaveLoc = new File(saveFolder, "leases.yml");
-        tmpFile = new File(saveFolder, "tmp_leases.yml");
-        yml = new YMLSaveHelper(tmpFile);
-        yml.getRoot().put("Leases", leasemanager.save());
-        yml.save();
-        if (ymlSaveLoc.isFile()) {
-            File backupFolder = new File(saveFolder, "Backup");
-            backupFolder.mkdirs();
-            File backupFile = new File(backupFolder, "leases.yml");
-            if (backupFile.isFile()) {
-                backupFile.delete();
-            }
-            ymlSaveLoc.renameTo(backupFile);
-        }
-        tmpFile.renameTo(ymlSaveLoc);
 
         // permlist save
         ymlSaveLoc = new File(saveFolder, "permlists.yml");
@@ -1089,14 +1048,6 @@ public class Residence extends JavaPlugin {
                 getConfigManager().ChangeConfig("Global.UUIDConvertion", false);
             }
 
-            loadFile = new File(saveFolder, "leases.yml");
-            if (loadFile.isFile()) {
-                yml = new YMLSaveHelper(loadFile);
-                yml.load();
-                Map<String, Object> root = yml.getRoot();
-                if (root != null)
-                    leasemanager = getLeaseManager().load((Map) root.get("Leases"));
-            }
             loadFile = new File(saveFolder, "permlists.yml");
             if (loadFile.isFile()) {
                 yml = new YMLSaveHelper(loadFile);
@@ -1204,9 +1155,6 @@ public class Residence extends JavaPlugin {
         list.add("Global.MoveCheckInterval");
         list.add("Global.SaveInterval");
         list.add("Global.DefaultGroup");
-        list.add("Global.UseLeaseSystem");
-        list.add("Global.LeaseCheckInterval");
-        list.add("Global.LeaseAutoRenew");
         list.add("Global.EnablePermissions");
         list.add("Global.LegacyPermissions");
         list.add("Global.EnableEconomy");

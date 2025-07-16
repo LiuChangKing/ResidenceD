@@ -50,7 +50,6 @@ public class ClaimedResidence {
     protected boolean mainRes = false;
     protected long createTime = 0L;
 
-    private long leaseExpireTime = 0;
 
     protected List<String> cmdWhiteList = new ArrayList<String>();
     protected List<String> cmdBlackList = new ArrayList<String>();
@@ -1833,13 +1832,6 @@ public class ClaimedResidence {
     }
 
 
-    public Long getLeaseExpireTime() {
-        return leaseExpireTime;
-    }
-
-    public void setLeaseExpireTime(long leaseExpireTime) {
-        this.leaseExpireTime = leaseExpireTime;
-    }
 
     public boolean kickFromResidence(Player player) {
 

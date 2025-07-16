@@ -73,8 +73,6 @@ Groups:
        Economy:
           # The cost, per block, of making a new Residence or adding a area to it.
           BuyCost: 0.5
-          # The cost, per block, of renewing a Residence lease (if the lease system is enabled).
-          RenewCost: 0.2
        # Flags are checked in the order:
        # 1: Player
        # 2: Group

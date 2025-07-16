@@ -36,7 +36,6 @@ import java.util.jar.JarFile;
 
 public class ConfigManager {
     protected String defaultGroup;
-    protected boolean useLeases;
     protected boolean ResMoneyBack;
     protected boolean enableEconomy;
     protected boolean chargeOnCreation;
@@ -68,11 +67,9 @@ public class ConfigManager {
     protected String multiworldPlugin;
     protected boolean enableRentSystem;
     // Rent system options removed
-    protected boolean leaseAutoRenew;
     protected boolean ShortInfoUse;
     private boolean InfoExcludeDFlags;
     protected int rentCheckInterval;
-    protected int leaseCheckInterval;
     protected int autoSaveInt;
     protected boolean NewSaveMechanic;
 
@@ -96,7 +93,6 @@ public class ConfigManager {
     protected int BackupAutoCleanUpDays;
     protected boolean UseZipBackup;
     protected boolean BackupWorldFiles;
-    protected boolean BackupleasesFile;
     protected boolean BackuppermlistsFile;
     protected boolean BackupflagsFile;
     protected boolean BackupgroupsFile;
@@ -156,7 +152,6 @@ public class ConfigManager {
     private boolean EnterAnimation;
     protected boolean useFlagGUI;
     protected int AutoMobRemovalInterval;
-    protected boolean enableLeaseMoneyAccount;
     protected boolean Couldroncompatibility;
     protected boolean enableDebug = false;
     protected boolean versionCheck = true;
@@ -875,7 +870,6 @@ public class ConfigManager {
         UseZipBackup = c.get("Global.Backup.UseZip", true);
 
         BackupWorldFiles = c.get("Global.Backup.IncludeFiles.Worlds", true);
-        BackupleasesFile = false;
         BackuppermlistsFile = c.get("Global.Backup.IncludeFiles.permlists", true);
         BackupflagsFile = c.get("Global.Backup.IncludeFiles.flags", true);
         BackupgroupsFile = c.get("Global.Backup.IncludeFiles.groups", true);
@@ -1006,7 +1000,6 @@ public class ConfigManager {
         c.addComment("Global.DefaultGroup", "如果权限无法连接或您不使用权限，则使用的默认组使用。");
         defaultGroup = c.get("Global.DefaultGroup", "default");
 
-        useLeases = false;
 
         DateFormat = "E yyyy.MM.dd 'at' hh:mm:ss a zzz";
         DateFormatShort = "MM.dd hh:mm";
@@ -1019,8 +1012,6 @@ public class ConfigManager {
         ResMoneyBack = c.get("Global.ResMoneyBack", false);
 
 
-        leaseCheckInterval = 0;
-        leaseAutoRenew = false;
 
         c.addComment("Global.EnablePermissions", "是否启用权限系统");
         c.get("Global.EnablePermissions", true);
@@ -1269,7 +1260,6 @@ public class ConfigManager {
 
         enforceAreaInsideArea = c.get("Global.EnforceAreaInsideArea", false);
         spoutEnable = c.get("Global.EnableSpout", false);
-        enableLeaseMoneyAccount = false;
 
         c.addComment("Global.Couldroncompatibility",
             "通过将其设置为真实，将启用Kcouldron服务器的部分兼容性。动作栏消息和选择可视化器将自动禁用，因为不正确的兼容性");
@@ -1503,9 +1493,6 @@ public class ConfigManager {
         return enableRentSystem && enableEconomy();
     }
 
-    public boolean useLeases() {
-        return useLeases;
-    }
 
     public boolean useResMoneyBack() {
         return ResMoneyBack;
@@ -1602,9 +1589,6 @@ public class ConfigManager {
         return multiworldPlugin;
     }
 
-    public boolean autoRenewLeases() {
-        return leaseAutoRenew;
-    }
 
     public boolean isShortInfoUse() {
         return ShortInfoUse;
@@ -1615,9 +1599,6 @@ public class ConfigManager {
         return rentCheckInterval;
     }
 
-    public int getLeaseCheckInterval() {
-        return leaseCheckInterval;
-    }
 
     public int getAutoSaveInterval() {
         return autoSaveInt;
@@ -1645,9 +1626,6 @@ public class ConfigManager {
     }
 
 
-    public boolean BackupleasesFile() {
-        return BackupleasesFile;
-    }
 
     public boolean BackuppermlistsFile() {
         return BackuppermlistsFile;
@@ -1787,9 +1765,6 @@ public class ConfigManager {
         return AutoMobRemovalInterval;
     }
 
-    public boolean enableLeaseMoneyAccount() {
-        return enableLeaseMoneyAccount;
-    }
 
     public boolean CouldronCompatibility() {
         return Couldroncompatibility;
