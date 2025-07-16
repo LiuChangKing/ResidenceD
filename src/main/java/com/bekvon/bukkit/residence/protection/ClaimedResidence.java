@@ -13,6 +13,8 @@ import com.bekvon.bukkit.residence.permissions.PermissionManager.ResPerm;
 import com.bekvon.bukkit.residence.protection.FlagPermissions.FlagCombo;
 import com.bekvon.bukkit.residence.signsStuff.Signs;
 import com.bekvon.bukkit.residence.utils.*;
+import com.liuchangking.dreamengine.api.DreamServerAPI;
+import com.liuchangking.dreamengine.service.RedisManager;
 import net.Zrips.CMILib.Container.PageInfo;
 import net.Zrips.CMILib.Locale.LC;
 import net.Zrips.CMILib.RawMessages.RawMessage;
@@ -27,6 +29,7 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import redis.clients.jedis.Jedis;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -1105,6 +1108,25 @@ public class ClaimedResidence {
                     Residence.getInstance().msg(reqPlayer, lm.Residence_MoveDeny, this.getName());
                     return;
                 }
+            }
+        }
+
+        Residence plugin = Residence.getInstance();
+        if (plugin.isUsingMysql()) {
+            String worldName = this.getPermissions().getWorldName();
+            String targetServerId = plugin.getWorldServerId(worldName);
+            if (!plugin.getServerId().equals(targetServerId)) {
+                if (com.liuchangking.dreamengine.config.Config.redisEnabled) {
+                    try (redis.clients.jedis.Jedis j = com.liuchangking.dreamengine.service.RedisManager.getPool().getResource()) {
+                        j.setex("res_tp:" + targetPlayer.getUniqueId(), 30, this.getName());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                String targetServer = com.liuchangking.dreamengine.api.DreamServerAPI.getServerName(targetServerId);
+                com.liuchangking.dreamengine.api.DreamServerAPI.sendPlayerToServer(targetPlayer, targetServer);
+                plugin.msg(reqPlayer, "\u6b63\u5728\u524d\u5f80\u5176\u4ed6\u670d\u52a1\u5668\u7684\u9886\u5730...");
+                return;
             }
         }
 
