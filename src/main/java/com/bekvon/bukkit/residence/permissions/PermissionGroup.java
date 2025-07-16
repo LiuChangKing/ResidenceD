@@ -51,9 +51,6 @@ public class PermissionGroup {
     protected boolean messageperms = false;
     protected String defaultEnterMessage = null;
     protected String defaultLeaveMessage = null;
-    private int maxLeaseTime = 16;
-    private int leaseGiveTime = 14;
-    protected double renewcostperarea = 0.02D;
     protected boolean cancreate = false;
     protected String groupname;
     protected int maxPhysical = 2;
@@ -199,12 +196,6 @@ public class PermissionGroup {
             defaultEnterMessage = limits.getString("Messaging.DefaultEnter", null);
         if (limits.contains("Messaging.DefaultLeave"))
             defaultLeaveMessage = limits.getString("Messaging.DefaultLeave", null);
-        if (limits.contains("Lease.MaxDays"))
-            maxLeaseTime = limits.getInt("Lease.MaxDays", 16);
-        if (limits.contains("Lease.RenewIncrement"))
-            leaseGiveTime = limits.getInt("Lease.RenewIncrement", 14);
-        if (limits.contains("Economy.RenewCost"))
-            renewcostperarea = limits.getDouble("Economy.RenewCost", 0.02D);
         if (limits.contains("Economy.BuyCost"))
             costperarea = limits.getDouble("Economy.BuyCost", 0);
 
@@ -407,17 +398,6 @@ public class PermissionGroup {
         return defaultLeaveMessage;
     }
 
-    public int getMaxLeaseTime() {
-        return maxLeaseTime;
-    }
-
-    public int getLeaseGiveTime() {
-        return leaseGiveTime;
-    }
-
-    public double getLeaseRenewCost() {
-        return renewcostperarea;
-    }
 
 
     public boolean hasUnstuckAccess() {
@@ -506,11 +486,6 @@ public class PermissionGroup {
             Residence.getInstance().msg(player, lm.Limits_Cost, group.costperarea);
         }
         Residence.getInstance().msg(player, lm.Limits_Flag, group.flagPerms.listFlags());
-        if (Residence.getInstance().getConfigManager().useLeases()) {
-            Residence.getInstance().msg(player, lm.Limits_MaxDays, group.maxLeaseTime);
-            Residence.getInstance().msg(player, lm.Limits_LeaseTime, group.leaseGiveTime);
-            Residence.getInstance().msg(player, lm.Limits_RenewCost, group.renewcostperarea);
-        }
         Residence.getInstance().msg(player, lm.General_Separator);
     }
 

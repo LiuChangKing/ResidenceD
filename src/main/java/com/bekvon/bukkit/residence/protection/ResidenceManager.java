@@ -262,7 +262,6 @@ public class ResidenceManager implements ResidenceInterface {
         residences.put(resName.toLowerCase(), newRes);
 
         calculateChunks(newRes);
-        plugin.getLeaseManager().removeExpireTime(newRes);
         plugin.getPlayerManager().addResidence(newRes.getOwner(), newRes);
 
         if (player != null) {
@@ -273,9 +272,7 @@ public class ResidenceManager implements ResidenceInterface {
             plugin.msg(player, lm.Area_Create, "main");
             plugin.msg(player, lm.Residence_Create, resName);
         }
-        if (plugin.getConfigManager().useLeases()) {
-            plugin.getLeaseManager().setExpireTime(player, newRes, group.getLeaseGiveTime());
-        }
+
         return true;
 
     }
@@ -761,11 +758,7 @@ public class ResidenceManager implements ResidenceInterface {
         if (res.getSubzonesAmount(false) > 0)
             plugin.msg(sender, lm.General_TotalSubzones, res.getSubzonesAmount(false), res.getSubzonesAmount(true));
 
-        if (plugin.getConfigManager().useLeases() && plugin.getLeaseManager().isLeased(res)) {
-            String time = plugin.getLeaseManager().getExpireTime(res);
-            if (time != null)
-                plugin.msg(sender, lm.Economy_LeaseExpire, time);
-        }
+
 
         // rent system removed
 
@@ -1388,7 +1381,6 @@ public class ResidenceManager implements ResidenceInterface {
     private void cleanResidenceRecords(ClaimedResidence res, boolean removeSigns) {
         String name = res.getName();
 
-        plugin.getLeaseManager().removeExpireTime(res);
         for (ClaimedResidence oneSub : res.getSubzones()) {
             plugin.getPlayerManager().removeResFromPlayer(res.getOwnerUUID(), oneSub);
         }
