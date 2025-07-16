@@ -3,7 +3,6 @@ package com.bekvon.bukkit.residence.signsStuff;
 import com.bekvon.bukkit.residence.CommentedYamlConfiguration;
 import com.bekvon.bukkit.residence.Residence;
 import com.bekvon.bukkit.residence.containers.lm;
-import com.bekvon.bukkit.residence.economy.rent.RentedLand;
 import com.bekvon.bukkit.residence.protection.ClaimedResidence;
 import com.bekvon.bukkit.residence.utils.Utils;
 import net.Zrips.CMILib.Items.CMIMaterial;
@@ -171,8 +170,7 @@ public class SignUtil {
         if (res == null)
             return false;
 
-        boolean ForSale = false;
-        boolean ForRent = res.isForRent();
+        // rent system removed
 
         Location nloc = Sign.getLocation();
 
@@ -196,63 +194,21 @@ public class SignUtil {
             String landName = res.getName();
             if (landName == null)
                 return;
-            if (!ForRent) {
-                String shortName = fixResName(landName);
-                String secondLine = null;
-                if (shortName.contains("~")) {
-                    String[] lines = fixDoubleResName(landName);
-                    shortName = lines[0];
-                    secondLine = lines[1];
-                }
-                sign.setLine(0, plugin.msg(lm.Sign_ResName, shortName));
-                if (secondLine != null)
-                    sign.setLine(1, plugin.msg(lm.Sign_ResName, secondLine));
-                sign.setLine(2, "");
-                sign.setLine(3, "");
-                sign.setLine(secondLine == null ? 1 : 2, plugin.msg(lm.Sign_Owner, res.getOwner()));
-                sign.update();
-
-                return;
+            String shortName = fixResName(landName);
+            String secondLine = null;
+            if (shortName.contains("~")) {
+                String[] lines = fixDoubleResName(landName);
+                shortName = lines[0];
+                secondLine = lines[1];
             }
-
-            if (ForRent) {
-
-                boolean rented = res.isRented();
-
-                RentedLand rentedPlace = res.getRentedLand();
-                long time = 0L;
-                if (rentedPlace != null)
-                    time = rentedPlace.endTime;
-
-                SimpleDateFormat formatter = new SimpleDateFormat(plugin.msg(lm.Sign_DateFormat));
-                formatter.setTimeZone(TimeZone.getTimeZone(plugin.getConfigManager().getTimeZone()));
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTimeInMillis(time);
-                String timeString = formatter.format(calendar.getTime());
-
-                String endDate = timeString;
-                if (time == 0L)
-                    endDate = "Unknown";
-
-                if (plugin.getRentManager().getRentedAutoRepeats(res))
-                    endDate = plugin.msg(lm.Sign_RentedAutorenewTrue, endDate);
-                else
-                    endDate = plugin.msg(lm.Sign_RentedAutorenewFalse, endDate);
-
-                String TopLine = rented ? plugin.msg(lm.Sign_RentedTopLine, endDate) : plugin.msg(lm.Sign_ForRentTopLine);
-                sign.setLine(0, TopLine);
-
-                String infoLine = plugin.msg(rented ? lm.Sign_RentedPriceLine : lm.Sign_ForRentPriceLine, plugin.getRentManager().getCostOfRent(res), plugin
-                    .getRentManager().getRentDays(res), plugin.getRentManager().getRentableRepeatable(res));
-
-                sign.setLine(1, infoLine);
-                String shortName = fixResName(landName);
-                sign.setLine(2, rented ? plugin.msg(lm.Sign_RentedResName, shortName)
-                    : plugin.msg(lm.Sign_RentedResName, shortName));
-                sign.setLine(3, rented ? plugin.msg(lm.Sign_RentedBottomLine, plugin.getRentManager().getRentingPlayer(landName))
-                    : plugin.msg(lm.Sign_ForRentBottomLine));
-                sign.update();
-            }
+            sign.setLine(0, plugin.msg(lm.Sign_ResName, shortName));
+            if (secondLine != null)
+                sign.setLine(1, plugin.msg(lm.Sign_ResName, secondLine));
+            sign.setLine(2, "");
+            sign.setLine(3, "");
+            sign.setLine(secondLine == null ? 1 : 2, plugin.msg(lm.Sign_Owner, res.getOwner()));
+            sign.update();
+            return;
 
         });
 

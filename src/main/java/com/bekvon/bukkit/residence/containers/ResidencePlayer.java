@@ -74,13 +74,6 @@ public class ResidencePlayer {
                     return mainResidence;
                 }
             }
-            for (String one : Residence.getInstance().getRentManager().getRentedLands(this.userName)) {
-                ClaimedResidence res = Residence.getInstance().getResidenceManager().getByName(one);
-                if (res != null) {
-                    mainResidence = res;
-                    return mainResidence;
-                }
-            }
             for (ClaimedResidence one : residenceList) {
                 if (one == null)
                     continue;
@@ -127,15 +120,6 @@ public class ResidencePlayer {
         getMaxData().setMaxRes(Residence.getInstance().getPermissionManager().getPermissionInfo(this.getUniqueId(), ResPerm.max_res_$1).getMaxValue(m));
     }
 
-    public void recountMaxRents() {
-
-        getMaxData().setMaxRents(0);
-    }
-
-    public int getMaxRents() {
-        recountMaxRents();
-        return getMaxData().getMaxRents();
-    }
 
     public void recountMaxSubzones() {
 

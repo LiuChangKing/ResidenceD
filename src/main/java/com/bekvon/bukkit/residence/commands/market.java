@@ -21,8 +21,8 @@ public class market implements cmd {
     public void getLocale() {
         ConfigReader c = Residence.getInstance().getLocaleManager().getLocaleConfig();
 
-        c.get("Description", "Buy, Sell, or Rent Residences");
-        c.get("Info", Arrays.asList("&eUsage: &6/res market ? for more Info"));
+        c.get("Description", "Economy functions disabled");
+        c.get("Info", Arrays.asList("&eThis command is disabled"));
 
         c.setFullPath(c.getPath() + "SubCommands.");
 

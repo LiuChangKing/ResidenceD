@@ -246,7 +246,6 @@ public class PermissionManager {
         max_subzonedepth_unlimited("Defines subzone depth limit as unlimited"),
         max_subzonedepth_$1("Defines subzone depth limit", "number"),
         group_$1("Defines players residence group", "groupName"),
-        market_evict("Allows to evict players from rented residences"),
         rename("Allows to rename residence"),
         select("Allows to select residence area"),
         select_auto_others("Allows to toggle auto selection for others"),

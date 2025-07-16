@@ -42,7 +42,6 @@ public class PermissionGroup {
     protected int maxSubzones = 3;
     protected FlagPermissions flagPerms;
     protected Map<String, Boolean> creatorDefaultFlags;
-//    protected Map<String, Boolean> rentedDefaultFlags;
     protected Map<String, Map<String, Boolean>> groupDefaultFlags;
     protected Map<String, Boolean> residenceDefaultFlags;
 
@@ -55,9 +54,6 @@ public class PermissionGroup {
     private int maxLeaseTime = 16;
     private int leaseGiveTime = 14;
     protected double renewcostperarea = 0.02D;
-    protected boolean canBuy = false;
-    protected boolean canSell = false;
-    protected boolean buyIgnoreLimits = false;
     protected boolean cancreate = false;
     protected String groupname;
     protected int maxPhysical = 2;
@@ -65,9 +61,6 @@ public class PermissionGroup {
     protected boolean kick = false;
     protected int minHeight = 0;
     protected int maxHeight = 256;
-    protected int maxRents = 0;
-    protected int MaxRentDays = -1;
-    protected int maxRentables = 0;
     protected boolean selectCommandAccess = true;
     protected boolean itemListAccess = true;
     protected int priority = 0;
@@ -75,7 +68,6 @@ public class PermissionGroup {
     public PermissionGroup(String name) {
         flagPerms = new FlagPermissions();
         creatorDefaultFlags = new HashMap<String, Boolean>();
-//	rentedDefaultFlags = new HashMap<String, Boolean>();
         residenceDefaultFlags = new HashMap<String, Boolean>();
         groupDefaultFlags = new HashMap<String, Map<String, Boolean>>();
 
@@ -213,12 +205,6 @@ public class PermissionGroup {
             leaseGiveTime = limits.getInt("Lease.RenewIncrement", 14);
         if (limits.contains("Economy.RenewCost"))
             renewcostperarea = limits.getDouble("Economy.RenewCost", 0.02D);
-        if (limits.contains("Economy.CanBuy"))
-            canBuy = limits.getBoolean("Economy.CanBuy", false);
-        if (limits.contains("Economy.CanSell"))
-            canSell = limits.getBoolean("Economy.CanSell", false);
-        if (limits.contains("Economy.IgnoreLimits"))
-            buyIgnoreLimits = limits.getBoolean("Economy.IgnoreLimits", false);
         if (limits.contains("Economy.BuyCost"))
             costperarea = limits.getDouble("Economy.BuyCost", 0);
 
@@ -257,13 +243,8 @@ public class PermissionGroup {
             }
         }
 
-//	node = limits.getConfigurationSection("Flags.RentedDefault");
 //	if (node == null) {
-//	    Object defaultRented = limits.get("Flags.CreatorDefault");
-//	    if (defaultRented != null) {
-//		limits.set("Flags.RentedDefault", defaultRented);
 //	    }
-//	    node = limits.getConfigurationSection("Flags.RentedDefault");
 //	}
 //	if (node != null) {
 //	    flags = node.getKeys(false);
@@ -271,7 +252,6 @@ public class PermissionGroup {
 //		Iterator<String> flagit = flags.iterator();
 //		while (flagit.hasNext()) {
 //		    String flagname = flagit.next();
-//		    rentedDefaultFlags.put(flagname, limits.getBoolean("Flags.RentedDefault." + flagname, false));
 //		}
 //	    }
 //	}
@@ -439,29 +419,6 @@ public class PermissionGroup {
         return renewcostperarea;
     }
 
-    public boolean canBuyLand() {
-        return canBuy;
-    }
-
-    public boolean canSellLand() {
-        return canSell;
-    }
-
-    public int getMaxRents() {
-        return 0;
-    }
-
-    public int getMaxRentDays() {
-        return -1;
-    }
-
-    public int getMaxRentables() {
-        return 0;
-    }
-
-    public boolean buyLandIgnoreLimits() {
-        return buyIgnoreLimits;
-    }
 
     public boolean hasUnstuckAccess() {
         return unstuck;
@@ -483,9 +440,6 @@ public class PermissionGroup {
         return creatorDefaultFlags.entrySet();
     }
 
-//    public Set<Entry<String, Boolean>> getDefaultRentedFlags() {
-//	return rentedDefaultFlags.entrySet();
-//    }
 
     public Set<Entry<String, Map<String, Boolean>>> getDefaultGroupFlags() {
         return groupDefaultFlags.entrySet();

@@ -9,7 +9,6 @@ import com.bekvon.bukkit.residence.containers.*;
 import com.bekvon.bukkit.residence.dynmap.DynMapListeners;
 import com.bekvon.bukkit.residence.dynmap.DynMapManager;
 import com.bekvon.bukkit.residence.economy.*;
-import com.bekvon.bukkit.residence.economy.rent.RentManager;
 import com.bekvon.bukkit.residence.gui.FlagUtil;
 import com.bekvon.bukkit.residence.itemlist.WorldItemManager;
 import com.bekvon.bukkit.residence.listeners.*;
@@ -87,7 +86,6 @@ public class Residence extends JavaPlugin {
     protected LeaseManager leasemanager;
     public WorldItemManager imanager;
     public WorldFlagManager wmanager;
-    protected RentManager rentmanager;
     protected Server server;
     public HelpEntry helppages;
     protected LocaleManager LocaleManager;
@@ -109,7 +107,6 @@ public class Residence extends JavaPlugin {
     protected EconomyInterface economy;
     public File dataFolder;
     protected CMITask leaseBukkitId = null;
-    protected CMITask rentBukkitId = null;
     protected CMITask healBukkitId = null;
     protected CMITask feedBukkitId = null;
     protected CMITask effectRemoveBukkitId = null;
@@ -121,9 +118,7 @@ public class Residence extends JavaPlugin {
     Metrics metrics = null;
 
     protected boolean initsuccess = false;
-    public Map<String, String> deleteConfirm;
-    public Map<String, String> UnrentConfirm = new HashMap<String, String>();
-    private ConcurrentHashMap<String, OfflinePlayer> OfflinePlayerList = new ConcurrentHashMap<String, OfflinePlayer>();
+    public Map<String, String> deleteConfirm;    private ConcurrentHashMap<String, OfflinePlayer> OfflinePlayerList = new ConcurrentHashMap<String, OfflinePlayer>();
     private Map<UUID, OfflinePlayer> cachedPlayerNameUUIDs = new HashMap<UUID, OfflinePlayer>();
     private Map<UUID, String> cachedPlayerNames = new HashMap<UUID, String>();
 
@@ -152,9 +147,7 @@ public class Residence extends JavaPlugin {
     }
 
     // API
-    private ResidenceApi API = new ResidenceApi();
-    private MarketRentInterface MarketRentAPI = null;
-    private ResidencePlayerInterface PlayerAPI = null;
+    private ResidenceApi API = new ResidenceApi();    private ResidencePlayerInterface PlayerAPI = null;
     private ResidenceInterface ResidenceAPI = null;
 
     public ResidencePlayerInterface getPlayerManagerAPI() {
@@ -178,13 +171,6 @@ public class Residence extends JavaPlugin {
     public boolean isPlaceholderAPIEnabled() {
         return PlaceholderAPIEnabled;
     }
-
-    public MarketRentInterface getMarketRentManagerAPI() {
-        if (MarketRentAPI == null)
-            MarketRentAPI = rentmanager;
-        return MarketRentAPI;
-    }
-
     public ResidenceCommandListener getCommandManager() {
         if (commandManager == null)
             commandManager = new ResidenceCommandListener(this);
@@ -203,13 +189,6 @@ public class Residence extends JavaPlugin {
     private Runnable removeBadEffects = () -> plistener.badEffects();
 
     private Runnable DespawnMobs = () -> plistener.DespawnMobs();
-
-    private Runnable rentExpire = () -> {
-        rentmanager.checkCurrentRents();
-        if (getConfigManager().showIntervalMessages()) {
-            Bukkit.getConsoleSender().sendMessage(getPrefix() + " - Rent Expirations checked!");
-        }
-    };
 
     private Runnable leaseExpire = () -> {
         leasemanager.doExpirations();
@@ -263,9 +242,6 @@ public class Residence extends JavaPlugin {
             }
         if (getConfigManager().useLeases() && leaseBukkitId != null) {
             leaseBukkitId.cancel();
-        }
-        if (getConfigManager().enabledRentSystem() && rentBukkitId != null) {
-            rentBukkitId.cancel();
         }
 
         if (getDynManager() != null && getDynManager().getMarkerSet() != null)
@@ -366,9 +342,6 @@ public class Residence extends JavaPlugin {
 
             imanager = new WorldItemManager(this);
             wmanager = new WorldFlagManager(this);
-
-            rentmanager = new RentManager(this);
-
             LocaleManager = new LocaleManager(this);
 
             PlayerManager = new PlayerManager(this);
@@ -598,14 +571,6 @@ public class Residence extends JavaPlugin {
                 leaseInterval = leaseInterval * 60 * 20;
                 leaseBukkitId = CMIScheduler.scheduleSyncRepeatingTask(this, leaseExpire, leaseInterval, leaseInterval);
             }
-            if (getConfigManager().enabledRentSystem()) {
-                int rentint = getConfigManager().getRentCheckInterval();
-                if (rentint < 1) {
-                    rentint = 1;
-                }
-                rentint = rentint * 60 * 20;
-                rentBukkitId = CMIScheduler.scheduleSyncRepeatingTask(this, rentExpire, rentint, rentint);
-            }
             for (Player player : Bukkit.getServer().getOnlinePlayers()) {
                 if (getPermissionManager().isResidenceAdmin(player)) {
                     ResAdmin.turnResAdminOn(player);
@@ -819,9 +784,6 @@ public class Residence extends JavaPlugin {
         return wmanager;
     }
 
-    public RentManager getRentManager() {
-        return rentmanager;
-    }
 
     public LocaleManager getLocaleManager() {
         return LocaleManager;
@@ -948,6 +910,7 @@ public class Residence extends JavaPlugin {
         if (!worldFolder.isDirectory())
             worldFolder.mkdirs();
         YMLSaveHelper syml;
+        File tmpFile = null;
         Map<String, Object> save = rmanager.save();
         for (Entry<String, Object> entry : save.entrySet()) {
 
@@ -965,7 +928,7 @@ public class Residence extends JavaPlugin {
                 continue;
             }
 
-            File tmpFile = new File(worldFolder, "tmp_res_" + entry.getKey() + ".yml");
+            tmpFile = new File(worldFolder, "tmp_res_" + entry.getKey() + ".yml");
 
             syml = new YMLSaveHelper(tmpFile);
             if (this.getResidenceManager().getMessageCatch(entry.getKey()) != null)
@@ -1247,8 +1210,6 @@ public class Residence extends JavaPlugin {
         list.add("Global.EnablePermissions");
         list.add("Global.LegacyPermissions");
         list.add("Global.EnableEconomy");
-        list.add("Global.EnableRentSystem");
-        list.add("Global.RentCheckInterval");
         list.add("Global.ResidenceChatEnable");
         list.add("Global.UseActionBar");
         list.add("Global.ResidenceChatColor");
@@ -1256,7 +1217,6 @@ public class Residence extends JavaPlugin {
         list.add("Global.AdminOPs");
         list.add("Global.MultiWorldPlugin");
         list.add("Global.ResidenceFlagsInherit");
-        list.add("Global.PreventRentModify");
         list.add("Global.StopOnSaveFault");
         list.add("Global.ResidenceNameRegex");
         list.add("Global.ShowIntervalMessages");

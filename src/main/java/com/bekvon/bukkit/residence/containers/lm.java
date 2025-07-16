@@ -88,7 +88,7 @@ public enum lm {
     Select_Disabled("&cYou don't have access to selections commands"),
 
     Sign_Updated("&6%1 &esigns updated!"),
-    Sign_TopLine("[market]"),
+    Sign_TopLine("[res]"),
     Sign_DateFormat("YY/MM/dd HH:mm"),
     Sign_LookAt("&cYou are not looking at sign"),
     Sign_TooMany("&cToo many signs for this residence"),
@@ -191,7 +191,6 @@ public enum lm {
     Residence_OwnerChange("&eResidence &6%1 &eowner changed to &6%2"),
     Residence_NonAdmin("&cYou are not a Residence admin."),
     Residence_Line("&eResidence: &6%1 "),
-    Residence_RentedBy("&eRented by: &6%1"),
     Residence_MessageChange("&eMessage Set..."),
     Residence_CantDeleteResidence("&cYou don't have permission to delete residence."),
     Residence_CantExpandResidence("&cYou don't have permission to expand residence."),

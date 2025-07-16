@@ -51,12 +51,7 @@ public class DynMapListeners implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onResidenceRent(ResidenceRentEvent event) {
-	plugin.getDynManager().fireUpdateAdd(event.getResidence(), event.getResidence().getSubzoneDeep());
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onResidenceSizeChange(ResidenceSizeChangeEvent event) {
-	plugin.getDynManager().fireUpdateAdd(event.getResidence(), event.getResidence().getSubzoneDeep());
+        plugin.getDynManager().fireUpdateAdd(event.getResidence(), event.getResidence().getSubzoneDeep());
     }
 }

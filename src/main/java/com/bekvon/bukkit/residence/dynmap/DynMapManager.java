@@ -2,7 +2,6 @@ package com.bekvon.bukkit.residence.dynmap;
 
 import com.bekvon.bukkit.residence.Residence;
 import com.bekvon.bukkit.residence.containers.lm;
-import com.bekvon.bukkit.residence.economy.rent.RentManager;
 import com.bekvon.bukkit.residence.protection.ClaimedResidence;
 import com.bekvon.bukkit.residence.protection.CuboidArea;
 import com.bekvon.bukkit.residence.protection.FlagPermissions;
@@ -97,15 +96,7 @@ public class DynMapManager {
 
         v += "</div></div>";
 
-        if (plugin.getRentManager().isForRent(res.getName()))
-            v = "<div class=\"regioninfo\"><div class=\"infowindow\">"
-                + CMIChatColor.stripColor(plugin.msg(lm.Rentable_Land, "")) + "<span style=\"font-size:140%;font-weight:bold;\">%regionname%</span><br />"
-                + CMIChatColor.stripColor(plugin.msg(lm.General_Owner, "")) + "<span style=\"font-weight:bold;\">%playerowners%</span><br />"
-                + CMIChatColor.stripColor(plugin.msg(lm.Residence_RentedBy, "")) + "<span style=\"font-weight:bold;\">%renter%</span><br /> "
-                + CMIChatColor.stripColor(plugin.msg(lm.General_LandCost, "")) + "<span style=\"font-weight:bold;\">%rent%</span><br /> "
-                + CMIChatColor.stripColor(plugin.msg(lm.Rent_Days, "")) + "<span style=\"font-weight:bold;\">%rentdays%</span><br /> "
-                + CMIChatColor.stripColor(plugin.msg(lm.Rentable_AllowRenewing, "")) + "<span style=\"font-weight:bold;\">%renew%</span><br /> "
-                + CMIChatColor.stripColor(plugin.msg(lm.Rent_Expire, "")) + "<span style=\"font-weight:bold;\">%expire%</span></div></div>";
+
 
 
         v = v.replace("%regionname%", resName);
@@ -115,28 +106,7 @@ public class DynMapManager {
         m = res.getLeaveMessage();
         v = v.replace("%leavemsg%", (m != null) ? m : "");
 
-        RentManager rentmgr = plugin.getRentManager();
-
-        if (rentmgr.isForRent(res.getName())) {
-            boolean isrented = rentmgr.isRented(resid);
-            v = v.replace("%isrented%", Boolean.toString(isrented));
-            String id = "";
-            if (isrented)
-                id = rentmgr.getRentingPlayer(resid);
-            v = v.replace("%renter%", id);
-
-            v = v.replace("%rent%", rentmgr.getCostOfRent(resid) + "");
-            v = v.replace("%rentdays%", rentmgr.getRentDays(resid) + "");
-            boolean renew = rentmgr.getRentableRepeatable(resid);
-            v = v.replace("%renew%", renew + "");
-            String expire = "";
-            if (isrented) {
-                long time = rentmgr.getRentedLand(resid).endTime;
-                if (time != 0L)
-                    expire = GetTime.getTime(time);
-            }
-            v = v.replace("%expire%", expire);
-        }
+        v = v.replace("%isrented%", "false");
 
 
         return v;
@@ -160,12 +130,7 @@ public class DynMapManager {
         int fc = 0xFF0000;
         try {
             sc = Integer.parseInt(as.strokecolor.substring(1), 16);
-            if (plugin.getRentManager().isForRent(resid) && !plugin.getRentManager().isRented(resid))
-                fc = Integer.parseInt(as.forrentstrokecolor.substring(1), 16);
-            else if (plugin.getRentManager().isForRent(resid) && plugin.getRentManager().isRented(resid))
-                fc = Integer.parseInt(as.rentedstrokecolor.substring(1), 16);
-            else
-                fc = Integer.parseInt(as.fillcolor.substring(1), 16);
+            fc = Integer.parseInt(as.fillcolor.substring(1), 16);
         } catch (NumberFormatException nfx) {
         }
         m.setLineStyle(as.strokeweight, as.strokeopacity, sc);

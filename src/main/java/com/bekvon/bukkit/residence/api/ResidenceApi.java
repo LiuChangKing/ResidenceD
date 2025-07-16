@@ -4,10 +4,6 @@ import com.bekvon.bukkit.residence.Residence;
 
 public class ResidenceApi {
 
-    public static MarketRentInterface getMarketRentManager() {
-        return Residence.getInstance().getMarketRentManagerAPI();
-    }
-
     public static ResidencePlayerInterface getPlayerManager() {
 	return Residence.getInstance().getPlayerManagerAPI();
     }

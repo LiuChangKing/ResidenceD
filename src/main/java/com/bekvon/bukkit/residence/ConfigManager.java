@@ -67,17 +67,10 @@ public class ConfigManager {
     protected boolean AdminFullAccess;
     protected String multiworldPlugin;
     protected boolean enableRentSystem;
-    protected boolean RentPreventRemoval;
-    protected boolean RentInformOnEnding;
-    protected boolean RentAllowRenewing;
-    protected boolean RentStayInMarket;
-    protected boolean RentAllowAutoPay;
-    protected boolean RentPlayerAutoPay;
+    // Rent system options removed
     protected boolean leaseAutoRenew;
     protected boolean ShortInfoUse;
     private boolean InfoExcludeDFlags;
-    protected int RentInformBefore;
-    protected int RentInformDelay;
     protected int rentCheckInterval;
     protected int leaseCheckInterval;
     protected int autoSaveInt;
@@ -141,7 +134,6 @@ public class ConfigManager {
     protected int FeedInterval;
     protected int SafeZoneInterval;
     protected FlagPermissions globalCreatorDefaults;
-    protected FlagPermissions globalRentedDefaults;
     protected FlagPermissions globalResidenceDefaults;
     protected Map<String, FlagPermissions> globalGroupDefaults;
     protected String language;
@@ -253,14 +245,11 @@ public class ConfigManager {
     public int DynMapBorderWeight;
     public String DynMapFillColor;
     public double DynMapFillOpacity;
-    public String DynMapFillForRent;
-    public String DynMapFillRented;
     public List<String> DynMapVisibleRegions;
     public List<String> DynMapHiddenRegions;
     // DynMap
 
     // Schematics
-    public boolean RestoreAfterRentEnds;
     public boolean SchematicsSaveOnFlagChange;
     // Schematics
 
@@ -276,7 +265,6 @@ public class ConfigManager {
 //	FileConfiguration config = YamlConfiguration.loadConfiguration(new File(Residence.dataFolder, "config.yml"));
         this.plugin = plugin;
         globalCreatorDefaults = new FlagPermissions();
-        globalRentedDefaults = new FlagPermissions();
         globalResidenceDefaults = new FlagPermissions();
         globalGroupDefaults = new HashMap<String, FlagPermissions>();
         UpdateConfigFile();
@@ -422,12 +410,7 @@ public class ConfigManager {
             conf.createSection("Global.FlagGui");
         }
 
-        if (!conf.isConfigurationSection("Global.RentedDefault")) {
-            for (Entry<String, Boolean> one : this.getGlobalCreatorDefaultFlags().getFlags().entrySet()) {
-                conf.set("Global.RentedDefault." + one.getKey(), one.getValue());
-            }
-            conf.set("Global.RentedDefault.admin", true);
-        }
+
 
         ConfigurationSection guiSection = conf.getConfigurationSection("Global.FlagGui");
 
@@ -466,7 +449,6 @@ public class ConfigManager {
         cfg.addComment("Global.FlagGui", "为每个旗帜在 GUI 中设置展示物品，未设置时默认使用灰色羊毛");
         cfg.addComment("Global.ResidenceDefault", "所有用户组创建的领地默认启用的旗帜");
         cfg.addComment("Global.CreatorDefault", "所有用户组的领地创建者默认拥有的旗帜");
-        cfg.addComment("Global.RentedDefault", "所有用户组的领地租户默认拥有的旗帜");
         cfg.addComment("Global.GroupedFlags", "组合旗帜设置，执行 /res pset 玩家 redstone true 时会同时赋予列表中所有旗帜，设为 false 或移除时亦如此");
         cfg.addComment("Global.GroupedFlags.trusted", "此组旗帜用于 padd 子指令");
         cfg.addComment("Global.TotalFlagDisabling", "完全禁用指定旗帜，即便 resadmin 命令也无法使用",
@@ -1065,8 +1047,6 @@ public class ConfigManager {
             VaultEconomy = EconomyType.None;
         }
 
-        // Extra enter message and selling functionality removed
-
         // Rent system removed
         enableRentSystem = false;
 
@@ -1074,31 +1054,9 @@ public class ConfigManager {
 //	c.addComment("Global.Town.MinRange", "住宅之间的范围","如果所有者不属于同一城镇");
 //	TownMinRange = c.get("Global.Town.MinRange", 16);
 
-        c.addComment("Global.Rent.PreventRemoval", "如果某些人仍在租用居住地，则防止住所/subzone拆除");
-        RentPreventRemoval = c.get("Global.Rent.PreventRemoval", true);
 
-
-        c.addComment("Global.Rent.Inform.OnEnding", "告知玩家租金时间结束");
-        RentInformOnEnding = c.get("Global.Rent.Inform.OnEnding", true);
-        c.addComment("Global.Rent.Inform.Before", "时间范围为几分钟，开始通知结束租金");
-        RentInformBefore = c.get("Global.Rent.Inform.Before", 1440);
-        c.addComment("Global.Rent.Inform.Delay", "时间范围为几秒钟，在玩家登录后等待多长时间才能告知租金");
-        RentInformDelay = c.get("Global.Rent.Inform.Delay", 60);
-
-        c.addComment("Global.Rent.DefaultValues.AllowRenewing", "租金时使用的默认值");
-        RentAllowRenewing = c.get("Global.Rent.DefaultValues.AllowRenewing", true);
-        RentStayInMarket = c.get("Global.Rent.DefaultValues.StayInMarket", true);
-        RentAllowAutoPay = c.get("Global.Rent.DefaultValues.AllowAutoPay", true);
-        c.addComment("Global.Rent.DefaultValues.PlayerAutoPay", "若设为 true，当玩家未指定是否自动支付租金时默认启用");
-        RentPlayerAutoPay = c.get("Global.Rent.DefaultValues.PlayerAutoPay", true);
-
-        c.addComment("Global.Rent.Schematics.RestoreAfterRentEnds", "实验功能！若设为 true，租约结束后将恢复为设置 backup 标志时的状态",
-            "出于安全原因，仅拥有额外 residence.backup 权限的玩家可设置 backup 标志");
-        RestoreAfterRentEnds = c.get("Global.Rent.Schematics.RestoreAfterRentEnds", true);
-        c.addComment("Global.Rent.Schematics.SaveOnFlagChange", "设为 true 时，仅在将 backup 旗帜改为 true 时保存区域状态",
-            "设为 false 时，玩家每次租用都会保存一次区域，以便保持最新外观",
-            "注意设为 false 会略微增加服务器负荷");
-        SchematicsSaveOnFlagChange = c.get("Global.Rent.Schematics.SaveOnFlagChange", true);
+        c.addComment("Global.Rent.Schematics.SaveOnFlagChange", "此设置已停用");
+        SchematicsSaveOnFlagChange = true;
 
 
         // Rent system removed, interval not used
@@ -1145,7 +1103,7 @@ public class ConfigManager {
         c.addComment("Global.ResidenceFlagsInherit", "将其设置为真实会导致子区域从其父区域继承标志。");
         flagsInherit = c.get("Global.ResidenceFlagsInherit", true);
 
-        c.addComment("Global.PreventRentModify", "将此设置为false将允许租赁参与者修改租用的住所。");
+        c.addComment("Global.PreventRentModify", "此选项已停用，保持默认值即可");
         preventBuildInRent = c.get("Global.PreventRentModify", true);
 
         c.addComment("Global.PreventSubZoneRemoval", "当Subzone所有者与父级所有者不同时，将其设置为true将防止子区删除。");
@@ -1157,7 +1115,7 @@ public class ConfigManager {
         c.addComment("This is the residence name filter, that filters out invalid characters.  Google 'Java RegEx' or 'Java Regular Expressions' for more info on how they work.");
         namefix = c.get("Global.ResidenceNameRegex", "[^a-zA-Z0-9\\-\\_]");
 
-        c.addComment("Global.ShowIntervalMessages", "将其设置为TRUE，每次居住时都会将消息发送到控制台，或者租金到期或租赁过期支票。");
+        c.addComment("Global.ShowIntervalMessages", "已停用的间隔提示设置");
         showIntervalMessages = c.get("Global.ShowIntervalMessages", false);
 
         c.addComment("Global.ShowNoobMessage", "将其设置为True，将胸部放在地面上时，将其发送给新玩家的教程消息。");
@@ -1346,8 +1304,6 @@ public class ConfigManager {
         DynMapBorderWeight = c.get("DynMap.Border.Weight", 3);
         DynMapFillOpacity = c.get("DynMap.Fill.Opacity", 0.3);
         DynMapFillColor = c.get("DynMap.Fill.Color", "#FFFF00");
-        DynMapFillForRent = c.get("DynMap.Fill.ForRent", "#33cc33");
-        DynMapFillRented = c.get("DynMap.Fill.Rented", "#99ff33");
 
         c.addComment("DynMap.VisibleRegions", "仅在此列表中显示区域");
         DynMapVisibleRegions = c.get("DynMap.VisibleRegions", new ArrayList<String>());
@@ -1392,7 +1348,6 @@ public class ConfigManager {
         }
 
         globalCreatorDefaults = FlagPermissions.parseFromConfigNode("CreatorDefault", flags.getConfigurationSection("Global"));
-        globalRentedDefaults = FlagPermissions.parseFromConfigNode("RentedDefault", flags.getConfigurationSection("Global"));
         globalResidenceDefaults = FlagPermissions.parseFromConfigNode("ResidenceDefault", flags.getConfigurationSection("Global"));
         loadGroups();
     }
@@ -1431,37 +1386,6 @@ public class ConfigManager {
         return GlobalChatFormat;
     }
 
-    public int getRentInformDelay() {
-        return RentInformDelay;
-    }
-
-    public int getRentInformBefore() {
-        return RentInformBefore;
-    }
-
-    public boolean isRentAllowAutoPay() {
-        return RentAllowAutoPay;
-    }
-
-    public boolean isRentPlayerAutoPay() {
-        return RentPlayerAutoPay;
-    }
-
-    public boolean isRentStayInMarket() {
-        return RentStayInMarket;
-    }
-
-    public boolean isRentAllowRenewing() {
-        return RentAllowRenewing;
-    }
-
-    public boolean isRentPreventRemoval() {
-        return RentPreventRemoval;
-    }
-
-    public boolean isRentInformOnEnding() {
-        return RentInformOnEnding;
-    }
 
     public boolean isTNTExplodeBelow() {
         return TNTExplodeBelow;
@@ -1795,11 +1719,6 @@ public class ConfigManager {
     public FlagPermissions getGlobalCreatorDefaultFlags() {
         return globalCreatorDefaults;
     }
-
-    public FlagPermissions getGlobalRentedDefaultFlags() {
-        return globalRentedDefaults;
-    }
-
     public FlagPermissions getGlobalResidenceDefaultFlags() {
         return globalResidenceDefaults;
     }

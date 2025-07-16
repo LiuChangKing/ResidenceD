@@ -3,8 +3,6 @@ package com.bekvon.bukkit.residence.protection;
 import com.bekvon.bukkit.residence.Residence;
 import com.bekvon.bukkit.residence.api.ResidenceInterface;
 import com.bekvon.bukkit.residence.containers.*;
-import com.bekvon.bukkit.residence.economy.rent.RentableLand;
-import com.bekvon.bukkit.residence.economy.rent.RentedLand;
 import com.bekvon.bukkit.residence.event.ResidenceCreationEvent;
 import com.bekvon.bukkit.residence.event.ResidenceDeleteEvent;
 import com.bekvon.bukkit.residence.event.ResidenceDeleteEvent.DeleteCause;
@@ -228,7 +226,6 @@ public class ResidenceManager implements ResidenceInterface {
             return false;
         }
 
-        newRes.BlockSellPrice = group.getSellPerBlock();
 
         if (!newRes.addArea(player, newArea, "main", resadmin, false))
             return false;
@@ -323,7 +320,6 @@ public class ResidenceManager implements ResidenceInterface {
             showhidden = true;
         boolean hidden = showhidden;
         TreeMap<String, ClaimedResidence> ownedResidences = plugin.getPlayerManager().getResidencesMap(targetplayer, hidden, onlyHidden, world);
-        ownedResidences.putAll(plugin.getRentManager().getRentsMap(targetplayer, onlyHidden, world));
         ownedResidences.putAll(plugin.getPlayerManager().getTrustedResidencesMap(targetplayer, hidden, onlyHidden, world));
 
         plugin.getInfoPageManager().printListInfo(sender, targetplayer, ownedResidences, page, resadmin, world);
@@ -537,19 +533,6 @@ public class ResidenceManager implements ResidenceInterface {
         }
 
         String name = res.getName();
-
-        if (plugin.getConfigManager().isRentPreventRemoval() && !resadmin) {
-            ClaimedResidence rented = res.getRentedSubzone();
-            if (rented != null) {
-                plugin.msg(player, lm.Residence_CantRemove, res.getName(), rented.getName(), rented.getRentedLand().player);
-                return;
-            }
-            if (player != null && res.isRented() && !player.getName().equalsIgnoreCase(res.getRentedLand().player)) {
-                plugin.msg(player, lm.Residence_CantRemove, res.getName(), res.getName(), res.getRentedLand().player);
-                return;
-            }
-        }
-
         if (player != null && !resadmin) {
             if (!res.getPermissions().hasResidencePermission(player, true) && !resadmin && res.getParent() != null && !res.getParent().isOwner(player)) {
                 plugin.msg(player, lm.General_NoPermission);
@@ -783,53 +766,7 @@ public class ResidenceManager implements ResidenceInterface {
                 plugin.msg(sender, lm.Economy_LeaseExpire, time);
         }
 
-        if (plugin.getConfigManager().enabledRentSystem() && plugin.getRentManager().isForRent(areaname) && !plugin.getRentManager().isRented(areaname)) {
-            String forRentMsg = plugin.msg(lm.Rent_isForRent);
-
-            RentableLand rentable = plugin.getRentManager().getRentableLand(areaname);
-            StringBuilder rentableString = new StringBuilder();
-            if (rentable != null) {
-                rentableString.append(plugin.msg(lm.General_Cost, rentable.cost, rentable.days) + "\n");
-                rentableString.append(plugin.msg(lm.Rentable_AllowRenewing, rentable.AllowRenewing) + "\n");
-                rentableString.append(plugin.msg(lm.Rentable_StayInMarket, rentable.StayInMarket) + "\n");
-                rentableString.append(plugin.msg(lm.Rentable_AllowAutoPay, rentable.AllowAutoPay));
-            }
-            if (sender instanceof Player) {
-
-                rm = new RawMessage();
-                rm.addText(forRentMsg).addHover(rentableString.toString());
-                rm.show(sender);
-            } else
-                plugin.msg(sender, forRentMsg);
-        } else if (plugin.getConfigManager().enabledRentSystem() && plugin.getRentManager().isRented(areaname)) {
-            String RentedMsg = plugin.msg(lm.Residence_RentedBy, plugin.getRentManager().getRentingPlayer(areaname));
-
-            RentableLand rentable = plugin.getRentManager().getRentableLand(areaname);
-            RentedLand rented = plugin.getRentManager().getRentedLand(areaname);
-
-            StringBuilder rentableString = new StringBuilder();
-            if (rented != null) {
-                rentableString.append(plugin.msg(lm.Rent_Expire, GetTime.getTime(rented.endTime)) + "\n");
-                if (rented.player.equals(sender.getName()) || resadmin || res.isOwner(sender))
-                    rentableString.append((rented.AutoPay ? plugin.msg(lm.Rent_AutoPayTurnedOn) : plugin.msg(lm.Rent_AutoPayTurnedOff))
-                        + "\n");
-            }
-
-            if (rentable != null) {
-                rentableString.append(plugin.msg(lm.General_Cost, rentable.cost, rentable.days) + "\n");
-                rentableString.append(plugin.msg(lm.Rentable_AllowRenewing, rentable.AllowRenewing) + "\n");
-                rentableString.append(plugin.msg(lm.Rentable_StayInMarket, rentable.StayInMarket) + "\n");
-                rentableString.append(plugin.msg(lm.Rentable_AllowAutoPay, rentable.AllowAutoPay));
-            }
-
-            if (sender instanceof Player) {
-
-                rm = new RawMessage();
-                rm.addText(RentedMsg).addHover(rentableString.toString());
-                rm.show(sender);
-            } else
-                plugin.msg(sender, RentedMsg);
-        }
+        // rent system removed
 
         plugin.msg(sender, lm.General_Separator);
     }
@@ -1453,10 +1390,9 @@ public class ResidenceManager implements ResidenceInterface {
         plugin.getLeaseManager().removeExpireTime(res);
         for (ClaimedResidence oneSub : res.getSubzones()) {
             plugin.getPlayerManager().removeResFromPlayer(res.getOwnerUUID(), oneSub);
-            plugin.getRentManager().removeRentable(ClaimedResidence.getByName(name + "." + oneSub.getResidenceName()), removeSigns);
         }
         plugin.getPlayerManager().removeResFromPlayer(res.getOwnerUUID(), res);
-        plugin.getRentManager().removeRentable(ClaimedResidence.getByName(name), removeSigns);
+
         
     }
 
