@@ -280,9 +280,31 @@ public class Residence extends JavaPlugin {
             deleteConfirm = new HashMap<String, String>();
             server = this.getServer();
             dataFolder = this.getDataFolder();
-            useMysql = com.liuchangking.dreamengine.config.Config.mysqlEnabled;
+
+            // Load mysql.yml to determine if MySQL should be used
+            File mysqlFile = new File(dataFolder, "mysql.yml");
+            if (!mysqlFile.isFile()) {
+                writeDefaultFileFromJar(mysqlFile, "mysql.yml", true);
+            }
+            YamlConfiguration mysqlCfg = YamlConfiguration.loadConfiguration(mysqlFile);
+            useMysql = mysqlCfg.getBoolean("enabled", false);
+
             serverId = com.liuchangking.dreamengine.api.DreamServerAPI.getServerId();
+
+            // When MySQL is enabled, verify DreamEngine configuration and connection
             if (useMysql) {
+                if (!com.liuchangking.dreamengine.config.Config.mysqlEnabled) {
+                    consoleMessage("MySQL is enabled in mysql.yml but disabled in DreamEngine config!");
+                    Bukkit.shutdown();
+                    return;
+                }
+                try (java.sql.Connection c = com.liuchangking.dreamengine.service.MysqlManager.getConnection()) {
+                    // test connection
+                } catch (Exception e) {
+                    consoleMessage("Failed to connect to MySQL: " + e.getMessage());
+                    Bukkit.shutdown();
+                    return;
+                }
                 createTables();
             }
 
