@@ -4,8 +4,6 @@ import com.bekvon.bukkit.residence.Residence;
 
 class AreaStyle {
     String strokecolor;
-    String forrentstrokecolor;
-    String rentedstrokecolor;
     double strokeopacity;
     int strokeweight;
     String fillcolor;
@@ -14,8 +12,6 @@ class AreaStyle {
 
     AreaStyle() {
 	strokecolor = Residence.getInstance().getConfigManager().DynMapBorderColor;
-	forrentstrokecolor = Residence.getInstance().getConfigManager().DynMapFillForRent;
-	rentedstrokecolor = Residence.getInstance().getConfigManager().DynMapFillRented;
 	strokeopacity = Residence.getInstance().getConfigManager().DynMapBorderOpacity;
 	strokeweight = Residence.getInstance().getConfigManager().DynMapBorderWeight;
 	fillcolor = Residence.getInstance().getConfigManager().DynMapFillColor;

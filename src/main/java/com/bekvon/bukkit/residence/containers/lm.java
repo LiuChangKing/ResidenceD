@@ -88,7 +88,7 @@ public enum lm {
     Select_Disabled("&cYou don't have access to selections commands"),
 
     Sign_Updated("&6%1 &esigns updated!"),
-    Sign_TopLine("[market]"),
+    Sign_TopLine("[res]"),
     Sign_DateFormat("YY/MM/dd HH:mm"),
     Sign_LookAt("&cYou are not looking at sign"),
     Sign_TooMany("&cToo many signs for this residence"),

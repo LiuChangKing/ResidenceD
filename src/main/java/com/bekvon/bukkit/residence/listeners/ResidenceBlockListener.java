@@ -207,7 +207,7 @@ public class ResidenceBlockListener implements Listener {
         if (Residence.getInstance().getConfigManager().enabledRentSystem() && res != null) {
             if (Residence.getInstance().getConfigManager().preventRentModify() && res.isRented()) {
                 if (inform)
-                    Residence.getInstance().msg(player, lm.Rent_ModifyDeny);
+                    Residence.getInstance().msg(player, lm.General_NoPermission);
                 return false;
             }
         }
@@ -613,7 +613,7 @@ public class ResidenceBlockListener implements Listener {
             String resname = res.getName();
             if (Residence.getInstance().getConfigManager().preventRentModify() && Residence.getInstance().getRentManager().isRented(resname)) {
                 if (informPlayer)
-                    Residence.getInstance().msg(player, lm.Rent_ModifyDeny);
+                    Residence.getInstance().msg(player, lm.General_NoPermission);
                 return false;
             }
         }

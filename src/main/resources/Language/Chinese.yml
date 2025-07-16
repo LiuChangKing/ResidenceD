@@ -167,7 +167,6 @@ Language:
     OwnerChange: '&e已将领地 &6%1 &e的所有者更改为 &6%2'
     NonAdmin: '&c你没有领地的管理员权限.'
     Line: '&e领地: &6%1 '
-    ReleaseConfirm: '&e输入 &6/res market confirm &e来确认从市场内删除领地 &6%1'
   command:
     addedAllow: '&e增加了一个新的允许的命令给 &6%1 &e领地'
     removedAllow: '&e删除了一个允许的命令给 &6%1 &e领地'
@@ -524,11 +523,6 @@ CommandHelp:
           - '&e使用方法: &6/res pdel <领地名称> [玩家名称]'
           - 删除玩家的基本权限
           Description: 从领地删除玩家
-        market:
-          Info:
-          - '&e使用方法: &6/res market ? 了解更多信息'
-          Description: 经济信息已停用
-          SubCommands:
         expand:
           Info:
           - '&e使用方法: &6/res expand (领地名称) [扩展单位]'

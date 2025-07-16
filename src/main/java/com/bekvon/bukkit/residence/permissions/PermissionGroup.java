@@ -55,9 +55,6 @@ public class PermissionGroup {
     private int maxLeaseTime = 16;
     private int leaseGiveTime = 14;
     protected double renewcostperarea = 0.02D;
-    protected boolean canBuy = false;
-    protected boolean canSell = false;
-    protected boolean buyIgnoreLimits = false;
     protected boolean cancreate = false;
     protected String groupname;
     protected int maxPhysical = 2;
@@ -213,12 +210,6 @@ public class PermissionGroup {
             leaseGiveTime = limits.getInt("Lease.RenewIncrement", 14);
         if (limits.contains("Economy.RenewCost"))
             renewcostperarea = limits.getDouble("Economy.RenewCost", 0.02D);
-        if (limits.contains("Economy.CanBuy"))
-            canBuy = limits.getBoolean("Economy.CanBuy", false);
-        if (limits.contains("Economy.CanSell"))
-            canSell = limits.getBoolean("Economy.CanSell", false);
-        if (limits.contains("Economy.IgnoreLimits"))
-            buyIgnoreLimits = limits.getBoolean("Economy.IgnoreLimits", false);
         if (limits.contains("Economy.BuyCost"))
             costperarea = limits.getDouble("Economy.BuyCost", 0);
 
@@ -439,14 +430,6 @@ public class PermissionGroup {
         return renewcostperarea;
     }
 
-    public boolean canBuyLand() {
-        return canBuy;
-    }
-
-    public boolean canSellLand() {
-        return canSell;
-    }
-
     public int getMaxRents() {
         return 0;
     }
@@ -457,10 +440,6 @@ public class PermissionGroup {
 
     public int getMaxRentables() {
         return 0;
-    }
-
-    public boolean buyLandIgnoreLimits() {
-        return buyIgnoreLimits;
     }
 
     public boolean hasUnstuckAccess() {

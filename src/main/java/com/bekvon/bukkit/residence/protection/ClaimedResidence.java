@@ -44,7 +44,6 @@ public class ClaimedResidence {
     protected Map<String, CuboidArea> areas;
     protected Map<String, ClaimedResidence> subzones;
     protected ResidencePermissions perms;
-    protected double BlockSellPrice = 0.0;
     public Vector tpLoc;
     public Vector PitchYaw;
     protected String enterMessage = null;
@@ -88,7 +87,7 @@ public class ClaimedResidence {
 
 
     public boolean isForRent() {
-        return Residence.getInstance().getRentManager().isForRent(this);
+        return Residence.getInstance().getRentManager().isForRent(getName());
     }
 
     public boolean isSubzoneForRent() {
@@ -129,7 +128,7 @@ public class ClaimedResidence {
 
 
     public boolean isRented() {
-        return Residence.getInstance().getRentManager().isRented(this);
+        return Residence.getInstance().getRentManager().isRented(getName());
     }
 
     public void setRentable(RentableLand rl) {
@@ -645,17 +644,7 @@ public class ClaimedResidence {
             return false;
 
         if ((!resadmin) && (player != null)) {
-            int chargeamount = (int) Math
-                .ceil((newarea.getSize() - oldarea.getSize()) * getBlockSellPrice().doubleValue());
-            if ((chargeamount < 0) && (Residence.getInstance().getConfigManager().useResMoneyBack())) {
-                if (!this.isServerLand()) {
-                    EconomyInterface econ = Residence.getInstance().getEconomyManager();
-                    if (econ != null) {
-                        econ.add(player.getName(), -chargeamount);
-                        Residence.getInstance().msg(player, lm.Economy_MoneyAdded, Residence.getInstance().getEconomyManager().format(-chargeamount), econ.getName());
-                    }
-                }
-            }
+            // selling system removed
         }
 
         Residence.getInstance().getResidenceManager().removeChunkList(this);
@@ -1444,8 +1433,7 @@ public class ClaimedResidence {
 //	    root.put("LeaveMessage", id);
 //	}
 
-        if (BlockSellPrice != 0D)
-            root.put("BlockSellPrice", BlockSellPrice);
+
 
         try {
         } catch (Throwable e) {
@@ -1588,11 +1576,7 @@ public class ClaimedResidence {
         if (root.containsKey("MainResidence"))
             res.mainRes = (Boolean) root.get("MainResidence");
 
-        if (root.containsKey("BlockSellPrice"))
-            res.BlockSellPrice = (Double) root.get("BlockSellPrice");
-        else {
-            res.BlockSellPrice = 0D;
-        }
+
 
         World world = Residence.getInstance().getServ().getWorld(res.perms.getWorldName());
 
@@ -1900,9 +1884,7 @@ public class ClaimedResidence {
         return false;
     }
 
-    public Double getBlockSellPrice() {
-        return BlockSellPrice;
-    }
+
 
     public ArrayList<Player> getPlayersInResidence() {
         ArrayList<Player> within = new ArrayList<>();
@@ -1994,7 +1976,7 @@ public class ClaimedResidence {
     }
 
     public double getWorth() {
-        return (long) ((getTotalSize() * getBlockSellPrice()) * 100L) / 100D;
+        return getWorthByOwner();
     }
 
     public void showBounds(Player player, boolean showOneTime) {

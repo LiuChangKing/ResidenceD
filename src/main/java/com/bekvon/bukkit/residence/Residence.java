@@ -948,6 +948,7 @@ public class Residence extends JavaPlugin {
         if (!worldFolder.isDirectory())
             worldFolder.mkdirs();
         YMLSaveHelper syml;
+        File tmpFile = null;
         Map<String, Object> save = rmanager.save();
         for (Entry<String, Object> entry : save.entrySet()) {
 
@@ -965,7 +966,7 @@ public class Residence extends JavaPlugin {
                 continue;
             }
 
-            File tmpFile = new File(worldFolder, "tmp_res_" + entry.getKey() + ".yml");
+            tmpFile = new File(worldFolder, "tmp_res_" + entry.getKey() + ".yml");
 
             syml = new YMLSaveHelper(tmpFile);
             if (this.getResidenceManager().getMessageCatch(entry.getKey()) != null)

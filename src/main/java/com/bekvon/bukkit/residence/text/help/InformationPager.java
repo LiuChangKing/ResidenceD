@@ -121,18 +121,8 @@ public class InformationPager {
             StringB.append("\n").append(plugin.msg(lm.General_CreatedOn, GetTime.getTime(res.getCreateTime())));
 
             String ExtraString = "";
-            if (res.isForRent()) {
-                if (res.isRented()) {
-                    ExtraString = " " + plugin.msg(lm.Residence_IsRented);
-                    StringB.append("\n").append(plugin.msg(lm.Residence_RentedBy, res.getRentedLand().player));
-                } else {
-                    ExtraString = " " + plugin.msg(lm.Residence_IsForRent);
-                }
-                RentableLand rentable = res.getRentable();
-                StringB.append("\n").append(plugin.msg(lm.General_Cost, rentable.cost, rentable.days));
-                StringB.append("\n").append(plugin.msg(lm.Rentable_AllowRenewing, rentable.AllowRenewing));
-                StringB.append("\n").append(plugin.msg(lm.Rentable_StayInMarket, rentable.StayInMarket));
-                StringB.append("\n").append(plugin.msg(lm.Rentable_AllowAutoPay, rentable.AllowAutoPay));
+            if (false) {
+                // rent system removed
             }
 
 
@@ -196,18 +186,8 @@ public class InformationPager {
             StringB.append("\n" + plugin.msg(lm.General_CreatedOn, GetTime.getTime(res.getCreateTime())));
 
             String ExtraString = "";
-            if (res.isForRent()) {
-                if (res.isRented()) {
-                    ExtraString = " " + plugin.msg(lm.Residence_IsRented);
-                    StringB.append("\n " + plugin.msg(lm.Residence_RentedBy, res.getRentedLand().player));
-                } else {
-                    ExtraString = " " + plugin.msg(lm.Residence_IsForRent);
-                }
-                RentableLand rentable = res.getRentable();
-                StringB.append("\n" + plugin.msg(lm.General_Cost, rentable.cost, rentable.days));
-                StringB.append("\n" + plugin.msg(lm.Rentable_AllowRenewing, rentable.AllowRenewing));
-                StringB.append("\n" + plugin.msg(lm.Rentable_StayInMarket, rentable.StayInMarket));
-                StringB.append("\n" + plugin.msg(lm.Rentable_AllowAutoPay, rentable.AllowAutoPay));
+            if (false) {
+                // rent system removed
             }
 
 
@@ -252,18 +232,8 @@ public class InformationPager {
                 StringB.append("\n " + plugin.msg(lm.General_CreatedOn, GetTime.getTime(res.getCreateTime())));
 
                 String ExtraString = "";
-                if (res.isForRent()) {
-                    if (res.isRented()) {
-                        ExtraString = " " + plugin.msg(lm.Residence_IsRented);
-                        StringB.append("\n " + plugin.msg(lm.Residence_RentedBy, res.getRentedLand().player));
-                    } else {
-                        ExtraString = " " + plugin.msg(lm.Residence_IsForRent);
-                    }
-                    RentableLand rentable = res.getRentable();
-                    StringB.append("\n " + plugin.msg(lm.General_Cost, rentable.cost, rentable.days));
-                    StringB.append("\n " + plugin.msg(lm.Rentable_AllowRenewing, rentable.AllowRenewing));
-                    StringB.append("\n " + plugin.msg(lm.Rentable_StayInMarket, rentable.StayInMarket));
-                    StringB.append("\n " + plugin.msg(lm.Rentable_AllowAutoPay, rentable.AllowAutoPay));
+                if (false) {
+                    // rent system removed
                 }
 
 

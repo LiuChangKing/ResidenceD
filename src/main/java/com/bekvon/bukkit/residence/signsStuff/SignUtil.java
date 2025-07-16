@@ -171,8 +171,7 @@ public class SignUtil {
         if (res == null)
             return false;
 
-        boolean ForSale = false;
-        boolean ForRent = res.isForRent();
+        boolean ForRent = false; // rent system removed
 
         Location nloc = Sign.getLocation();
 
@@ -216,41 +215,10 @@ public class SignUtil {
             }
 
             if (ForRent) {
-
-                boolean rented = res.isRented();
-
-                RentedLand rentedPlace = res.getRentedLand();
-                long time = 0L;
-                if (rentedPlace != null)
-                    time = rentedPlace.endTime;
-
-                SimpleDateFormat formatter = new SimpleDateFormat(plugin.msg(lm.Sign_DateFormat));
-                formatter.setTimeZone(TimeZone.getTimeZone(plugin.getConfigManager().getTimeZone()));
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTimeInMillis(time);
-                String timeString = formatter.format(calendar.getTime());
-
-                String endDate = timeString;
-                if (time == 0L)
-                    endDate = "Unknown";
-
-                if (plugin.getRentManager().getRentedAutoRepeats(res))
-                    endDate = plugin.msg(lm.Sign_RentedAutorenewTrue, endDate);
-                else
-                    endDate = plugin.msg(lm.Sign_RentedAutorenewFalse, endDate);
-
-                String TopLine = rented ? plugin.msg(lm.Sign_RentedTopLine, endDate) : plugin.msg(lm.Sign_ForRentTopLine);
-                sign.setLine(0, TopLine);
-
-                String infoLine = plugin.msg(rented ? lm.Sign_RentedPriceLine : lm.Sign_ForRentPriceLine, plugin.getRentManager().getCostOfRent(res), plugin
-                    .getRentManager().getRentDays(res), plugin.getRentManager().getRentableRepeatable(res));
-
-                sign.setLine(1, infoLine);
-                String shortName = fixResName(landName);
-                sign.setLine(2, rented ? plugin.msg(lm.Sign_RentedResName, shortName)
-                    : plugin.msg(lm.Sign_RentedResName, shortName));
-                sign.setLine(3, rented ? plugin.msg(lm.Sign_RentedBottomLine, plugin.getRentManager().getRentingPlayer(landName))
-                    : plugin.msg(lm.Sign_ForRentBottomLine));
+                sign.setLine(0, plugin.msg(lm.Sign_TopLine));
+                sign.setLine(1, plugin.msg(lm.General_NoPermission));
+                sign.setLine(2, "");
+                sign.setLine(3, "");
                 sign.update();
             }
 
