@@ -105,7 +105,7 @@ public class Residence extends JavaPlugin {
     protected boolean firstenable = true;
     protected EconomyInterface economy;
     public File dataFolder;
-    private boolean useMysql = false;
+    private boolean useMysql = true;
     private String serverId = "default";
     /**
      * Get the owning server id for a world from MySQL. Returns this server id
