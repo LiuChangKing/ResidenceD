@@ -105,6 +105,29 @@ public class Residence extends JavaPlugin {
     protected boolean firstenable = true;
     protected EconomyInterface economy;
     public File dataFolder;
+    private boolean useMysql = false;
+    private String serverId = "default";
+    /**
+     * Get the owning server id for a world from MySQL. Returns this server id
+     * when MySQL is disabled or world not found.
+     */
+    public String getWorldServerId(String worldName) {
+        if (!useMysql) {
+            return serverId;
+        }
+        try (java.sql.Connection conn = com.liuchangking.dreamengine.service.MysqlManager.getConnection();
+             java.sql.PreparedStatement ps = conn.prepareStatement("SELECT server_id FROM residence_worlds WHERE world_name=? LIMIT 1")) {
+            ps.setString(1, worldName);
+            try (java.sql.ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString(1);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return serverId;
+    }
     protected CMITask healBukkitId = null;
     protected CMITask feedBukkitId = null;
     protected CMITask effectRemoveBukkitId = null;
@@ -257,6 +280,11 @@ public class Residence extends JavaPlugin {
             deleteConfirm = new HashMap<String, String>();
             server = this.getServer();
             dataFolder = this.getDataFolder();
+            useMysql = com.liuchangking.dreamengine.config.Config.mysqlEnabled;
+            serverId = com.liuchangking.dreamengine.api.DreamServerAPI.getServerId();
+            if (useMysql) {
+                createTables();
+            }
 
             ResidenceVersion = this.getDescription().getVersion();
             authlist = this.getDescription().getAuthors();
@@ -494,6 +522,7 @@ public class Residence extends JavaPlugin {
                 pm.registerEvents(blistener, this);
                 pm.registerEvents(plistener, this);
                 pm.registerEvents(elistener, this);
+                pm.registerEvents(new com.bekvon.bukkit.residence.listeners.CrossServerTeleportListener(), this);
                 pm.registerEvents(new ResidenceFixesListener(), this);
                 // Events for old versions removed
 
@@ -732,6 +761,14 @@ public class Residence extends JavaPlugin {
         return server;
     }
 
+    public boolean isUsingMysql() {
+        return useMysql;
+    }
+
+    public String getServerId() {
+        return serverId;
+    }
+
     public PlayerManager getPlayerManager() {
         return PlayerManager;
     }
@@ -880,6 +917,10 @@ public class Residence extends JavaPlugin {
     }
 
     private void saveYml() throws IOException {
+        if (useMysql) {
+            saveMysql();
+            return;
+        }
         File saveFolder = new File(dataFolder, "Save");
         File worldFolder = new File(saveFolder, "Worlds");
         if (!worldFolder.isDirectory())
@@ -947,6 +988,106 @@ public class Residence extends JavaPlugin {
         }
     }
 
+    private void saveMysql() {
+        com.bekvon.bukkit.residence.persistance.MysqlSaveHelper helper = new com.bekvon.bukkit.residence.persistance.MysqlSaveHelper(serverId);
+        Map<String, Object> save = rmanager.save();
+        for (Entry<String, Object> entry : save.entrySet()) {
+            Map<String, Object> root = new java.util.LinkedHashMap<>();
+            if (this.getResidenceManager().getMessageCatch(entry.getKey()) != null)
+                root.put("Messages", this.getResidenceManager().getMessageCatch(entry.getKey()));
+            if (this.getResidenceManager().getFlagsCatch(entry.getKey()) != null)
+                root.put("Flags", this.getResidenceManager().getFlagsCatch(entry.getKey()));
+            root.put("Residences", entry.getValue());
+            try {
+                helper.saveWorld(entry.getKey(), root);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        Map<String, Object> pr = new java.util.LinkedHashMap<>();
+        pr.put("PermissionLists", pmanager.save());
+        try {
+            helper.savePermLists(pr);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (getConfigManager().showIntervalMessages()) {
+            System.out.println("[Residence] - Saved Residences...");
+        }
+    }
+
+    private void createTables() {
+        try (java.sql.Connection conn = com.liuchangking.dreamengine.service.MysqlManager.getConnection();
+             java.sql.Statement st = conn.createStatement()) {
+            st.executeUpdate("CREATE TABLE IF NOT EXISTS residence_worlds (server_id VARCHAR(32), world_name VARCHAR(64), data MEDIUMTEXT, flags MEDIUMTEXT, messages MEDIUMTEXT, updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, PRIMARY KEY (server_id, world_name))");
+            st.executeUpdate("CREATE TABLE IF NOT EXISTS residence_permlists (id INT PRIMARY KEY, data MEDIUMTEXT)");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Import existing YAML data into MySQL tables.
+     */
+    public void migrateToMysql() throws Exception {
+        if (!useMysql) {
+            return;
+        }
+        com.bekvon.bukkit.residence.persistance.MysqlSaveHelper helper = new com.bekvon.bukkit.residence.persistance.MysqlSaveHelper(serverId);
+        File saveFolder = new File(dataFolder, "Save");
+        File worldFolder = new File(saveFolder, "Worlds");
+        if (worldFolder.isDirectory()) {
+            for (File f : worldFolder.listFiles()) {
+                if (!f.isFile())
+                    continue;
+                String name = f.getName();
+                if (!name.startsWith(saveFilePrefix) || !name.endsWith(".yml"))
+                    continue;
+                String world = name.substring(saveFilePrefix.length(), name.length() - 4);
+                YMLSaveHelper yml = new YMLSaveHelper(f);
+                yml.load();
+                helper.saveWorld(world, yml.getRoot());
+            }
+        }
+        File permFile = new File(saveFolder, "permlists.yml");
+        if (permFile.isFile()) {
+            YMLSaveHelper yml = new YMLSaveHelper(permFile);
+            yml.load();
+            helper.savePermLists(yml.getRoot());
+        }
+    }
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    private boolean loadMysql() throws Exception {
+        com.bekvon.bukkit.residence.persistance.MysqlSaveHelper helper = new com.bekvon.bukkit.residence.persistance.MysqlSaveHelper(serverId);
+        HashMap<String, Object> worlds = new HashMap<>();
+        for (String worldName : this.getResidenceManager().getWorldNames()) {
+            Map<String, Object> root = null;
+            try {
+                root = helper.loadWorld(worldName);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            if (root == null)
+                continue;
+            loadMessagesAndFlags(worldName, root);
+            worlds.put(worldName, root.get("Residences"));
+        }
+
+        getResidenceManager().load(worlds);
+
+        try {
+            Map<String, Object> pr = helper.loadPermLists();
+            if (pr != null)
+                pmanager = getPermissionListManager().load((Map) pr.get("PermissionLists"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
+
     public final static String saveFilePrefix = "res_";
 
     private void loadFlags(String worldName, YMLSaveHelper yml) {
@@ -998,8 +1139,56 @@ public class Residence extends JavaPlugin {
         loadFlags(worldName, yml);
     }
 
+    private void loadFlags(String worldName, Map<String, Object> root) {
+        if (root == null || !root.containsKey("Flags"))
+            return;
+        HashMap<Integer, MinimizeFlags> c = getResidenceManager().getCacheFlags().get(worldName);
+        if (c == null)
+            c = new HashMap<Integer, MinimizeFlags>();
+        Map<Integer, Object> ms = (Map<Integer, Object>) root.get("Flags");
+        if (ms == null)
+            return;
+        for (Entry<Integer, Object> one : ms.entrySet()) {
+            try {
+                HashMap<String, Boolean> msgs = (HashMap<String, Boolean>) one.getValue();
+                c.put(one.getKey(), new MinimizeFlags(one.getKey(), msgs));
+            } catch (Exception e) {
+
+            }
+        }
+        getResidenceManager().getCacheFlags().put(worldName, c);
+    }
+
+    private void loadMessages(String worldName, Map<String, Object> root) {
+        if (root == null || !root.containsKey("Messages"))
+            return;
+        HashMap<Integer, MinimizeMessages> c = getResidenceManager().getCacheMessages().get(worldName);
+        if (c == null)
+            c = new HashMap<Integer, MinimizeMessages>();
+        Map<Integer, Object> ms = (Map<Integer, Object>) root.get("Messages");
+        if (ms == null)
+            return;
+        for (Entry<Integer, Object> one : ms.entrySet()) {
+            try {
+                Map<String, String> msgs = (Map<String, String>) one.getValue();
+                c.put(one.getKey(), new MinimizeMessages(one.getKey(), msgs.get("EnterMessage"), msgs.get("LeaveMessage")));
+            } catch (Exception e) {
+
+            }
+        }
+        getResidenceManager().getCacheMessages().put(worldName, c);
+    }
+
+    private void loadMessagesAndFlags(String worldName, Map<String, Object> root) {
+        loadMessages(worldName, root);
+        loadFlags(worldName, root);
+    }
+
     @SuppressWarnings({ "rawtypes", "unchecked" })
     protected boolean loadYml() throws Exception {
+        if (useMysql) {
+            return loadMysql();
+        }
         File saveFolder = new File(dataFolder, "Save");
         try {
             File worldFolder = new File(saveFolder, "Worlds");

@@ -944,15 +944,29 @@ public class ResidenceManager implements ResidenceInterface {
         Set<String> worldnames = new HashSet<String>();
         File saveFolder = new File(plugin.dataFolder, "Save");
         try {
-            File worldFolder = new File(saveFolder, "Worlds");
-            if (plugin.getConfigManager().isLoadEveryWorld() && worldFolder.isDirectory()) {
-                for (File f : worldFolder.listFiles()) {
-                    if (!f.isFile())
-                        continue;
-                    String name = f.getName();
-                    if (!name.startsWith(Residence.saveFilePrefix))
-                        continue;
-                    worldnames.add(name.substring(Residence.saveFilePrefix.length(), name.length() - 4));
+            if (plugin.isUsingMysql()) {
+                try (java.sql.Connection conn = com.liuchangking.dreamengine.service.MysqlManager.getConnection();
+                     java.sql.PreparedStatement ps = conn.prepareStatement("SELECT world_name FROM residence_worlds WHERE server_id=?")) {
+                    ps.setString(1, plugin.getServerId());
+                    try (java.sql.ResultSet rs = ps.executeQuery()) {
+                        while (rs.next()) {
+                            worldnames.add(rs.getString(1));
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else {
+                File worldFolder = new File(saveFolder, "Worlds");
+                if (plugin.getConfigManager().isLoadEveryWorld() && worldFolder.isDirectory()) {
+                    for (File f : worldFolder.listFiles()) {
+                        if (!f.isFile())
+                            continue;
+                        String name = f.getName();
+                        if (!name.startsWith(Residence.saveFilePrefix))
+                            continue;
+                        worldnames.add(name.substring(Residence.saveFilePrefix.length(), name.length() - 4));
+                    }
                 }
             }
             plugin.getServ().getWorlds().forEach((w) -> {
