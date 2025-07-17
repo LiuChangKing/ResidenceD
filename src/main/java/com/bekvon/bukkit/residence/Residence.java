@@ -1021,20 +1021,11 @@ public class Residence extends JavaPlugin {
         }
 
         // Save shared permission lists and caches using legacy structure
-        Map<String, Object> save = rmanager.save();
-        for (Entry<String, Object> entry : save.entrySet()) {
-            Map<String, Object> root = new java.util.LinkedHashMap<>();
-            if (this.getResidenceManager().getMessageCatch(entry.getKey()) != null)
-                root.put("Messages", this.getResidenceManager().getMessageCatch(entry.getKey()));
-            if (this.getResidenceManager().getFlagsCatch(entry.getKey()) != null)
-                root.put("Flags", this.getResidenceManager().getFlagsCatch(entry.getKey()));
-            root.put("Residences", entry.getValue());
-            try {
-                helper.saveWorld(entry.getKey(), root);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+        //
+        // MySQL already stores each residence individually via saveResidence.
+        // Calling saveWorld here would overwrite the extended fields
+        // (owner_uuid and coordinates) with partial data. The legacy call is
+        // therefore skipped to preserve complete records.
 
         Map<String, Object> pr = new java.util.LinkedHashMap<>();
         pr.put("PermissionLists", pmanager.save());
