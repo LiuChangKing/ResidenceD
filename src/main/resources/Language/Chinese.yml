@@ -510,10 +510,6 @@ CommandHelp:
           - 如果显示自己的领地, 隐藏领地也会被显示
           - 要列出所有玩家的领地, 使用命令 /res listall
           Description: 显示领地列表
-        version:
-          Info:
-          - '&e使用方法: &6/res version'
-          Description: 显示领地插件版本
         tool:
           Info:
           - '&e使用方法: &6/res tool'

@@ -154,7 +154,6 @@ public class ConfigManager {
     protected int AutoMobRemovalInterval;
     protected boolean Couldroncompatibility;
     protected boolean enableDebug = false;
-    protected boolean versionCheck = true;
     protected boolean UUIDConvertion = true;
     protected boolean OfflineMode = false;
     protected boolean SelectionIgnoreY = false;
@@ -549,8 +548,6 @@ public class ConfigManager {
             "若服务器为离线模式，建议保持为 false 并使用 UUID 管理归属");
         OfflineMode = c.get("Global.OfflineMode", false);
 
-        c.addComment("Global.versionCheck", "拥有 residence.versioncheck 权限的玩家登录时会收到新版本提示");
-        versionCheck = c.get("Global.versionCheck", true);
 
         c.addComment("Global.Language", "从 Language 文件夹加载指定语言文件");
         language = c.get("Global.Language", "English");
@@ -1786,9 +1783,6 @@ public class ConfigManager {
         return NoCostForYBlocks;
     }
 
-    public boolean versionCheck() {
-        return versionCheck;
-    }
 
     public boolean isUUIDConvertion() {
         return UUIDConvertion;

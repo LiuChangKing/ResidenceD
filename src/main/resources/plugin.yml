@@ -68,9 +68,6 @@ permissions:
   residence.resize:
     description: Allows you to resize an area
     default: true
-  residence.versioncheck:
-    description: Notice to new version after connect
-    default: op
   residence.bypass.nofly:
     description: Bypasses nofly flag in residence
     default: op
@@ -267,9 +264,6 @@ permissions:
     description: Allows to access particular command
     default: true
   residence.command.unstuck:
-    description: Allows to access particular command
-    default: true
-  residence.command.version:
     description: Allows to access particular command
     default: true
   residence.command.siege:

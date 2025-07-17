@@ -6,8 +6,6 @@ Global:
   # 极不推荐启用，仅在确实需要时再开启
   # 若服务器为离线模式，建议保持为 false 并使用 UUID 管理归属
   OfflineMode: false
-  # 拥有 residence.versioncheck 权限的玩家登录时会收到新版本提示
-  versionCheck: false
   # 从 Language 文件夹加载指定语言文件
   Language: Chinese
   # 默认的区域选择工具，默认为木锄

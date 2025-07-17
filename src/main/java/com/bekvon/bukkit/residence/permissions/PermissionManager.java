@@ -261,7 +261,6 @@ public class PermissionManager {
         command_kick_bypass("Allows to bypass kick from residence"),
         command_contract_subzone("Allows to contract subzones"),
         command_expand_subzone("Allows to expand subzones"),
-        versioncheck("Shows when we have new version of plugin"),
         command_$1("Gives access to particular command", "commandName"),
         command_$1_others("Allows to perform command on another player", "commandName");
 
