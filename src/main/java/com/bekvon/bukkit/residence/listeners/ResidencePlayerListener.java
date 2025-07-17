@@ -26,7 +26,6 @@ import net.Zrips.CMILib.Entities.CMIEntityType;
 import net.Zrips.CMILib.Items.CMIItemStack;
 import net.Zrips.CMILib.Items.CMIMaterial;
 import net.Zrips.CMILib.TitleMessages.CMITitleMessage;
-import net.Zrips.CMILib.Util.CMIVersionChecker;
 import net.Zrips.CMILib.Version.Schedulers.CMIScheduler;
 import net.Zrips.CMILib.Version.Teleporters.CMITeleporter;
 import net.Zrips.CMILib.Version.Version;
@@ -799,9 +798,6 @@ public class ResidencePlayerListener implements Listener {
 
         plugin.getPlayerManager().playerJoin(player);
 
-        if (ResPerm.versioncheck.hasPermission(player)) {
-            CMIVersionChecker.VersionCheck(player, 11480, plugin.getDescription());
-        }
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)

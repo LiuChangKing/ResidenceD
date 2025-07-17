@@ -28,7 +28,6 @@ import com.residence.mcstats.Metrics;
 import com.residence.zip.ZipLibrary;
 import net.Zrips.CMILib.Colors.CMIChatColor;
 import net.Zrips.CMILib.Items.CMIMaterial;
-import net.Zrips.CMILib.Util.CMIVersionChecker;
 import net.Zrips.CMILib.Version.Schedulers.CMIScheduler;
 import net.Zrips.CMILib.Version.Schedulers.CMITask;
 import net.Zrips.CMILib.Version.Version;
@@ -624,7 +623,6 @@ public class Residence extends JavaPlugin {
         }
 
 
-        CMIVersionChecker.VersionCheck(null, 11480, this.getDescription());
         fullyLoaded = true;
     }
 
@@ -1402,7 +1400,6 @@ public class Residence extends JavaPlugin {
         list.add("Global.StopOnSaveFault");
         list.add("Global.ResidenceNameRegex");
         list.add("Global.ShowIntervalMessages");
-        list.add("Global.VersionCheck");
         list.add("Global.CustomContainers");
         list.add("Global.CustomBothClick");
         list.add("Global.CustomRightClick");
