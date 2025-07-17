@@ -44,6 +44,12 @@ ResidenceD/
 3. 启动后在 `plugins/Residence/` 会生成默认的 `config.yml`、`flags.yml` 和 `groups.yml`，可按需修改。
 4. 使用 `/res ?` 查看全部指令，或通过 GUI 管理领地权限等功能。
 
+## MySQL 存储
+
+在 `config.yml` 中启用 MySQL 后，插件会将每个领地的数据写入 `residences` 表。
+进入/退出消息和权限等字段都会随同其他信息序列化到 `data` 字段中存储，
+因此不会再生成 `Messages` 或 `Flags` 的缓存文件。
+
 ## 许可证
 
 源代码在 `src/main/resources/LICENSE` 中声明的许可证下发布，使用前请仔细阅读并遵守相关条款。

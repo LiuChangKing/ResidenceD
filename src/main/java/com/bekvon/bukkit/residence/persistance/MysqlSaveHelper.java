@@ -52,6 +52,13 @@ public class MysqlSaveHelper {
         return root;
     }
 
+    /**
+     * Legacy save format used when exporting worlds from YAML.
+     * This method only stores the serialized data blob and does not
+     * include extended fields like owner UUID or coordinates.
+     * It should not be used after {@link #saveResidence} has been
+     * called for a residence, otherwise those fields will be cleared.
+     */
     @SuppressWarnings("unchecked")
     public void saveWorld(String worldName, Map<String, Object> root) throws Exception {
         if (root == null || !root.containsKey("Residences")) {
