@@ -226,6 +226,20 @@ public class ResidenceManager implements ResidenceInterface {
             plugin.msg(player, lm.Residence_AlreadyExists, residences.get(resName.toLowerCase()).getResidenceName());
             return false;
         }
+        if (plugin.isUsingMysql()) {
+            try (java.sql.Connection conn = com.liuchangking.dreamengine.service.MysqlManager.getConnection();
+                 java.sql.PreparedStatement ps = conn.prepareStatement("SELECT 1 FROM residences WHERE res_name=? LIMIT 1")) {
+                ps.setString(1, resName);
+                try (java.sql.ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        plugin.msg(player, lm.Residence_AlreadyExists, resName);
+                        return false;
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 
 
         if (!newRes.addArea(player, newArea, "main", resadmin, false))
@@ -946,7 +960,7 @@ public class ResidenceManager implements ResidenceInterface {
         try {
             if (plugin.isUsingMysql()) {
                 try (java.sql.Connection conn = com.liuchangking.dreamengine.service.MysqlManager.getConnection();
-                     java.sql.PreparedStatement ps = conn.prepareStatement("SELECT world_name FROM residence_worlds WHERE server_id=?")) {
+                     java.sql.PreparedStatement ps = conn.prepareStatement("SELECT DISTINCT world_name FROM residences WHERE server_id=?")) {
                     ps.setString(1, plugin.getServerId());
                     try (java.sql.ResultSet rs = ps.executeQuery()) {
                         while (rs.next()) {

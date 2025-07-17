@@ -1,6 +1,9 @@
 package com.bekvon.bukkit.residence.persistance;
 
+import com.bekvon.bukkit.residence.protection.ClaimedResidence;
+import com.bekvon.bukkit.residence.protection.CuboidArea;
 import com.liuchangking.dreamengine.service.MysqlManager;
+import org.bukkit.util.Vector;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.DumperOptions.FlowStyle;
@@ -28,44 +31,85 @@ public class MysqlSaveHelper {
 
     @SuppressWarnings("unchecked")
     public Map<String, Object> loadWorld(String worldName) throws Exception {
-        String sql = "SELECT data, flags, messages FROM residence_worlds WHERE server_id=? AND world_name=?";
+        Map<String, Object> root = new LinkedHashMap<>();
+        Map<String, Object> resMap = new LinkedHashMap<>();
+        String sql = "SELECT res_name, data FROM residences WHERE server_id=? AND world_name=?";
         try (Connection conn = MysqlManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, serverId);
             ps.setString(2, worldName);
             try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    Map<String, Object> root = new LinkedHashMap<>();
+                while (rs.next()) {
+                    String name = rs.getString("res_name");
                     String data = rs.getString("data");
-                    String flags = rs.getString("flags");
-                    String messages = rs.getString("messages");
                     if (data != null) {
-                        root.put("Residences", yaml.load(data));
+                        resMap.put(name, yaml.load(data));
                     }
-                    if (flags != null) {
-                        root.put("Flags", yaml.load(flags));
-                    }
-                    if (messages != null) {
-                        root.put("Messages", yaml.load(messages));
-                    }
-                    return root;
                 }
             }
         }
-        return null;
+        root.put("Residences", resMap);
+        return root;
     }
 
+    @SuppressWarnings("unchecked")
     public void saveWorld(String worldName, Map<String, Object> root) throws Exception {
-        String sql = "REPLACE INTO residence_worlds(server_id, world_name, data, flags, messages) VALUES(?,?,?,?,?)";
+        if (root == null || !root.containsKey("Residences")) {
+            return;
+        }
+        Map<String, Object> resMap = (Map<String, Object>) root.get("Residences");
+        String sql = "REPLACE INTO residences(server_id, world_name, res_name, data) VALUES(?,?,?,?)";
+        try (Connection conn = MysqlManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            for (Map.Entry<String, Object> entry : resMap.entrySet()) {
+                ps.setString(1, serverId);
+                ps.setString(2, worldName);
+                ps.setString(3, entry.getKey());
+                ps.setString(4, yaml.dump(entry.getValue()));
+                ps.addBatch();
+            }
+            ps.executeBatch();
+        }
+    }
+
+    public void saveResidence(ClaimedResidence residence) throws Exception {
+        int[] bounds = getBounds(residence);
+        String sql = "REPLACE INTO residences(server_id, world_name, res_name, owner_uuid, min_x, min_y, min_z, max_x, max_y, max_z, data) VALUES(?,?,?,?,?,?,?,?,?,?,?)";
         try (Connection conn = MysqlManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, serverId);
-            ps.setString(2, worldName);
-            ps.setString(3, root.containsKey("Residences") ? yaml.dump(root.get("Residences")) : null);
-            ps.setString(4, root.containsKey("Flags") ? yaml.dump(root.get("Flags")) : null);
-            ps.setString(5, root.containsKey("Messages") ? yaml.dump(root.get("Messages")) : null);
+            ps.setString(2, residence.getWorld());
+            ps.setString(3, residence.getResidenceName());
+            ps.setString(4, residence.getOwnerUUID() == null ? null : residence.getOwnerUUID().toString());
+            ps.setInt(5, bounds[0]);
+            ps.setInt(6, bounds[1]);
+            ps.setInt(7, bounds[2]);
+            ps.setInt(8, bounds[3]);
+            ps.setInt(9, bounds[4]);
+            ps.setInt(10, bounds[5]);
+            ps.setString(11, yaml.dump(residence.save()));
             ps.executeUpdate();
         }
+    }
+
+    private int[] getBounds(ClaimedResidence res) {
+        int minX = Integer.MAX_VALUE;
+        int minY = Integer.MAX_VALUE;
+        int minZ = Integer.MAX_VALUE;
+        int maxX = Integer.MIN_VALUE;
+        int maxY = Integer.MIN_VALUE;
+        int maxZ = Integer.MIN_VALUE;
+        for (CuboidArea area : res.getAreaArray()) {
+            Vector low = area.getLowVector();
+            Vector high = area.getHighVector();
+            minX = Math.min(minX, low.getBlockX());
+            minY = Math.min(minY, low.getBlockY());
+            minZ = Math.min(minZ, low.getBlockZ());
+            maxX = Math.max(maxX, high.getBlockX());
+            maxY = Math.max(maxY, high.getBlockY());
+            maxZ = Math.max(maxZ, high.getBlockZ());
+        }
+        return new int[] {minX, minY, minZ, maxX, maxY, maxZ};
     }
 
     @SuppressWarnings("unchecked")
