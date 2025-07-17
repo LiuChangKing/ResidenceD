@@ -1356,19 +1356,20 @@ public class ClaimedResidence {
 //	}
 
         try {
-            if (Residence.getInstance().getConfigManager().isNewSaveMechanic()) {
-                if (enterMessage != null || leaveMessage != null) {
-                    MinimizeMessages min = Residence.getInstance().getResidenceManager().addMessageToTempCache(this.getWorld(), enterMessage,
-                        leaveMessage);
-                    if (min == null) {
-                        if (enterMessage != null)
-                            root.put("EnterMessage", enterMessage);
-                        if (leaveMessage != null)
-                            root.put("LeaveMessage", leaveMessage);
-                    } else {
-                        if (min.getId() > 0)
-                            root.put("Messages", min.getId());
-                    }
+            boolean optimize = Residence.getInstance().getConfigManager().isNewSaveMechanic()
+                    && !Residence.getInstance().isUsingMysql();
+
+            if (optimize && (enterMessage != null || leaveMessage != null)) {
+                MinimizeMessages min = Residence.getInstance().getResidenceManager()
+                        .addMessageToTempCache(this.getWorld(), enterMessage, leaveMessage);
+                if (min == null) {
+                    if (enterMessage != null)
+                        root.put("EnterMessage", enterMessage);
+                    if (leaveMessage != null)
+                        root.put("LeaveMessage", leaveMessage);
+                } else {
+                    if (min.getId() > 0)
+                        root.put("Messages", min.getId());
                 }
             } else {
                 if (enterMessage != null)

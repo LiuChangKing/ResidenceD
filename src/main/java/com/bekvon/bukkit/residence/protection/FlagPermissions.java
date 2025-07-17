@@ -753,9 +753,13 @@ public class FlagPermissions {
     public Map<String, Object> save(String world) {
         Map<String, Object> root = new LinkedHashMap<>();
 
-        // Putting uuid's to main cache for later save
+        // Putting uuid's to main cache for later save when optimizing YML.
+        // MySQL does not store world caches, so disable this optimization.
 
-        if (Residence.getInstance().getConfigManager().isNewSaveMechanic()) {
+        boolean optimize = Residence.getInstance().getConfigManager().isNewSaveMechanic()
+                && !Residence.getInstance().isUsingMysql();
+
+        if (optimize) {
             Map<String, Object> playerFlagsClone = new HashMap<String, Object>();
             for (Entry<String, Map<String, Boolean>> one : playerFlags.entrySet()) {
                 MinimizeFlags min = Residence.getInstance().getResidenceManager().addFlagsTempCache(world, one.getValue());
