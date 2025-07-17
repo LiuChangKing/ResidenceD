@@ -116,7 +116,7 @@ public class Residence extends JavaPlugin {
             return serverId;
         }
         try (java.sql.Connection conn = com.liuchangking.dreamengine.service.MysqlManager.getConnection();
-             java.sql.PreparedStatement ps = conn.prepareStatement("SELECT server_id FROM residence_worlds WHERE world_name=? LIMIT 1")) {
+             java.sql.PreparedStatement ps = conn.prepareStatement("SELECT server_id FROM residences WHERE world_name=? LIMIT 1")) {
             ps.setString(1, worldName);
             try (java.sql.ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -1012,6 +1012,15 @@ public class Residence extends JavaPlugin {
 
     private void saveMysql() {
         com.bekvon.bukkit.residence.persistance.MysqlSaveHelper helper = new com.bekvon.bukkit.residence.persistance.MysqlSaveHelper(serverId);
+        for (com.bekvon.bukkit.residence.protection.ClaimedResidence res : rmanager.getResidences().values()) {
+            try {
+                helper.saveResidence(res);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        // Save shared permission lists and caches using legacy structure
         Map<String, Object> save = rmanager.save();
         for (Entry<String, Object> entry : save.entrySet()) {
             Map<String, Object> root = new java.util.LinkedHashMap<>();
@@ -1043,7 +1052,18 @@ public class Residence extends JavaPlugin {
     private void createTables() {
         try (java.sql.Connection conn = com.liuchangking.dreamengine.service.MysqlManager.getConnection();
              java.sql.Statement st = conn.createStatement()) {
-            st.executeUpdate("CREATE TABLE IF NOT EXISTS residence_worlds (server_id VARCHAR(32), world_name VARCHAR(64), data MEDIUMTEXT, flags MEDIUMTEXT, messages MEDIUMTEXT, updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, PRIMARY KEY (server_id, world_name))");
+            st.executeUpdate("CREATE TABLE IF NOT EXISTS residences (" +
+                    "id INT AUTO_INCREMENT PRIMARY KEY," +
+                    "server_id VARCHAR(32)," +
+                    "world_name VARCHAR(64)," +
+                    "res_name VARCHAR(64)," +
+                    "owner_uuid CHAR(36)," +
+                    "min_x INT, min_y INT, min_z INT," +
+                    "max_x INT, max_y INT, max_z INT," +
+                    "data MEDIUMTEXT," +
+                    "updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP," +
+                    "UNIQUE KEY uniq_res_name (res_name)," +
+                    "KEY world_idx (server_id, world_name))");
             st.executeUpdate("CREATE TABLE IF NOT EXISTS residence_permlists (id INT PRIMARY KEY, data MEDIUMTEXT)");
         } catch (Exception e) {
             e.printStackTrace();
@@ -1070,7 +1090,18 @@ public class Residence extends JavaPlugin {
                 String world = name.substring(saveFilePrefix.length(), name.length() - 4);
                 YMLSaveHelper yml = new YMLSaveHelper(f);
                 yml.load();
-                helper.saveWorld(world, yml.getRoot());
+                Map<String, Object> root = yml.getRoot();
+                if (root != null && root.containsKey("Residences")) {
+                    Map<String, Object> resMap = (Map<String, Object>) root.get("Residences");
+                    for (Object obj : resMap.values()) {
+                        try {
+                            com.bekvon.bukkit.residence.protection.ClaimedResidence res = com.bekvon.bukkit.residence.protection.ClaimedResidence.load(world, (Map<String, Object>) obj, null, this);
+                            helper.saveResidence(res);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
             }
         }
         File permFile = new File(saveFolder, "permlists.yml");
