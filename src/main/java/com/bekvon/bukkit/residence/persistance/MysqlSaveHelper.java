@@ -69,9 +69,15 @@ public class MysqlSaveHelper {
         try (Connection conn = MysqlManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             for (Map.Entry<String, Object> entry : resMap.entrySet()) {
+                String resName = entry.getKey();
+                // Skip entries without a valid residence name so we don't
+                // create blank records in the database.
+                if (resName == null || resName.isEmpty()) {
+                    continue;
+                }
                 ps.setString(1, serverId);
                 ps.setString(2, worldName);
-                ps.setString(3, entry.getKey());
+                ps.setString(3, resName);
                 ps.setString(4, yaml.dump(entry.getValue()));
                 ps.addBatch();
             }
@@ -81,6 +87,12 @@ public class MysqlSaveHelper {
 
     public void saveResidence(ClaimedResidence residence) throws Exception {
         int[] bounds = getBounds(residence);
+        // Construction may trigger database writes before the name or world is set.
+        // Skip those calls to avoid inserting rows with NULL values.
+        if (residence == null || residence.getResidenceName() == null || residence.getResidenceName().isEmpty()
+                || residence.getWorld() == null || residence.getWorld().isEmpty()) {
+            return;
+        }
         String sql = "REPLACE INTO residences(server_id, world_name, res_name, owner_uuid, min_x, min_y, min_z, max_x, max_y, max_z, data) VALUES(?,?,?,?,?,?,?,?,?,?,?)";
         try (Connection conn = MysqlManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
