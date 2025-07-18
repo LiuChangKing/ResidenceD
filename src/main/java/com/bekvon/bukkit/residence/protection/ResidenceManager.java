@@ -278,6 +278,10 @@ public class ResidenceManager implements ResidenceInterface {
         calculateChunks(newRes);
         plugin.getPlayerManager().addResidence(newRes.getOwner(), newRes);
 
+        if (plugin.isUsingMysql()) {
+            plugin.saveResidenceMysql(newRes);
+        }
+
         if (player != null) {
             Visualizer v = new Visualizer(player);
             v.setAreas(newArea);
@@ -606,6 +610,10 @@ public class ResidenceManager implements ResidenceInterface {
 
         for (ClaimedResidence sub : res.getSubzones()) {
             removeResidence(rPlayer, sub, resadmin, false);
+        }
+
+        if (plugin.isUsingMysql() && parent == null) {
+            plugin.deleteResidenceMysql(res.getResidenceName());
         }
     }
 
@@ -1291,6 +1299,10 @@ public class ResidenceManager implements ResidenceInterface {
 
                 plugin.getSignUtil().updateSignResName(res);
 
+                if (plugin.isUsingMysql()) {
+                    plugin.renameResidenceMysql(oldName, res);
+                }
+
                 plugin.msg(sender, lm.Residence_Rename, oldName, newName);
 
                 return true;
@@ -1393,6 +1405,13 @@ public class ResidenceManager implements ResidenceInterface {
             }
 
             cleanResidenceRecords(next, false);
+
+            if (plugin.isUsingMysql()) {
+                plugin.deleteResidenceMysql(next.getResidenceName());
+                for (ClaimedResidence sub : next.getSubzones()) {
+                    plugin.deleteResidenceMysql(sub.getResidenceName());
+                }
+            }
 
             it.remove();
             count++;

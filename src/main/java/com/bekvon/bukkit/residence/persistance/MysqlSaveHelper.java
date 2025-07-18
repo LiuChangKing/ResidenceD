@@ -99,6 +99,54 @@ public class MysqlSaveHelper {
         }
     }
 
+    public void deleteResidence(String resName) throws Exception {
+        String sql = "DELETE FROM residences WHERE server_id=? AND res_name=?";
+        try (Connection conn = MysqlManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, serverId);
+            ps.setString(2, resName);
+            ps.executeUpdate();
+        }
+    }
+
+    public void renameResidence(String oldName, String newName) throws Exception {
+        String sql = "UPDATE residences SET res_name=? WHERE server_id=? AND res_name=?";
+        try (Connection conn = MysqlManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, newName);
+            ps.setString(2, serverId);
+            ps.setString(3, oldName);
+            ps.executeUpdate();
+        }
+    }
+
+    public java.util.List<ClaimedResidence> loadResidencesByOwner(java.util.UUID ownerUUID, com.bekvon.bukkit.residence.Residence plugin) throws Exception {
+        java.util.List<ClaimedResidence> list = new java.util.ArrayList<>();
+        String sql = "SELECT world_name, res_name, data FROM residences WHERE server_id=? AND owner_uuid=?";
+        try (Connection conn = MysqlManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, serverId);
+            ps.setString(2, ownerUUID.toString());
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    String world = rs.getString("world_name");
+                    String data = rs.getString("data");
+                    if (data == null)
+                        continue;
+                    @SuppressWarnings("unchecked")
+                    java.util.Map<String, Object> root = yaml.load(data);
+                    try {
+                        ClaimedResidence res = ClaimedResidence.load(world, root, null, plugin);
+                        list.add(res);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+        return list;
+    }
+
     private int[] getBounds(ClaimedResidence res) {
         int minX = Integer.MAX_VALUE;
         int minY = Integer.MAX_VALUE;

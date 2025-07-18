@@ -187,7 +187,30 @@ public class PlayerManager implements ResidencePlayerInterface {
     }
 
     public TreeMap<String, ClaimedResidence> getResidencesMap(String player, boolean showhidden, boolean onlyHidden, World world) {
-        TreeMap<String, ClaimedResidence> temp = new TreeMap<String, ClaimedResidence>();
+        TreeMap<String, ClaimedResidence> temp = new TreeMap<>();
+
+        if (Residence.getInstance().isUsingMysql()) {
+            UUID uuid = Residence.getInstance().getPlayerUUID(player);
+            if (uuid == null)
+                return temp;
+            com.bekvon.bukkit.residence.persistance.MysqlSaveHelper helper = new com.bekvon.bukkit.residence.persistance.MysqlSaveHelper(Residence.getInstance().getServerId());
+            try {
+                java.util.List<ClaimedResidence> list = helper.loadResidencesByOwner(uuid, Residence.getInstance());
+                for (ClaimedResidence one : list) {
+                    boolean hidden = one.getPermissions().has(Flags.hidden, false);
+                    if (!showhidden && hidden)
+                        continue;
+                    if (onlyHidden && !hidden)
+                        continue;
+                    if (world != null && !world.getName().equalsIgnoreCase(one.getWorld()))
+                        continue;
+                    temp.put(one.getName(), one);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return temp;
+        }
 
         ResidencePlayer resPlayer = this.getResidencePlayer(player);
         if (resPlayer == null) {

@@ -44,8 +44,9 @@ public class reset implements cmd {
 	    }
 
 
-	    res.getPermissions().applyDefaultFlags();
-	    plugin.msg(sender, lm.Flag_reset, res.getName());
+            res.getPermissions().applyDefaultFlags();
+            plugin.saveResidenceMysql(res);
+            plugin.msg(sender, lm.Flag_reset, res.getName());
 	    return true;
 	}
 
@@ -57,8 +58,9 @@ public class reset implements cmd {
 	int count = 0;
 	for (World oneW : Bukkit.getWorlds()) {
 	    for (ClaimedResidence one : plugin.getResidenceManager().getFromAllResidences(true, false, oneW)) {
-		one.getPermissions().applyDefaultFlags();
-		count++;
+                one.getPermissions().applyDefaultFlags();
+                plugin.saveResidenceMysql(one);
+                count++;
 	    }
 	}
 	plugin.msg(sender, lm.Flag_resetAll, count);

@@ -407,6 +407,7 @@ public class ResidencePermissions extends FlagPermissions {
                     }
                 }
 
+                Residence.getInstance().saveResidenceMysql(residence);
                 return true;
             }
         }
@@ -451,6 +452,7 @@ public class ResidencePermissions extends FlagPermissions {
                 }
                 if (super.setGroupFlag(group, flag, flagstate)) {
                     Residence.getInstance().msg(player, lm.Flag_Set, flag, residence.getName(), flagstate);
+                    Residence.getInstance().saveResidenceMysql(residence);
                     return true;
                 }
             } else {
@@ -521,6 +523,7 @@ public class ResidencePermissions extends FlagPermissions {
                         break;
                     }
                 }
+                Residence.getInstance().saveResidenceMysql(residence);
                 return true;
             }
         }
@@ -540,6 +543,7 @@ public class ResidencePermissions extends FlagPermissions {
             }
             super.removeAllPlayerFlags(targetPlayer);
             Residence.getInstance().msg(sender, lm.Flag_RemovedAll, targetPlayer, this.residence.getName());
+            Residence.getInstance().saveResidenceMysql(residence);
             return true;
         }
         return false;
@@ -556,6 +560,7 @@ public class ResidencePermissions extends FlagPermissions {
             }
             super.removeAllGroupFlags(group);
             Residence.getInstance().msg(player, lm.Flag_RemovedGroup, group, this.residence.getName());
+            Residence.getInstance().saveResidenceMysql(residence);
             return true;
         }
         return false;
@@ -580,7 +585,11 @@ public class ResidencePermissions extends FlagPermissions {
             if (fc.isCancelled())
                 return false;
         }
-        return super.setGroupFlag(group, flag, state);
+        if (super.setGroupFlag(group, flag, state)) {
+            Residence.getInstance().saveResidenceMysql(residence);
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -591,7 +600,11 @@ public class ResidencePermissions extends FlagPermissions {
             if (fc.isCancelled())
                 return false;
         }
-        return super.setPlayerFlag(player, flag, state);
+        if (super.setPlayerFlag(player, flag, state)) {
+            Residence.getInstance().saveResidenceMysql(residence);
+            return true;
+        }
+        return false;
     }
 
     public void applyDefaultFlags(Player player, boolean resadmin) {
@@ -631,6 +644,8 @@ public class ResidencePermissions extends FlagPermissions {
                 this.setGroupFlag(entry.getKey(), flag.getKey(), flag.getValue() ? FlagState.TRUE : FlagState.FALSE);
             }
         }
+
+        Residence.getInstance().saveResidenceMysql(residence);
     }
 
 
@@ -651,6 +666,8 @@ public class ResidencePermissions extends FlagPermissions {
 
         if (resetFlags)
             this.applyDefaultFlags();
+
+        Residence.getInstance().saveResidenceMysql(residence);
 
         return true;
     }
@@ -686,6 +703,8 @@ public class ResidencePermissions extends FlagPermissions {
         Residence.getInstance().getPlayerManager().addResidence(ownerLastKnownName, residence);
         if (resetFlags)
             this.applyDefaultFlags();
+
+        Residence.getInstance().saveResidenceMysql(residence);
     }
 
     public String getOwner() {
