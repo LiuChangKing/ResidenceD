@@ -47,8 +47,9 @@ ResidenceD/
 ## MySQL 存储
 
 在 `config.yml` 中启用 MySQL 后，插件会将每个领地的数据写入 `residences` 表。
-进入/退出消息和权限等字段都会随同其他信息序列化到 `data` 字段中存储，
-因此不会再生成 `Messages` 或 `Flags` 的缓存文件。
+新版表结构拆分了常用字段，例如所有者信息、传送点、权限和区域坐标等都会
+分别保存在对应的列中（`owner_uuid`、`tp_loc`、`player_flags` 等），不再使
+用统一的 `data` 文本字段。这使得直接查询或统计更加方便。
 
 ## 许可证
 

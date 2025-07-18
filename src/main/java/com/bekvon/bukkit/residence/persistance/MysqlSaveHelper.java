@@ -1,9 +1,7 @@
 package com.bekvon.bukkit.residence.persistance;
 
 import com.bekvon.bukkit.residence.protection.ClaimedResidence;
-import com.bekvon.bukkit.residence.protection.CuboidArea;
 import com.liuchangking.dreamengine.service.MysqlManager;
-import org.bukkit.util.Vector;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.DumperOptions.FlowStyle;
@@ -33,7 +31,8 @@ public class MysqlSaveHelper {
     public Map<String, Object> loadWorld(String worldName) throws Exception {
         Map<String, Object> root = new LinkedHashMap<>();
         Map<String, Object> resMap = new LinkedHashMap<>();
-        String sql = "SELECT res_name, data FROM residences WHERE server_id=? AND world_name=?";
+        String sql = "SELECT res_name, owner_uuid, owner_name, leave_message, tp_loc, enter_message, " +
+                "player_flags, area_flags, created_on, areas FROM residences WHERE server_id=? AND world_name=?";
         try (Connection conn = MysqlManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, serverId);
@@ -41,10 +40,37 @@ public class MysqlSaveHelper {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     String name = rs.getString("res_name");
-                    String data = rs.getString("data");
-                    if (data != null) {
-                        resMap.put(name, yaml.load(data));
-                    }
+                    Map<String, Object> data = new LinkedHashMap<>();
+                    String leave = rs.getString("leave_message");
+                    if (leave != null)
+                        data.put("LeaveMessage", leave);
+                    String enter = rs.getString("enter_message");
+                    if (enter != null)
+                        data.put("EnterMessage", enter);
+                    String tploc = rs.getString("tp_loc");
+                    if (tploc != null)
+                        data.put("TPLoc", yaml.load(tploc));
+                    Map<String, Object> perms = new LinkedHashMap<>();
+                    String ownerUuid = rs.getString("owner_uuid");
+                    if (ownerUuid != null)
+                        perms.put("OwnerUUID", ownerUuid);
+                    String ownerName = rs.getString("owner_name");
+                    if (ownerName != null)
+                        perms.put("OwnerLastKnownName", ownerName);
+                    String pflags = rs.getString("player_flags");
+                    if (pflags != null)
+                        perms.put("PlayerFlags", yaml.load(pflags));
+                    String aflags = rs.getString("area_flags");
+                    if (aflags != null)
+                        perms.put("AreaFlags", yaml.load(aflags));
+                    data.put("Permissions", perms);
+                    long created = rs.getLong("created_on");
+                    if (!rs.wasNull())
+                        data.put("CreatedOn", created);
+                    String areas = rs.getString("areas");
+                    if (areas != null)
+                        data.put("Areas", yaml.load(areas));
+                    resMap.put(name, data);
                 }
             }
         }
@@ -65,7 +91,9 @@ public class MysqlSaveHelper {
             return;
         }
         Map<String, Object> resMap = (Map<String, Object>) root.get("Residences");
-        String sql = "REPLACE INTO residences(server_id, world_name, res_name, data) VALUES(?,?,?,?)";
+        String sql = "REPLACE INTO residences(server_id, world_name, res_name, owner_uuid, owner_name, " +
+                "leave_message, tp_loc, enter_message, player_flags, area_flags, created_on, areas) " +
+                "VALUES(?,?,?,?,?,?,?,?,?,?,?,?)";
         try (Connection conn = MysqlManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             for (Map.Entry<String, Object> entry : resMap.entrySet()) {
@@ -75,10 +103,21 @@ public class MysqlSaveHelper {
                 if (resName == null || resName.isEmpty()) {
                     continue;
                 }
+                Map<String, Object> data = (Map<String, Object>) entry.getValue();
+                Map<String, Object> perms = (Map<String, Object>) data.get("Permissions");
+
                 ps.setString(1, serverId);
                 ps.setString(2, worldName);
                 ps.setString(3, resName);
-                ps.setString(4, yaml.dump(entry.getValue()));
+                ps.setString(4, perms == null ? null : (String) perms.get("OwnerUUID"));
+                ps.setString(5, perms == null ? null : (String) perms.get("OwnerLastKnownName"));
+                ps.setString(6, (String) data.get("LeaveMessage"));
+                ps.setString(7, data.get("TPLoc") == null ? null : yaml.dump(data.get("TPLoc")));
+                ps.setString(8, (String) data.get("EnterMessage"));
+                ps.setString(9, perms == null || perms.get("PlayerFlags") == null ? null : yaml.dump(perms.get("PlayerFlags")));
+                ps.setString(10, perms == null || perms.get("AreaFlags") == null ? null : yaml.dump(perms.get("AreaFlags")));
+                ps.setObject(11, data.get("CreatedOn"));
+                ps.setString(12, data.get("Areas") == null ? null : yaml.dump(data.get("Areas")));
                 ps.addBatch();
             }
             ps.executeBatch();
@@ -86,27 +125,30 @@ public class MysqlSaveHelper {
     }
 
     public void saveResidence(ClaimedResidence residence) throws Exception {
-        int[] bounds = getBounds(residence);
         // Construction may trigger database writes before the name or world is set.
         // Skip those calls to avoid inserting rows with NULL values.
         if (residence == null || residence.getResidenceName() == null || residence.getResidenceName().isEmpty()
                 || residence.getWorld() == null || residence.getWorld().isEmpty()) {
             return;
         }
-        String sql = "REPLACE INTO residences(server_id, world_name, res_name, owner_uuid, min_x, min_y, min_z, max_x, max_y, max_z, data) VALUES(?,?,?,?,?,?,?,?,?,?,?)";
+        String sql = "REPLACE INTO residences(server_id, world_name, res_name, owner_uuid, owner_name, " +
+                "leave_message, tp_loc, enter_message, player_flags, area_flags, created_on, areas) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)";
         try (Connection conn = MysqlManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, serverId);
             ps.setString(2, residence.getWorld());
             ps.setString(3, residence.getResidenceName());
-            ps.setString(4, residence.getOwnerUUID() == null ? null : residence.getOwnerUUID().toString());
-            ps.setInt(5, bounds[0]);
-            ps.setInt(6, bounds[1]);
-            ps.setInt(7, bounds[2]);
-            ps.setInt(8, bounds[3]);
-            ps.setInt(9, bounds[4]);
-            ps.setInt(10, bounds[5]);
-            ps.setString(11, yaml.dump(residence.save()));
+            Map<String, Object> data = residence.save();
+            Map<String, Object> perms = (Map<String, Object>) data.get("Permissions");
+            ps.setString(4, perms == null ? null : (String) perms.get("OwnerUUID"));
+            ps.setString(5, perms == null ? null : (String) perms.get("OwnerLastKnownName"));
+            ps.setString(6, (String) data.get("LeaveMessage"));
+            ps.setString(7, data.get("TPLoc") == null ? null : yaml.dump(data.get("TPLoc")));
+            ps.setString(8, (String) data.get("EnterMessage"));
+            ps.setString(9, perms == null || perms.get("PlayerFlags") == null ? null : yaml.dump(perms.get("PlayerFlags")));
+            ps.setString(10, perms == null || perms.get("AreaFlags") == null ? null : yaml.dump(perms.get("AreaFlags")));
+            ps.setObject(11, data.get("CreatedOn"));
+            ps.setString(12, data.get("Areas") == null ? null : yaml.dump(data.get("Areas")));
             ps.executeUpdate();
         }
     }
@@ -134,21 +176,50 @@ public class MysqlSaveHelper {
 
     public java.util.List<ClaimedResidence> loadResidencesByOwner(java.util.UUID ownerUUID, com.bekvon.bukkit.residence.Residence plugin) throws Exception {
         java.util.List<ClaimedResidence> list = new java.util.ArrayList<>();
-        String sql = "SELECT world_name, res_name, data FROM residences WHERE server_id=? AND owner_uuid=?";
+        String sql = "SELECT world_name, res_name, owner_uuid, owner_name, leave_message, tp_loc, enter_message, " +
+                "player_flags, area_flags, created_on, areas FROM residences WHERE owner_uuid=?";
         try (Connection conn = MysqlManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, serverId);
-            ps.setString(2, ownerUUID.toString());
+            ps.setString(1, ownerUUID.toString());
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     String world = rs.getString("world_name");
-                    String data = rs.getString("data");
-                    if (data == null)
-                        continue;
-                    @SuppressWarnings("unchecked")
-                    java.util.Map<String, Object> root = yaml.load(data);
+                    String resName = rs.getString("res_name");
+                    Map<String, Object> root = new LinkedHashMap<>();
+                    String leave = rs.getString("leave_message");
+                    if (leave != null)
+                        root.put("LeaveMessage", leave);
+                    String enter = rs.getString("enter_message");
+                    if (enter != null)
+                        root.put("EnterMessage", enter);
+                    String tploc = rs.getString("tp_loc");
+                    if (tploc != null)
+                        root.put("TPLoc", yaml.load(tploc));
+                    Map<String, Object> perms = new LinkedHashMap<>();
+                    String ownerName = rs.getString("owner_name");
+                    if (ownerName != null)
+                        perms.put("OwnerLastKnownName", ownerName);
+                    String ownerId = rs.getString("owner_uuid");
+                    if (ownerId != null)
+                        perms.put("OwnerUUID", ownerId);
+                    String pflags = rs.getString("player_flags");
+                    if (pflags != null)
+                        perms.put("PlayerFlags", yaml.load(pflags));
+                    String aflags = rs.getString("area_flags");
+                    if (aflags != null)
+                        perms.put("AreaFlags", yaml.load(aflags));
+                    root.put("Permissions", perms);
+                    long created = rs.getLong("created_on");
+                    if (!rs.wasNull())
+                        root.put("CreatedOn", created);
+                    String areas = rs.getString("areas");
+                    if (areas != null)
+                        root.put("Areas", yaml.load(areas));
                     try {
                         ClaimedResidence res = ClaimedResidence.load(world, root, null, plugin);
+                        if (res != null && res.getResidenceName() == null) {
+                            res.setName(resName);
+                        }
                         list.add(res);
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -157,26 +228,6 @@ public class MysqlSaveHelper {
             }
         }
         return list;
-    }
-
-    private int[] getBounds(ClaimedResidence res) {
-        int minX = Integer.MAX_VALUE;
-        int minY = Integer.MAX_VALUE;
-        int minZ = Integer.MAX_VALUE;
-        int maxX = Integer.MIN_VALUE;
-        int maxY = Integer.MIN_VALUE;
-        int maxZ = Integer.MIN_VALUE;
-        for (CuboidArea area : res.getAreaArray()) {
-            Vector low = area.getLowVector();
-            Vector high = area.getHighVector();
-            minX = Math.min(minX, low.getBlockX());
-            minY = Math.min(minY, low.getBlockY());
-            minZ = Math.min(minZ, low.getBlockZ());
-            maxX = Math.max(maxX, high.getBlockX());
-            maxY = Math.max(maxY, high.getBlockY());
-            maxZ = Math.max(maxZ, high.getBlockZ());
-        }
-        return new int[] {minX, minY, minZ, maxX, maxY, maxZ};
     }
 
     @SuppressWarnings("unchecked")
