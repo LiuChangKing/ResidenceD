@@ -583,11 +583,13 @@ public class Residence extends JavaPlugin {
 
 
             int autosaveInt = getConfigManager().getAutoSaveInterval();
-            if (autosaveInt < 1) {
-                autosaveInt = 1;
+            if (!useMysql) {
+                if (autosaveInt < 1) {
+                    autosaveInt = 1;
+                }
+                autosaveInt = autosaveInt * 60 * 20;
+                autosaveBukkitId = CMIScheduler.scheduleSyncRepeatingTask(this, autoSave, autosaveInt, autosaveInt);
             }
-            autosaveInt = autosaveInt * 60 * 20;
-            autosaveBukkitId = CMIScheduler.scheduleSyncRepeatingTask(this, autoSave, autosaveInt, autosaveInt);
 
             if (getConfigManager().getHealInterval() > 0)
                 healBukkitId = CMIScheduler.scheduleSyncRepeatingTask(this, doHeals, 20, getConfigManager().getHealInterval() * 20);
@@ -787,6 +789,52 @@ public class Residence extends JavaPlugin {
 
     public String getServerId() {
         return serverId;
+    }
+
+    /**
+     * Persist a single residence immediately when MySQL mode is enabled.
+     */
+    public void saveResidenceMysql(com.bekvon.bukkit.residence.protection.ClaimedResidence res) {
+        if (!useMysql || res == null)
+            return;
+        com.bekvon.bukkit.residence.persistance.MysqlSaveHelper helper =
+                new com.bekvon.bukkit.residence.persistance.MysqlSaveHelper(serverId);
+        try {
+            helper.saveResidence(res);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Delete a residence record from MySQL immediately.
+     */
+    public void deleteResidenceMysql(String name) {
+        if (!useMysql)
+            return;
+        com.bekvon.bukkit.residence.persistance.MysqlSaveHelper helper =
+                new com.bekvon.bukkit.residence.persistance.MysqlSaveHelper(serverId);
+        try {
+            helper.deleteResidence(name);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Update the name of a residence in MySQL immediately.
+     */
+    public void renameResidenceMysql(String oldName, com.bekvon.bukkit.residence.protection.ClaimedResidence res) {
+        if (!useMysql || res == null)
+            return;
+        com.bekvon.bukkit.residence.persistance.MysqlSaveHelper helper =
+                new com.bekvon.bukkit.residence.persistance.MysqlSaveHelper(serverId);
+        try {
+            helper.renameResidence(oldName, res.getResidenceName());
+            helper.saveResidence(res);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public PlayerManager getPlayerManager() {

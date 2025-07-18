@@ -122,6 +122,7 @@ public class ClaimedResidence {
 
     public void setMainResidence(boolean state) {
         mainRes = state;
+        Residence.getInstance().saveResidenceMysql(this);
     }
 
     public boolean isSubzone() {
@@ -412,6 +413,9 @@ public class ClaimedResidence {
         Residence.getInstance().getResidenceManager().removeChunkList(this);
         areas.put(name, area);
         Residence.getInstance().getResidenceManager().calculateChunks(this);
+
+        Residence.getInstance().saveResidenceMysql(this);
+
         return true;
     }
 
@@ -589,6 +593,8 @@ public class ClaimedResidence {
         areas.put(name, newarea);
         Residence.getInstance().getResidenceManager().calculateChunks(this);
 
+        Residence.getInstance().saveResidenceMysql(this);
+
         if (player != null)
             Residence.getInstance().msg(player, lm.Area_Update);
         return true;
@@ -710,6 +716,9 @@ public class ClaimedResidence {
                 return false;
 
             subzones.put(name, newres);
+
+            Residence.getInstance().saveResidenceMysql(newres);
+
             if (player != null) {
                 Residence.getInstance().msg(player, lm.Area_Create, NName);
                 Residence.getInstance().msg(player, lm.Subzone_Create, NName);
@@ -826,6 +835,11 @@ public class ClaimedResidence {
             return false;
         }
         subzones.remove(name);
+
+        if (Residence.getInstance().isUsingMysql()) {
+            Residence.getInstance().deleteResidenceMysql(res.getResidenceName());
+        }
+
         if (player != null) {
             Residence.getInstance().msg(player, lm.Subzone_Remove, name);
         }
@@ -908,6 +922,8 @@ public class ClaimedResidence {
             this.setLeaveMessage(message);
         }
         Residence.getInstance().msg(sender, lm.Residence_MessageChange);
+
+        Residence.getInstance().saveResidenceMysql(this);
     }
 
     public CuboidArea getMainArea() {
@@ -1076,6 +1092,8 @@ public class ClaimedResidence {
         tpLoc = player.getLocation().toVector();
         PitchYaw = new Vector(player.getLocation().getPitch(), player.getLocation().getYaw(), 0);
         Residence.getInstance().msg(player, lm.Residence_SetTeleportLocation);
+
+        Residence.getInstance().saveResidenceMysql(this);
     }
 
     public void tpToResidence(final Player reqPlayer, final Player targetPlayer, final boolean resadmin) {
@@ -1310,6 +1328,8 @@ public class ClaimedResidence {
         Residence.getInstance().getResidenceManager().removeChunkList(this);
         areas.remove(id);
         Residence.getInstance().getResidenceManager().calculateChunks(this);
+
+        Residence.getInstance().saveResidenceMysql(this);
     }
 
     public void removeArea(Player player, String id, boolean resadmin) {
@@ -1332,6 +1352,7 @@ public class ClaimedResidence {
             removeArea(id);
             if (player != null)
                 Residence.getInstance().msg(player, lm.Area_Remove, id);
+            Residence.getInstance().saveResidenceMysql(this);
         } else {
             if (player != null)
                 Residence.getInstance().msg(player, lm.General_NoPermission);
@@ -1691,6 +1712,8 @@ public class ClaimedResidence {
         subzones.put(newName, res);
         subzones.remove(oldName);
 
+        Residence.getInstance().saveResidenceMysql(res);
+
         Residence.getInstance().msg(sender, lm.Subzone_Rename, oldName, newName);
         return true;
     }
@@ -1722,6 +1745,9 @@ public class ClaimedResidence {
             areas.remove(oldName);
             if (player != null)
                 Residence.getInstance().msg(player, lm.Area_Rename, oldName, newName);
+
+            Residence.getInstance().saveResidenceMysql(this);
+
             return true;
         }
         Residence.getInstance().msg(player, lm.General_NoPermission);
@@ -1823,23 +1849,31 @@ public class ClaimedResidence {
     public boolean addCmdBlackList(String cmd) {
         if (cmd.contains("/"))
             cmd = cmd.replace("/", "");
+        boolean added;
         if (!this.cmdBlackList.contains(cmd.toLowerCase())) {
             this.cmdBlackList.add(cmd.toLowerCase());
-            return true;
+            added = true;
+        } else {
+            this.cmdBlackList.remove(cmd.toLowerCase());
+            added = false;
         }
-        this.cmdBlackList.remove(cmd.toLowerCase());
-        return false;
+        Residence.getInstance().saveResidenceMysql(this);
+        return added;
     }
 
     public boolean addCmdWhiteList(String cmd) {
         if (cmd.contains("/"))
             cmd = cmd.replace("/", "");
+        boolean added;
         if (!this.cmdWhiteList.contains(cmd.toLowerCase())) {
             this.cmdWhiteList.add(cmd.toLowerCase());
-            return true;
+            added = true;
+        } else {
+            this.cmdWhiteList.remove(cmd.toLowerCase());
+            added = false;
         }
-        this.cmdWhiteList.remove(cmd.toLowerCase());
-        return false;
+        Residence.getInstance().saveResidenceMysql(this);
+        return added;
     }
 
 

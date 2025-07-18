@@ -28,14 +28,16 @@ public class ResidenceItemList extends ItemList {
 
 	ResidencePlayer rPlayer = plugin.getPlayerManager().getResidencePlayer(player);
 	PermissionGroup group = rPlayer.getGroup();
-	if (resadmin || (res.getPermissions().hasResidencePermission(player, true) && group.itemListAccess())) {
-	    if (super.toggle(mat))
-		plugin.msg(player, lm.General_ListMaterialAdd, mat.toString(), type.toString().toLowerCase());
-	    else
-		plugin.msg(player, lm.General_ListMaterialRemove, mat.toString(), type.toString().toLowerCase());
-	} else {
-	    plugin.msg(player, lm.General_NoPermission);
-	}
+        if (resadmin || (res.getPermissions().hasResidencePermission(player, true) && group.itemListAccess())) {
+            boolean added = super.toggle(mat);
+            if (added)
+                plugin.msg(player, lm.General_ListMaterialAdd, mat.toString(), type.toString().toLowerCase());
+            else
+                plugin.msg(player, lm.General_ListMaterialRemove, mat.toString(), type.toString().toLowerCase());
+            plugin.saveResidenceMysql(res);
+        } else {
+            plugin.msg(player, lm.General_NoPermission);
+        }
     }
 
     public static ResidenceItemList load(Residence plugin, ClaimedResidence parent, Map<String, Object> map) {
