@@ -107,16 +107,18 @@ public class Residence extends JavaPlugin {
     private boolean useMysql = true;
     private String serverId = "default";
     /**
-     * Get the owning server id for a world from MySQL. Returns this server id
-     * when MySQL is disabled or world not found.
+     * Look up the server id that owns the specified residence.
+     *
+     * <p>If MySQL is disabled or no record is found, the current
+     * server id is returned.</p>
      */
-    public String getWorldServerId(String worldName) {
+    public String getResidenceServerId(String resName) {
         if (!useMysql) {
             return serverId;
         }
         try (java.sql.Connection conn = com.liuchangking.dreamengine.service.MysqlManager.getConnection();
-             java.sql.PreparedStatement ps = conn.prepareStatement("SELECT server_id FROM residences WHERE world_name=? LIMIT 1")) {
-            ps.setString(1, worldName);
+             java.sql.PreparedStatement ps = conn.prepareStatement("SELECT server_id FROM residences WHERE res_name=? LIMIT 1")) {
+            ps.setString(1, resName);
             try (java.sql.ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return rs.getString(1);
@@ -126,6 +128,22 @@ public class Residence extends JavaPlugin {
             e.printStackTrace();
         }
         return serverId;
+    }
+
+    /**
+     * Transfer a player to another server for a cross-server residence teleport.
+     */
+    public void sendPlayerToResidenceServer(Player player, String resName, String serverId) {
+        if (com.liuchangking.dreamengine.config.Config.redisEnabled) {
+            try (redis.clients.jedis.Jedis j = com.liuchangking.dreamengine.service.RedisManager.getPool().getResource()) {
+                j.setex("res_tp:" + player.getUniqueId(), 30, resName);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        String targetServer = com.liuchangking.dreamengine.api.DreamServerAPI.getServerName(serverId);
+        com.liuchangking.dreamengine.api.DreamServerAPI.sendPlayerToServer(player, targetServer);
+        msg(player, "正在前往其他服务器的领地...");
     }
     protected CMITask healBukkitId = null;
     protected CMITask feedBukkitId = null;
