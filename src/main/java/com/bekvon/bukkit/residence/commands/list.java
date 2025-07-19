@@ -95,14 +95,22 @@ public class list implements cmd {
         CrossPlatformMenu<String> menu = CrossUI.stringMenu(player);
         menu.title("领地列表");
         for (ClaimedResidence res : owned.values()) {
-            String worldName = res.getWorldName();
-            String serverId = plugin.getWorldServerId(worldName);
+            String resName = res.getName();
+            String serverId = plugin.getResidenceServerId(resName);
             String serverName = DreamServerAPI.getServerName(serverId);
             String label = res.getName() + " - " + serverName;
             menu.button(label, res.getName());
         }
         menu.onClick(ev -> {
-            ClaimedResidence res = plugin.getResidenceManager().getByName(ev.getPayload());
+            String resName = ev.getPayload();
+            String serverId = plugin.getResidenceServerId(resName);
+            if (!plugin.getServerId().equals(serverId)) {
+                player.closeInventory();
+                plugin.sendPlayerToResidenceServer(player, resName, serverId);
+                return;
+            }
+
+            ClaimedResidence res = plugin.getResidenceManager().getByName(resName);
             if (res != null) {
                 player.closeInventory();
                 res.tpToResidence(player, player, resadmin);
