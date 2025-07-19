@@ -9,6 +9,7 @@ import com.bekvon.bukkit.residence.permissions.PermissionManager.ResPerm;
 import com.bekvon.bukkit.residence.protection.ClaimedResidence;
 import com.liuchangking.dreamengine.api.CrossPlatformMenu;
 import com.liuchangking.dreamengine.api.CrossUI;
+import com.liuchangking.dreamengine.utils.MessageUtil;
 import net.Zrips.CMILib.Container.CMIWorld;
 import net.Zrips.CMILib.FileHandler.ConfigReader;
 import org.bukkit.World;
@@ -16,6 +17,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;
+import java.util.TreeMap;
 
 public class list implements cmd {
 
@@ -80,12 +82,12 @@ public class list implements cmd {
     }
 
     private void openMenu(Residence plugin, Player player, boolean resadmin) {
-        java.util.TreeMap<String, ClaimedResidence> owned = plugin.getPlayerManager()
+        TreeMap<String, ClaimedResidence> owned = plugin.getPlayerManager()
                 .getResidencesMap(player.getName(), true, false, null);
         owned.putAll(plugin.getPlayerManager().getTrustedResidencesMap(player.getName(), true, false, null));
 
         if (owned.isEmpty()) {
-            plugin.msg(player, lm.Residence_DontOwn, player.getName());
+            MessageUtil.notifyError(player, "你还没有领地,快去创建吧");
             return;
         }
 
