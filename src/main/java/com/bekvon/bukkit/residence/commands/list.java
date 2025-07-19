@@ -6,10 +6,14 @@ import com.bekvon.bukkit.residence.containers.CommandAnnotation;
 import com.bekvon.bukkit.residence.containers.ResidencePlayer;
 import com.bekvon.bukkit.residence.containers.cmd;
 import com.bekvon.bukkit.residence.permissions.PermissionManager.ResPerm;
+import com.bekvon.bukkit.residence.protection.ClaimedResidence;
+import com.liuchangking.dreamengine.api.CrossPlatformMenu;
+import com.liuchangking.dreamengine.api.CrossUI;
 import net.Zrips.CMILib.Container.CMIWorld;
 import net.Zrips.CMILib.FileHandler.ConfigReader;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 
@@ -21,6 +25,11 @@ public class list implements cmd {
         int page = 1;
         World world = null;
         String target = null;
+
+        if (args.length == 0 && sender instanceof Player) {
+            openMenu(plugin, (Player) sender, resadmin);
+            return true;
+        }
 
         for (int i = 0; i < args.length; i++) {
 
@@ -68,5 +77,33 @@ public class list implements cmd {
             "If listing your own residences, shows hidden ones as well.",
             "To list everyones residences, use /res listall."));
         LocaleManager.addTabCompleteMain(this, "[playername]", "[worldname]");
+    }
+
+    private void openMenu(Residence plugin, Player player, boolean resadmin) {
+        java.util.TreeMap<String, ClaimedResidence> owned = plugin.getPlayerManager()
+                .getResidencesMap(player.getName(), true, false, null);
+        owned.putAll(plugin.getPlayerManager().getTrustedResidencesMap(player.getName(), true, false, null));
+
+        if (owned.isEmpty()) {
+            plugin.msg(player, lm.Residence_DontOwn, player.getName());
+            return;
+        }
+
+        CrossPlatformMenu<String> menu = CrossUI.stringMenu(player);
+        menu.title("领地列表");
+        for (ClaimedResidence res : owned.values()) {
+            String worldName = res.getWorldName();
+            String serverId = plugin.getWorldServerId(worldName);
+            String serverName = com.liuchangking.dreamengine.api.DreamServerAPI.getServerName(serverId);
+            String label = res.getName() + " - " + serverName;
+            menu.button(label, res.getName());
+        }
+        menu.onClick(ev -> {
+            ClaimedResidence res = plugin.getResidenceManager().getByName(ev.getPayload());
+            if (res != null) {
+                res.tpToResidence(player, player, resadmin);
+            }
+        });
+        menu.open(player);
     }
 }
