@@ -1097,12 +1097,12 @@ public class Residence extends JavaPlugin {
                     "owner_uuid CHAR(36)," +
                     "owner_name VARCHAR(64)," +
                     "leave_message TEXT," +
-                    "tp_loc JSON," +
+                    "tp_loc MEDIUMTEXT," +
                     "enter_message TEXT," +
-                    "player_flags JSON," +
-                    "area_flags JSON," +
+                    "player_flags MEDIUMTEXT," +
+                    "area_flags MEDIUMTEXT," +
                     "created_on BIGINT," +
-                    "areas JSON," +
+                    "areas MEDIUMTEXT," +
                     "updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP," +
                     "UNIQUE KEY uniq_res_name (res_name)," +
                     "KEY world_idx (server_id, world_name))");
