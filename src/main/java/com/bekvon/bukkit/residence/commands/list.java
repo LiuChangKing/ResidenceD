@@ -9,6 +9,7 @@ import com.bekvon.bukkit.residence.permissions.PermissionManager.ResPerm;
 import com.bekvon.bukkit.residence.protection.ClaimedResidence;
 import com.liuchangking.dreamengine.api.CrossPlatformMenu;
 import com.liuchangking.dreamengine.api.CrossUI;
+import com.liuchangking.dreamengine.api.DreamServerAPI;
 import com.liuchangking.dreamengine.utils.MessageUtil;
 import net.Zrips.CMILib.Container.CMIWorld;
 import net.Zrips.CMILib.FileHandler.ConfigReader;
@@ -96,13 +97,14 @@ public class list implements cmd {
         for (ClaimedResidence res : owned.values()) {
             String worldName = res.getWorldName();
             String serverId = plugin.getWorldServerId(worldName);
-            String serverName = com.liuchangking.dreamengine.api.DreamServerAPI.getServerName(serverId);
+            String serverName = DreamServerAPI.getServerName(serverId);
             String label = res.getName() + " - " + serverName;
             menu.button(label, res.getName());
         }
         menu.onClick(ev -> {
             ClaimedResidence res = plugin.getResidenceManager().getByName(ev.getPayload());
             if (res != null) {
+                player.closeInventory();
                 res.tpToResidence(player, player, resadmin);
             }
         });
