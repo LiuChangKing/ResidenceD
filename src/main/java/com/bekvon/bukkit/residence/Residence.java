@@ -24,6 +24,8 @@ import com.bekvon.bukkit.residence.text.help.HelpEntry;
 import com.bekvon.bukkit.residence.text.help.InformationPager;
 import com.bekvon.bukkit.residence.utils.*;
 import com.bekvon.bukkit.residence.vaultinterface.ResidenceVaultAdapter;
+import com.liuchangking.dreamengine.api.DreamServerAPI;
+import com.liuchangking.dreamengine.utils.MessageUtil;
 import com.residence.mcstats.Metrics;
 import com.residence.zip.ZipLibrary;
 import net.Zrips.CMILib.Colors.CMIChatColor;
@@ -141,9 +143,9 @@ public class Residence extends JavaPlugin {
                 e.printStackTrace();
             }
         }
-        String targetServer = com.liuchangking.dreamengine.api.DreamServerAPI.getServerName(serverId);
-        com.liuchangking.dreamengine.api.DreamServerAPI.sendPlayerToServer(player, targetServer);
-        msg(player, "正在前往其他服务器的领地...");
+        String targetServer = DreamServerAPI.getServerName(serverId);
+        DreamServerAPI.sendPlayerToServer(player, targetServer);
+        MessageUtil.notifySuccess(player, "正在传送...");
     }
     protected CMITask healBukkitId = null;
     protected CMITask feedBukkitId = null;
