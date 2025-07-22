@@ -81,6 +81,7 @@ public class LandCoreListener implements Listener {
         menu.button("领地设置", "set");
         menu.onClick(ev -> {
             if ("upgrade".equals(ev.getPayload())) {
+                ev.getPlayer().closeInventory();
                 manager.upgrade(ev.getPlayer(), block);
             } else if ("set".equals(ev.getPayload())) {
                 ev.getPlayer().performCommand("res set " + manager.get(block).getResidenceName());

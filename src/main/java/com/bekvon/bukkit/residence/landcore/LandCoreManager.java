@@ -5,12 +5,15 @@ import com.bekvon.bukkit.residence.protection.ClaimedResidence;
 import com.bekvon.bukkit.residence.protection.CuboidArea;
 import com.liuchangking.dreamengine.shop.hook.VaultHook;
 import com.liuchangking.dreamengine.utils.MessageUtil;
+import com.liuchangking.dreamengine.utils.HeadUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Skull;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
@@ -32,6 +35,7 @@ public class LandCoreManager {
     private final NamespacedKey coreKey;
     private final NamespacedKey ownerKey;
     private final NamespacedKey holoKey;
+    private static final String CORE_TEXTURE = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzk1ZDM3OTkzZTU5NDA4MjY3ODQ3MmJmOWQ4NjgyMzQxM2MyNTBkNDMzMmEyYzdkOGM1MmRlNDk3NmIzNjIifX19";
 
     public LandCoreManager(Residence plugin) {
         this.plugin = plugin;
@@ -129,6 +133,7 @@ public class LandCoreManager {
                 meta.setLore(lore.stream().map(l -> apply(l, level, ownerName)).toList());
             }
             item.setItemMeta(meta);
+            HeadUtil.applyTexture(item, CORE_TEXTURE);
         }
         return item;
     }
@@ -172,6 +177,7 @@ public class LandCoreManager {
         }
         meta.setDisplayName(name);
         item.setItemMeta(meta);
+        HeadUtil.applyTexture(item, CORE_TEXTURE);
     }
 
     /** Update all core items in a player's inventory. */
@@ -217,6 +223,17 @@ public class LandCoreManager {
         }
     }
 
+    /** Apply the custom texture to a skull block. */
+    private void applyTexture(Skull skull) {
+        if (skull == null) return;
+        ItemStack temp = new ItemStack(Material.PLAYER_HEAD);
+        HeadUtil.applyTexture(temp, CORE_TEXTURE);
+        ItemMeta meta = temp.getItemMeta();
+        if (meta instanceof SkullMeta sm && sm.getPlayerProfile() != null) {
+            skull.setPlayerProfile(sm.getPlayerProfile());
+        }
+    }
+
 
     /** Generate a random alphanumeric string of given length. */
     private String randomString(int len) {
@@ -245,7 +262,8 @@ public class LandCoreManager {
         Location loc1 = new Location(world, minX, minY, minZ);
         Location loc2 = new Location(world, maxX, maxY, maxZ);
         String resName = player.getName() + "的领地" + randomString(4);
-        if (!plugin.getResidenceManager().addResidence(player, resName, loc1, loc2, false)) {
+        // use resadmin=true to avoid Residence plugin charging player again
+        if (!plugin.getResidenceManager().addResidence(player, resName, loc1, loc2, true)) {
             return  false; // creation failed
         }
         // floor and border
@@ -261,7 +279,11 @@ public class LandCoreManager {
         int px = loc.getBlockX();
         int pz = loc.getBlockZ();
         if (px == minX || px == maxX || pz == minZ || pz == maxZ) {
-            world.getBlockAt(px, loc.getBlockY(), pz).setType(Material.STONE_SLAB);
+            // this block is reset by BlockPlaceEvent when cancelled,
+            // so delay the slab placement by one tick
+            Bukkit.getScheduler().runTask(plugin, () ->
+                world.getBlockAt(px, loc.getBlockY(), pz).setType(Material.STONE_SLAB)
+            );
         }
         int centerX = (minX + maxX) / 2;
         int centerZ = (minZ + maxZ) / 2;
@@ -278,6 +300,7 @@ public class LandCoreManager {
                     skull.getPersistentDataContainer().set(ownerKey, PersistentDataType.STRING, ownerName);
                 }
             }
+            applyTexture(skull);
             skull.update(true);
         }
         spawnOrUpdateHologram(coreLoc, level, ownerName);
@@ -384,7 +407,8 @@ public class LandCoreManager {
             return;
         }
 
-        boolean replaced = res.replaceArea(player, newArea, "main", false);
+        // use resadmin=true to avoid Residence plugin charging player again
+        boolean replaced = res.replaceArea(player, newArea, "main", true);
         if (!replaced) {
             if (money > 0) {
                 VaultHook.giveMoney(player, money);
@@ -397,19 +421,11 @@ public class LandCoreManager {
             removeMatchingItems(player, it, it.getAmount());
         }
 
-        int floorY = block.getY() - 1;
-        for (int x = minX; x <= maxX; x++) {
-            for (int z = minZ; z <= maxZ; z++) {
-                world.getBlockAt(x, floorY, z).setType(Material.OAK_PLANKS);
-                if (x == minX || x == maxX || z == minZ || z == maxZ) {
-                    world.getBlockAt(x, block.getY(), z).setType(Material.STONE_SLAB);
-                }
-            }
-        }
         String ownerName = null;
         if (block.getState() instanceof Skull skull) {
             skull.getPersistentDataContainer().set(coreKey, PersistentDataType.INTEGER, newLevel);
             ownerName = skull.getPersistentDataContainer().get(ownerKey, PersistentDataType.STRING);
+            applyTexture(skull);
             skull.update(true);
         }
         spawnOrUpdateHologram(block.getLocation(), newLevel, ownerName);
