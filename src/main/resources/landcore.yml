@@ -16,37 +16,37 @@ item:
     lore:
       - "§f在生存世界放置后创建领地"
       - " "
-      - "&c绑定: %player%"
+      - "§c绑定: %player%"
   1:
     name: "§a一级领地核心"
     lore:
       - "§f在生存世界放置后创建一级领地"
       - " "
-      - "&c绑定: %player%"
+      - "§c绑定: %player%"
   2:
     name: "§a二级领地核心"
     lore:
       - "§f在生存世界放置后创建二级领地"
       - " "
-      - "&c绑定: %player%"
+      - "§c绑定: %player%"
   3:
     name: "§a三级领地核心"
     lore:
       - "§f在生存世界放置后创建三级领地"
       - " "
-      - "&c绑定: %player%"
+      - "§c绑定: %player%"
   4:
     name: "§a四级领地核心"
     lore:
       - "§f在生存世界放置后创建四级领地"
       - " "
-      - "&c绑定: %player%"
+      - "§c绑定: %player%"
   5:
     name: "§a五级领地核心"
     lore:
       - "§f在生存世界放置后创建五级领地"
       - " "
-      - "&c绑定: %player%"
+      - "§c绑定: %player%"
 
 # 限制领地核心使用的高度范围
 place-height:
