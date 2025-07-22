@@ -102,10 +102,10 @@ Groups:
     NextGroup: # 组名，玩家需拥有 residence.group.nextgroup 权限才能加入
        Residence:
            CanCreate: true
-           MaxResidences: 4
+           MaxResidences: 99
            MaxAreasPerResidence: 2
-           MaxEastWest: 20
-           MaxNorthSouth: 20
+           MaxEastWest: 999
+           MaxNorthSouth: 999
            MaxUpDown: 20
            MinHeight: -64
            MaxHeight: 320
