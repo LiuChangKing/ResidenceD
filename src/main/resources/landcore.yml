@@ -14,8 +14,7 @@ item:
   default:
     name: "§a%level_cn%领地核心"
     lore:
-      - "放置后创建领地"
-      - "等级: %level_cn%"
+      - "§f在生存世界放置后创建领地"
   #1:
   #  name: "§a一级领地核心"
   #  lore:
