@@ -172,7 +172,10 @@ public class LandCoreManager {
                 }
             }
         }
-        Block core = loc.getBlock();
+        int centerX = (minX + maxX) / 2;
+        int centerZ = (minZ + maxZ) / 2;
+        Location coreLoc = new Location(world, centerX, loc.getBlockY(), centerZ);
+        Block core = coreLoc.getBlock();
         core.setType(Material.PLAYER_HEAD);
         if (core.getState() instanceof Skull skull) {
             skull.getPersistentDataContainer().set(coreKey, PersistentDataType.INTEGER, level);
@@ -186,7 +189,7 @@ public class LandCoreManager {
             skull.update(true);
         }
         LandCoreData data = new LandCoreData(level,resName);
-        cores.put(key(loc), data);
+        cores.put(key(coreLoc), data);
         save();
     }
 
