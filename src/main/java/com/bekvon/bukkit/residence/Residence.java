@@ -270,6 +270,7 @@ public class Residence extends JavaPlugin {
             despawnMobsBukkitId.cancel();
 
         if (landCoreManager != null) {
+            landCoreManager.removeAllHolograms();
             landCoreManager.save();
         }
 

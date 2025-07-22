@@ -2,6 +2,7 @@ package com.bekvon.bukkit.residence.landcore;
 
 import com.bekvon.bukkit.residence.Residence;
 import com.bekvon.bukkit.residence.protection.ClaimedResidence;
+import com.bekvon.bukkit.residence.protection.CuboidArea;
 import com.liuchangking.dreamengine.shop.hook.VaultHook;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -10,6 +11,9 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Skull;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
+import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -26,12 +30,14 @@ public class LandCoreManager {
     private final Map<String, LandCoreData> cores = new HashMap<>();
     private final NamespacedKey coreKey;
     private final NamespacedKey ownerKey;
+    private final NamespacedKey holoKey;
 
     public LandCoreManager(Residence plugin) {
         this.plugin = plugin;
         this.config = new LandCoreConfig(plugin);
         this.coreKey = new NamespacedKey(plugin, "landcore");
         this.ownerKey = new NamespacedKey(plugin, "owner");
+        this.holoKey = new NamespacedKey(plugin, "landcore_holo");
     }
 
     public void load() {
@@ -41,6 +47,14 @@ public class LandCoreManager {
                 int lvl = config.getConfig().getInt("cores."+key+".level",1);
                 String res = config.getConfig().getString("cores."+key+".res");
                 cores.put(key, new LandCoreData(lvl, res));
+                Location loc = parseKey(key);
+                String owner = null;
+                if (loc != null && loc.getBlock().getState() instanceof Skull skull) {
+                    owner = skull.getPersistentDataContainer().get(ownerKey, PersistentDataType.STRING);
+                }
+                if (loc != null) {
+                    spawnOrUpdateHologram(loc, lvl, owner);
+                }
             }
         }
     }
@@ -57,8 +71,35 @@ public class LandCoreManager {
         return loc.getWorld().getName()+","+loc.getBlockX()+","+loc.getBlockY()+","+loc.getBlockZ();
     }
 
+    private Location parseKey(String key) {
+        String[] arr = key.split(",");
+        if (arr.length != 4) return null;
+        World w = plugin.getServer().getWorld(arr[0]);
+        if (w == null) return null;
+        try {
+            int x = Integer.parseInt(arr[1]);
+            int y = Integer.parseInt(arr[2]);
+            int z = Integer.parseInt(arr[3]);
+            return new Location(w, x, y, z);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
     public boolean isCore(Block block) {
         return cores.containsKey(key(block.getLocation()));
+    }
+
+    /** Check if the given block or any adjacent block is a land core. */
+    public boolean isAdjacentToCore(Block block) {
+        if (isCore(block)) return true;
+        for (BlockFace face : new BlockFace[]{BlockFace.UP, BlockFace.DOWN, BlockFace.NORTH,
+                BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST}) {
+            if (isCore(block.getRelative(face))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public LandCoreData get(Block block) {
@@ -139,13 +180,56 @@ public class LandCoreManager {
         }
     }
 
+    private void spawnOrUpdateHologram(Location loc, int level, String ownerName) {
+        if (loc == null || loc.getWorld() == null) return;
+        Location holoLoc = loc.clone().add(0.5, 1.2, 0.5);
+        String name = apply(config.getItem(level).getName(), level, ownerName == null ? "" : ownerName);
+        for (Entity ent : holoLoc.getWorld().getNearbyEntities(holoLoc, 0.5, 0.5, 0.5)) {
+            if (ent instanceof ArmorStand stand &&
+                    stand.getPersistentDataContainer().has(holoKey, PersistentDataType.INTEGER)) {
+                stand.setCustomName(name);
+                stand.setCustomNameVisible(true);
+                return;
+            }
+        }
+        ArmorStand stand = (ArmorStand) holoLoc.getWorld().spawn(holoLoc, ArmorStand.class);
+        stand.setInvisible(true);
+        stand.setMarker(true);
+        stand.setGravity(false);
+        stand.setCustomNameVisible(true);
+        stand.setCustomName(name);
+        stand.getPersistentDataContainer().set(holoKey, PersistentDataType.INTEGER, 1);
+    }
+
+    public void removeAllHolograms() {
+        for (String k : cores.keySet()) {
+            Location loc = parseKey(k);
+            if (loc == null || loc.getWorld() == null) continue;
+            Location holoLoc = loc.clone().add(0.5, 1.2, 0.5);
+            for (Entity ent : holoLoc.getWorld().getNearbyEntities(holoLoc, 0.5, 0.5, 0.5)) {
+                if (ent instanceof ArmorStand stand &&
+                        stand.getPersistentDataContainer().has(holoKey, PersistentDataType.INTEGER)) {
+                    stand.remove();
+                }
+            }
+        }
+    }
+
 
     /** Generate a random alphanumeric string of given length. */
     private String randomString(int len) {
         return UUID.randomUUID().toString().replace("-", "").substring(0, len);
     }
 
-    public void placeCore(Player player, Location loc, ItemStack item, int level) {
+    /**
+     * Place a land core if the location is within allowed height.
+     * @return true if placement succeeded
+     */
+    public boolean placeCore(Player player, Location loc, ItemStack item, int level) {
+        if (loc.getBlockY() < config.getMinPlaceY() || loc.getBlockY() > config.getMaxPlaceY()) {
+            player.sendMessage("领地核心只能在Y" + config.getMinPlaceY() + "-" + config.getMaxPlaceY() + "之间使用");
+            return false;
+        }
         World world = loc.getWorld();
         int chunkX = loc.getChunk().getX();
         int chunkZ = loc.getChunk().getZ();
@@ -182,20 +266,23 @@ public class LandCoreManager {
         Location coreLoc = new Location(world, centerX, loc.getBlockY(), centerZ);
         Block core = coreLoc.getBlock();
         core.setType(Material.PLAYER_HEAD);
+        String ownerName = null;
         if (core.getState() instanceof Skull skull) {
             skull.getPersistentDataContainer().set(coreKey, PersistentDataType.INTEGER, level);
             ItemMeta im = item.getItemMeta();
             if (im != null) {
-                String ownerName = im.getPersistentDataContainer().get(ownerKey, PersistentDataType.STRING);
+                ownerName = im.getPersistentDataContainer().get(ownerKey, PersistentDataType.STRING);
                 if (ownerName != null) {
                     skull.getPersistentDataContainer().set(ownerKey, PersistentDataType.STRING, ownerName);
                 }
             }
             skull.update(true);
         }
+        spawnOrUpdateHologram(coreLoc, level, ownerName);
         LandCoreData data = new LandCoreData(level,resName);
         cores.put(key(coreLoc), data);
         save();
+        return true;
     }
 
     private int countMatchingItems(Player player, LandCoreConfig.UpgradeItem req) {
@@ -302,7 +389,13 @@ public class LandCoreManager {
                 }
             }
         }
-
+        String ownerName = null;
+        if (block.getState() instanceof Skull skull) {
+            skull.getPersistentDataContainer().set(coreKey, PersistentDataType.INTEGER, newLevel);
+            ownerName = skull.getPersistentDataContainer().get(ownerKey, PersistentDataType.STRING);
+            skull.update(true);
+        }
+        spawnOrUpdateHologram(block.getLocation(), newLevel, ownerName);
         data.setLevel(newLevel);
         save();
     }

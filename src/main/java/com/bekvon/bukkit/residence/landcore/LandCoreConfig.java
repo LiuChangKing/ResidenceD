@@ -69,6 +69,8 @@ public class LandCoreConfig {
     private String defaultItemName;
     private List<String> defaultItemLore = new ArrayList<>();
     private final Map<Integer, CoreItem> itemMap = new HashMap<>();
+    private int minPlaceY;
+    private int maxPlaceY;
 
     public LandCoreConfig(JavaPlugin plugin) {
         this.plugin = plugin;
@@ -127,6 +129,8 @@ public class LandCoreConfig {
                 itemMap.put(lvl, new CoreItem(name, lore));
             }
         }
+        minPlaceY = cfg.getInt("place-height.min", 0);
+        maxPlaceY = cfg.getInt("place-height.max", 320);
     }
 
     public UpgradeCost getUpgradeCost(int level) {
@@ -149,6 +153,14 @@ public class LandCoreConfig {
         itemMap.put(level, ci);
         cfg.set("item."+level+".name", name);
         cfg.set("item."+level+".lore", lore);
+    }
+
+    public int getMinPlaceY() {
+        return minPlaceY;
+    }
+
+    public int getMaxPlaceY() {
+        return maxPlaceY;
     }
 
     public void save() {

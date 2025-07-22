@@ -11,8 +11,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.GameMode;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -58,9 +61,10 @@ public class LandCoreListener implements Listener {
         if (!isCoreItem(item)) return;
         event.setCancelled(true);
         int lvl = parseLevel(item);
-        manager.placeCore(event.getPlayer(), event.getBlockPlaced().getLocation(), item, lvl);
-        if (event.getPlayer().getGameMode() != GameMode.CREATIVE) {
-            item.setAmount(item.getAmount()-1);
+        if (manager.placeCore(event.getPlayer(), event.getBlockPlaced().getLocation(), item, lvl)) {
+            if (event.getPlayer().getGameMode() != GameMode.CREATIVE) {
+                item.setAmount(item.getAmount()-1);
+            }
         }
     }
 
@@ -88,5 +92,27 @@ public class LandCoreListener implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         manager.updatePlayerInventory(event.getPlayer());
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onBreak(BlockBreakEvent event) {
+        if (manager.isCore(event.getBlock())) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onBucket(PlayerBucketEmptyEvent event) {
+        Block target = event.getBlockClicked().getRelative(event.getBlockFace());
+        if (manager.isAdjacentToCore(target)) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onFlow(BlockFromToEvent event) {
+        if (manager.isCore(event.getToBlock())) {
+            event.setCancelled(true);
+        }
     }
 }
