@@ -344,23 +344,6 @@ public class LandCoreManager {
             player.sendMessage("已经到达最大等级");
             return;
         }
-        LandCoreConfig.UpgradeCost cost = config.getUpgradeCost(level + 1);
-        int money = cost.getMoney();
-        // check item availability first
-        for (LandCoreConfig.UpgradeItem it : cost.getItems()) {
-            if (countMatchingItems(player, it) < it.getAmount()) {
-                String name = it.getLore() == null ? "物品" : it.getLore();
-                player.sendMessage("缺少物品: " + name + " x" + it.getAmount());
-                return;
-            }
-        }
-        if (money > 0 && !VaultHook.takeMoney(player, money)) {
-            player.sendMessage("金币不足," + money);
-            return;
-        }
-        for (LandCoreConfig.UpgradeItem it : cost.getItems()) {
-            removeMatchingItems(player, it, it.getAmount());
-        }
         ClaimedResidence res = plugin.getResidenceManager().getByName(data.getResidenceName());
         if (res == null) {
             player.sendMessage("领地不存在");
@@ -380,7 +363,39 @@ public class LandCoreManager {
         int maxY = world.getMaxHeight() - 1;
         CuboidArea newArea = new CuboidArea(new Location(world, minX, minY, minZ),
                 new Location(world, maxX, maxY, maxZ));
-        res.replaceArea(player, newArea, "main", false);
+        // check collision before charging player
+        if (plugin.getResidenceManager().checkAreaCollision(newArea, res) != null) {
+            player.sendMessage("升级失败, 与其他领地冲突");
+            return;
+        }
+
+        LandCoreConfig.UpgradeCost cost = config.getUpgradeCost(level + 1);
+        int money = cost.getMoney();
+        // check item availability first
+        for (LandCoreConfig.UpgradeItem it : cost.getItems()) {
+            if (countMatchingItems(player, it) < it.getAmount()) {
+                String name = it.getLore() == null ? "物品" : it.getLore();
+                player.sendMessage("缺少物品: " + name + " x" + it.getAmount());
+                return;
+            }
+        }
+        if (money > 0 && !VaultHook.takeMoney(player, money)) {
+            player.sendMessage("金币不足," + money);
+            return;
+        }
+
+        boolean replaced = res.replaceArea(player, newArea, "main", false);
+        if (!replaced) {
+            if (money > 0) {
+                VaultHook.giveMoney(player, money);
+            }
+            player.sendMessage("升级失败");
+            return;
+        }
+
+        for (LandCoreConfig.UpgradeItem it : cost.getItems()) {
+            removeMatchingItems(player, it, it.getAmount());
+        }
 
         int floorY = block.getY() - 1;
         for (int x = minX; x <= maxX; x++) {
