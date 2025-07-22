@@ -1,0 +1,22 @@
+upgrade-costs:
+  2:
+    money: 1000
+    # items:
+    #   - lore: "升级核心"
+    #     amount: 1
+  3:
+    money: 3000
+  4:
+    money: 6000
+  5:
+    money: 10000
+item:
+  default:
+    name: "§a%level_cn%领地核心"
+    lore:
+      - "放置后创建领地"
+      - "等级: %level_cn%"
+  #1:
+  #  name: "§a一级领地核心"
+  #  lore:
+  #    - "自定义 lore"
