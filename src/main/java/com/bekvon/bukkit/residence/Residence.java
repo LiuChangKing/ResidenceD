@@ -28,6 +28,8 @@ import com.liuchangking.dreamengine.api.DreamServerAPI;
 import com.liuchangking.dreamengine.utils.MessageUtil;
 import com.residence.mcstats.Metrics;
 import com.residence.zip.ZipLibrary;
+import com.bekvon.bukkit.residence.landcore.LandCoreManager;
+import com.bekvon.bukkit.residence.landcore.LandCoreListener;
 import net.Zrips.CMILib.Colors.CMIChatColor;
 import net.Zrips.CMILib.Items.CMIMaterial;
 import net.Zrips.CMILib.Version.Schedulers.CMIScheduler;
@@ -98,6 +100,9 @@ public class Residence extends JavaPlugin {
     protected Sorting SortingManager;
     protected AutoSelection AutoSelectionManager;
     private InformationPager InformationPagerManager;
+
+    // Land core module
+    protected LandCoreManager landCoreManager;
 
     protected CommandFiller cmdFiller;
 
@@ -263,6 +268,10 @@ public class Residence extends JavaPlugin {
             effectRemoveBukkitId.cancel();
         if (despawnMobsBukkitId != null)
             despawnMobsBukkitId.cancel();
+
+        if (landCoreManager != null) {
+            landCoreManager.save();
+        }
 
         this.getPermissionManager().stopCacheClearScheduler();
 
@@ -574,6 +583,10 @@ public class Residence extends JavaPlugin {
 
             AutoSelectionManager = new AutoSelection(this);
 
+            landCoreManager = new LandCoreManager(this);
+            landCoreManager.load();
+            getServer().getPluginManager().registerEvents(new LandCoreListener(this, landCoreManager), this);
+
             try {
                 Class.forName("org.bukkit.event.player.PlayerItemDamageEvent");
                 getServer().getPluginManager().registerEvents(new SpigotListener(), this);
@@ -793,6 +806,10 @@ public class Residence extends JavaPlugin {
 
     public RandomTp getRandomTpManager() {
         return RandomTpManager;
+    }
+
+    public LandCoreManager getLandCoreManager() {
+        return landCoreManager;
     }
 
     public EconomyInterface getEconomyManager() {
