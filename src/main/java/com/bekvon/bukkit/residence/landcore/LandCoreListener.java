@@ -12,6 +12,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.GameMode;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -34,7 +35,11 @@ public class LandCoreListener implements Listener {
         ItemMeta meta = item.getItemMeta();
         if (meta == null) return false;
         PersistentDataContainer pdc = meta.getPersistentDataContainer();
-        return pdc.has(key, PersistentDataType.INTEGER);
+        boolean result = pdc.has(key, PersistentDataType.INTEGER);
+        if (result) {
+            manager.updateCoreItem(item);
+        }
+        return result;
     }
 
     private int parseLevel(ItemStack item) {
@@ -78,5 +83,10 @@ public class LandCoreListener implements Listener {
             }
         });
         menu.open(event.getPlayer());
+    }
+
+    @EventHandler
+    public void onJoin(PlayerJoinEvent event) {
+        manager.updatePlayerInventory(event.getPlayer());
     }
 }

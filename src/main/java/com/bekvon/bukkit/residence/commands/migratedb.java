@@ -16,7 +16,7 @@ public class migratedb implements cmd {
     @CommandAnnotation(simple = false, priority = 5600)
     public Boolean perform(Residence plugin, CommandSender sender, String[] args, boolean resadmin) {
         if (!plugin.isUsingMysql()) {
-            plugin.msg(sender, "MySQL\u672a\u542f\u7528");
+            plugin.msg(sender, "MySQL未启用");
             return true;
         }
         if (sender instanceof Player && !plugin.getPermissionManager().isResidenceAdmin(sender)) {
@@ -25,9 +25,9 @@ public class migratedb implements cmd {
         }
         try {
             plugin.migrateToMysql();
-            plugin.msg(sender, "\u6570\u636e\u5df2\u8f6c\u79fb\u5230MySQL");
+            plugin.msg(sender, "数据已转移到MySQL");
         } catch (Exception e) {
-            plugin.msg(sender, "\u8f6c\u79fb\u5931\u8d25: " + e.getMessage());
+            plugin.msg(sender, "转移失败: " + e.getMessage());
         }
         return true;
     }

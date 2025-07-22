@@ -11,12 +11,13 @@ import org.bukkit.block.Block;
 import org.bukkit.block.Skull;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.persistence.PersistentDataType;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
+import java.util.UUID;
 
 /** Manager for land cores. */
 public class LandCoreManager {
@@ -24,11 +25,13 @@ public class LandCoreManager {
     private final LandCoreConfig config;
     private final Map<String, LandCoreData> cores = new HashMap<>();
     private final NamespacedKey coreKey;
+    private final NamespacedKey ownerKey;
 
     public LandCoreManager(Residence plugin) {
         this.plugin = plugin;
         this.config = new LandCoreConfig(plugin);
         this.coreKey = new NamespacedKey(plugin, "landcore");
+        this.ownerKey = new NamespacedKey(plugin, "owner");
     }
 
     public void load() {
@@ -64,27 +67,39 @@ public class LandCoreManager {
 
     /**
      * Create a land core item with the specified level.
+     * If an owner is provided, the item lore will display their name
+     * and the owner name will be stored in the item's data.
      */
-    public ItemStack createCoreItem(int level) {
+    public ItemStack createCoreItem(int level, Player owner) {
         ItemStack item = new ItemStack(Material.PLAYER_HEAD);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
             LandCoreConfig.CoreItem def = config.getItem(level);
-            String name = def.getName();
-            name = name.replace("%level%", String.valueOf(level));
-            name = name.replace("%level_cn%", chineseNumber(level));
+            String ownerName = owner != null ? owner.getName() : "";
+            String name = apply(def.getName(), level, ownerName);
             meta.setDisplayName(name);
             meta.getPersistentDataContainer().set(coreKey, PersistentDataType.INTEGER, level);
+            if (owner != null) {
+                meta.getPersistentDataContainer().set(ownerKey, PersistentDataType.STRING, ownerName);
+            }
             List<String> lore = def.getLore();
             if (lore != null && !lore.isEmpty()) {
-                meta.setLore(lore.stream()
-                        .map(l -> l.replace("%level%", String.valueOf(level))
-                                .replace("%level_cn%", chineseNumber(level)))
-                        .toList());
+                meta.setLore(lore.stream().map(l -> apply(l, level, ownerName)).toList());
             }
             item.setItemMeta(meta);
         }
         return item;
+    }
+
+    public ItemStack createCoreItem(int level) {
+        return createCoreItem(level, null);
+    }
+
+    private String apply(String str, int level, String playerName) {
+        return str
+                .replace("%level%", String.valueOf(level))
+                .replace("%level_cn%", chineseNumber(level))
+                .replace("%player%", playerName);
     }
 
     private String chineseNumber(int level) {
@@ -93,6 +108,41 @@ public class LandCoreManager {
             return arr[level];
         }
         return String.valueOf(level);
+    }
+
+    /** Update an existing core item to use latest name and lore from config. */
+    public void updateCoreItem(ItemStack item) {
+        if (item == null || item.getType() != Material.PLAYER_HEAD) return;
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null) return;
+        Integer lvl = meta.getPersistentDataContainer().get(coreKey, PersistentDataType.INTEGER);
+        if (lvl == null) return;
+        LandCoreConfig.CoreItem def = config.getItem(lvl);
+        String owner = meta.getPersistentDataContainer().get(ownerKey, PersistentDataType.STRING);
+        if (owner == null) owner = "";
+        String name = apply(def.getName(), lvl, owner);
+        List<String> lore = def.getLore();
+        if (lore != null && !lore.isEmpty()) {
+            meta.setLore(lore.stream().map(l -> apply(l, lvl, owner)).toList());
+        } else {
+            meta.setLore(null);
+        }
+        meta.setDisplayName(name);
+        item.setItemMeta(meta);
+    }
+
+    /** Update all core items in a player's inventory. */
+    public void updatePlayerInventory(Player player) {
+        PlayerInventory inv = player.getInventory();
+        for (ItemStack it : inv.getContents()) {
+            updateCoreItem(it);
+        }
+    }
+
+
+    /** Generate a random alphanumeric string of given length. */
+    private String randomString(int len) {
+        return UUID.randomUUID().toString().replace("-", "").substring(0, len);
     }
 
     public void placeCore(Player player, Location loc, ItemStack item, int level) {
@@ -108,7 +158,7 @@ public class LandCoreManager {
         int maxY = world.getMaxHeight() - 1;
         Location loc1 = new Location(world, minX, minY, minZ);
         Location loc2 = new Location(world, maxX, maxY, maxZ);
-        String resName = "core_"+loc.getBlockX()+"_"+loc.getBlockZ()+"_"+player.getName();
+        String resName = player.getName() + "的领地" + randomString(4);
         if (!plugin.getResidenceManager().addResidence(player, resName, loc1, loc2, false)) {
             return; // creation failed
         }
@@ -124,8 +174,15 @@ public class LandCoreManager {
         }
         Block core = loc.getBlock();
         core.setType(Material.PLAYER_HEAD);
-        if (core.getState() instanceof Skull skull && item.getItemMeta() instanceof SkullMeta sm) {
+        if (core.getState() instanceof Skull skull) {
             skull.getPersistentDataContainer().set(coreKey, PersistentDataType.INTEGER, level);
+            ItemMeta im = item.getItemMeta();
+            if (im != null) {
+                String ownerName = im.getPersistentDataContainer().get(ownerKey, PersistentDataType.STRING);
+                if (ownerName != null) {
+                    skull.getPersistentDataContainer().set(ownerKey, PersistentDataType.STRING, ownerName);
+                }
+            }
             skull.update(true);
         }
         LandCoreData data = new LandCoreData(level,resName);
@@ -213,6 +270,6 @@ public class LandCoreManager {
             plugin.getResidenceManager().removeResidence(res);
         }
         data.setLevel(level+1);
-        placeCore(player, block.getLocation(), createCoreItem(data.getLevel()), data.getLevel());
+        placeCore(player, block.getLocation(), createCoreItem(data.getLevel(), player), data.getLevel());
     }
 }
