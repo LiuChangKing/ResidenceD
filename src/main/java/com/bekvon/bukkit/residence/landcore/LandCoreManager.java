@@ -22,6 +22,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.profile.PlayerProfile;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
@@ -255,9 +257,9 @@ public class LandCoreManager {
             skull.getPersistentDataContainer().set(ownerKey, PersistentDataType.STRING, owner);
         }
         if (meta instanceof SkullMeta sm) {
-            var profile = sm.getPlayerProfile();
-            if (profile != null) {
-                skull.setPlayerProfile(profile);
+            PlayerProfile ownerProfile = sm.getOwnerProfile();
+            if (ownerProfile != null) {
+                skull.setOwnerProfile(ownerProfile);
                 return;
             }
         }
@@ -265,8 +267,8 @@ public class LandCoreManager {
         ItemStack temp = new ItemStack(Material.PLAYER_HEAD);
         ItemStack tmp = HeadUtil.applyTexture(temp, CORE_TEXTURE);
         ItemMeta tm = tmp.getItemMeta();
-        if (tm instanceof SkullMeta sm2 && sm2.getPlayerProfile() != null) {
-            skull.setPlayerProfile(sm2.getPlayerProfile());
+        if (tm instanceof SkullMeta sm2 && sm2.getOwnerProfile() != null) {
+            skull.setOwnerProfile(sm2.getOwnerProfile());
         }
     }
 
