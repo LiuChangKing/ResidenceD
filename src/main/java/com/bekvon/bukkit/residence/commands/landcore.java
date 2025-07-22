@@ -39,18 +39,18 @@ public class landcore implements cmd {
             return true;
         }
         LandCoreManager manager = plugin.getLandCoreManager();
-        ItemStack core = manager.createCoreItem(level);
+        ItemStack core = manager.createCoreItem(level, target);
         target.getInventory().addItem(core);
-        plugin.msg(sender, "\u5df2\u83b7\u5f97\u7b49\u7ea7" + level + "\u7684\u9886\u5730\u6838\u5fc3");
+        plugin.msg(sender, "已获得等级" + level + "的领地核心");
         if (target != sender)
-            plugin.msg(target, "\u5df2\u83b7\u5f97\u7b49\u7ea7" + level + "\u7684\u9886\u5730\u6838\u5fc3");
+            plugin.msg(target, "已获得等级" + level + "的领地核心");
         return true;
     }
 
     @Override
     public void getLocale() {
         ConfigReader c = Residence.getInstance().getLocaleManager().getLocaleConfig();
-        c.get("Description", "\u7ed9\u4e88\u9886\u5730\u6838\u5fc3");
+        c.get("Description", "给予领地核心");
         c.get("Info", Arrays.asList("&eUsage: &6/res landcore <level> [player]"));
         LocaleManager.addTabCompleteMain(this, "<level>", "[playername]");
     }
