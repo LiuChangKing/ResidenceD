@@ -90,10 +90,6 @@ public class LandCoreListener implements Listener {
         menu.open(event.getPlayer());
     }
 
-    @EventHandler
-    public void onJoin(PlayerJoinEvent event) {
-        manager.updatePlayerInventory(event.getPlayer());
-    }
 
     @EventHandler(ignoreCancelled = true)
     public void onBreak(BlockBreakEvent event) {
