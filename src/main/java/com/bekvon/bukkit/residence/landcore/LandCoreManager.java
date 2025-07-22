@@ -164,13 +164,18 @@ public class LandCoreManager {
         }
         // floor and border
         int floorY = loc.getBlockY() - 1;
-        for (int x=minX; x<=maxX; x++) {
-            for (int z=minZ; z<=maxZ; z++) {
-                world.getBlockAt(x,floorY,z).setType(Material.OAK_PLANKS);
-                if (x==minX || x==maxX || z==minZ || z==maxZ) {
+        for (int x = minX; x <= maxX; x++) {
+            for (int z = minZ; z <= maxZ; z++) {
+                world.getBlockAt(x, floorY, z).setType(Material.OAK_PLANKS);
+                if (x == minX || x == maxX || z == minZ || z == maxZ) {
                     world.getBlockAt(x, loc.getBlockY(), z).setType(Material.STONE_SLAB);
                 }
             }
+        }
+        int px = loc.getBlockX();
+        int pz = loc.getBlockZ();
+        if (px == minX || px == maxX || pz == minZ || pz == maxZ) {
+            world.getBlockAt(px, loc.getBlockY(), pz).setType(Material.STONE_SLAB);
         }
         int centerX = (minX + maxX) / 2;
         int centerZ = (minZ + maxZ) / 2;
@@ -267,12 +272,38 @@ public class LandCoreManager {
         for (LandCoreConfig.UpgradeItem it : cost.getItems()) {
             removeMatchingItems(player, it, it.getAmount());
         }
-        // remove old residence
         ClaimedResidence res = plugin.getResidenceManager().getByName(data.getResidenceName());
-        if (res != null) {
-            plugin.getResidenceManager().removeResidence(res);
+        if (res == null) {
+            player.sendMessage("领地不存在");
+            return;
         }
-        data.setLevel(level+1);
-        placeCore(player, block.getLocation(), createCoreItem(data.getLevel(), player), data.getLevel());
+
+        int newLevel = level + 1;
+        World world = block.getWorld();
+        int chunkX = block.getChunk().getX();
+        int chunkZ = block.getChunk().getZ();
+        int radius = newLevel - 1;
+        int minX = (chunkX - radius) * 16;
+        int maxX = (chunkX + radius) * 16 + 15;
+        int minZ = (chunkZ - radius) * 16;
+        int maxZ = (chunkZ + radius) * 16 + 15;
+        int minY = world.getMinHeight();
+        int maxY = world.getMaxHeight() - 1;
+        CuboidArea newArea = new CuboidArea(new Location(world, minX, minY, minZ),
+                new Location(world, maxX, maxY, maxZ));
+        res.replaceArea(player, newArea, "main", false);
+
+        int floorY = block.getY() - 1;
+        for (int x = minX; x <= maxX; x++) {
+            for (int z = minZ; z <= maxZ; z++) {
+                world.getBlockAt(x, floorY, z).setType(Material.OAK_PLANKS);
+                if (x == minX || x == maxX || z == minZ || z == maxZ) {
+                    world.getBlockAt(x, block.getY(), z).setType(Material.STONE_SLAB);
+                }
+            }
+        }
+
+        data.setLevel(newLevel);
+        save();
     }
 }
