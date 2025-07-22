@@ -180,11 +180,21 @@ public class LandCoreManager {
         HeadUtil.applyTexture(item, CORE_TEXTURE);
     }
 
-    /** Update all core items in a player's inventory. */
+    /**
+     * Update all core items in a player's inventory.
+     *
+     * <p>When using {@link PlayerInventory#getContents()} Bukkit returns a
+     * copy of the item array, meaning modifications to the returned items will
+     * not automatically be applied to the inventory. To ensure that updated
+     * meta is sent to the client we must set the items back into their slots
+     * after updating.</p>
+     */
     public void updatePlayerInventory(Player player) {
         PlayerInventory inv = player.getInventory();
-        for (ItemStack it : inv.getContents()) {
-            updateCoreItem(it);
+        for (int slot = 0; slot < inv.getSize(); slot++) {
+            ItemStack item = inv.getItem(slot);
+            updateCoreItem(item);
+            inv.setItem(slot, item);
         }
     }
 
@@ -227,6 +237,37 @@ public class LandCoreManager {
     /** Generate a random alphanumeric string of given length. */
     private String randomString(int len) {
         return UUID.randomUUID().toString().replace("-", "").substring(0, len);
+    }
+
+    /**
+     * Copy skull-related metadata from an item directly onto a block state.
+     *
+     * <p>This preserves the custom texture set by {@link HeadUtil#applyTexture}
+     * so the placed head looks identical to the item.</p>
+     */
+    private void applyItemToSkull(Skull skull, ItemStack item, int level) {
+        if (skull == null || item == null) return;
+        skull.getPersistentDataContainer().set(coreKey, PersistentDataType.INTEGER, level);
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null) return;
+        String owner = meta.getPersistentDataContainer().get(ownerKey, PersistentDataType.STRING);
+        if (owner != null) {
+            skull.getPersistentDataContainer().set(ownerKey, PersistentDataType.STRING, owner);
+        }
+        if (meta instanceof SkullMeta sm) {
+            var profile = sm.getPlayerProfile();
+            if (profile != null) {
+                skull.setPlayerProfile(profile);
+                return;
+            }
+        }
+        // Fallback to default core texture if item lacks a readable profile
+        ItemStack temp = new ItemStack(Material.PLAYER_HEAD);
+        ItemStack tmp = HeadUtil.applyTexture(temp, CORE_TEXTURE);
+        ItemMeta tm = tmp.getItemMeta();
+        if (tm instanceof SkullMeta sm2 && sm2.getPlayerProfile() != null) {
+            skull.setPlayerProfile(sm2.getPlayerProfile());
+        }
     }
 
     /**
@@ -281,13 +322,10 @@ public class LandCoreManager {
         core.setType(Material.PLAYER_HEAD);
         String ownerName = null;
         if (core.getState() instanceof Skull skull) {
-            skull.getPersistentDataContainer().set(coreKey, PersistentDataType.INTEGER, level);
+            applyItemToSkull(skull, item, level);
             ItemMeta im = item.getItemMeta();
             if (im != null) {
                 ownerName = im.getPersistentDataContainer().get(ownerKey, PersistentDataType.STRING);
-                if (ownerName != null) {
-                    skull.getPersistentDataContainer().set(ownerKey, PersistentDataType.STRING, ownerName);
-                }
             }
             skull.update(true);
         }
