@@ -1,128 +1,128 @@
 # 这些分组对应於在 '<worldname>.yml' 中定义的权限组
 Groups:
-    Default: #组名，不要删除此组
-       # 玩家可自行设定的领地区域相关信息
-       # 取消注释下方行可将此配置同步到其他组
-       #Mirror:
-         #- 'group1'
-         #- 'group2'
-       Residence:
-           # 决定该组是否允许创建领地，可被权限节点 'residence.create' 覆盖
-           CanCreate: true
-           # 玩家可以拥有的领地数量上限
-           MaxResidences: 0
-           # 一个领地可包含的区域数量上限
-           MaxAreasPerResidence: 1
-           # 领地在东西方向 (X) 的最大尺寸
-           MaxEastWest: 256
-           # （可选）领地在东西方向的最小尺寸
-           MinEastWest: 16
-           # 领地在南北方向 (Z) 的最大尺寸
-           MaxNorthSouth: 256
-           # （可选）领地在南北方向的最小尺寸
-           MinNorthSouth: 16
-           # 领地在高度方向 (Y) 的最大尺寸
-           MaxUpDown: 320
-           # （可选）领地在高度方向的最小尺寸
-           MinUpDown: 3
-           # 此组允许保护的最低高度
-           MinHeight: -64
-           # 此组允许保护的最高高度
-           MaxHeight: 320
-            # 当前区域可拥有的子区数量上限
-           MaxSubzonesInArea: 0
-            # 子区可嵌套的最大深度
-            # 例如在领地中创建子区，再在其中创建子区则深度为 2
-            # 设为 0 将禁用子区
-           SubzoneDepth: 3
-           # （可选）子区在东西方向的最大尺寸
-           SubzoneMaxEastWest: 16
-           # （可选）子区在东西方向的最小尺寸
-           SubzoneMinEastWest: 3
-           # （可选）子区在南北方向的最大尺寸
-           SubzoneMaxNorthSouth: 16
-           # （可选）子区在南北方向的最小尺寸
-           SubzoneMinNorthSouth: 3
-           # （可选）子区在高度方向的最大尺寸
-           SubzoneMaxUpDown: 320
-           # （可选）子区在高度方向的最小尺寸
-           SubzoneMinUpDown: 3
-           # 是否允许传送到领地
-           CanTeleport: true
-           # 是否允许使用 /res unstuck 指令在被卡住时脱困
-           Unstuck: true
-           # 是否允许使用 /res kick 将玩家踢出领地
-           Kick: False
-           # 是否允许使用 /res select 命令，禁用后只能使用选择工具
-           SelectCommandAccess: true
-           # 是否允许访问自己领地的黑名单/忽略名单
-           ItemListAccess: true
-       # 与进入和离开领地相关的提示设置
-       Messaging:
-           # 玩家是否可以修改这些提示
-           CanChange: true
-           # 创建新领地时默认的进入提示
-           # 若只想显示当前领地名，可使用 %zone；留空则关闭提示
-           DefaultEnter: "你已进入领地: %residence, 拥有者: %owner."
-           # 创建新领地时默认的离开提示
-           # 同样可使用 %zone；留空则关闭提示
-           DefaultLeave: "你已离开领地: %residence."
-       # 与领地经济相关的设置
-       Economy:
-          # 新建领地或扩展区域时，每个方块的花费
-          BuyCost: 1000
-       # 旗帜（权限）检查顺序：
-       # 1：玩家
-       # 2：群组
-       # 3：领地主
-       # 4：若以上都未定义，则使用默认值（通常为 true）
-       # 旗帜权限默认均为 false
-       # 以下设置将覆盖全局配置
-       Flags:
-          # 为该组明确允许或禁止修改特定旗帜
-          Permission:
-               #build: true
-          # 该组玩家创建领地时自动应用的旗帜
-          Default:
-              #build: true
-          # 在领地创建时给予创建者的旗帜
-          CreatorDefault:
-              #build: true
-          # 此领地在创建时赋予其他组的旗帜
-          GroupDefault:
-               #default: #group name
-                   #build: false
-          # 当玩家处于任何非领地区域时，对该组生效的旗帜
-          # 这些旗帜会覆盖上方全局部分的设置
-          World:
-                Global: # 这些设置将应用于所有世界
-                     #build: false
-                WorldNameHere: # 也可以按单个世界进行设置
-                     #build: false
-    NextGroup: # 组名，玩家需拥有 residence.group.nextgroup 权限才能加入
-       Residence:
-           CanCreate: true
-           MaxResidences: 99
-           MaxAreasPerResidence: 2
-           MaxEastWest: 999
-           MaxNorthSouth: 999
-           MaxUpDown: 20
-           MinHeight: -64
-           MaxHeight: 320
-           SubzoneDepth: 3
-           CanTeleport: true
-           Unstuck: true
-           Kick: true
-           SelectCommandAccess: true
-           ItemListAccess: true
-       Messaging:
-           CanChange: true
-           DefaultEnter: "Welcome %player to %residence, owned by %owner."
-           DefaultLeave: "Now leaving %residence."
-       Economy:
-          BuyCost: 0.7
-          RenewCost: 0.3
+  Default: #组名，不要删除此组
+    # 玩家可自行设定的领地区域相关信息
+    # 取消注释下方行可将此配置同步到其他组
+    #Mirror:
+    #- 'group1'
+    #- 'group2'
+    Residence:
+      # 决定该组是否允许创建领地，可被权限节点 'residence.create' 覆盖
+      CanCreate: true
+      # 玩家可以拥有的领地数量上限
+      MaxResidences: 0
+      # 一个领地可包含的区域数量上限
+      MaxAreasPerResidence: 1
+      # 领地在东西方向 (X) 的最大尺寸
+      MaxEastWest: 256
+      # （可选）领地在东西方向的最小尺寸
+      MinEastWest: 16
+      # 领地在南北方向 (Z) 的最大尺寸
+      MaxNorthSouth: 256
+      # （可选）领地在南北方向的最小尺寸
+      MinNorthSouth: 16
+      # 领地在高度方向 (Y) 的最大尺寸
+      MaxUpDown: 320
+      # （可选）领地在高度方向的最小尺寸
+      MinUpDown: 3
+      # 此组允许保护的最低高度
+      MinHeight: -64
+      # 此组允许保护的最高高度
+      MaxHeight: 320
+      # 当前区域可拥有的子区数量上限
+      MaxSubzonesInArea: 0
+        # 子区可嵌套的最大深度
+        # 例如在领地中创建子区，再在其中创建子区则深度为 2
+      # 设为 0 将禁用子区
+      SubzoneDepth: 3
+      # （可选）子区在东西方向的最大尺寸
+      SubzoneMaxEastWest: 16
+      # （可选）子区在东西方向的最小尺寸
+      SubzoneMinEastWest: 3
+      # （可选）子区在南北方向的最大尺寸
+      SubzoneMaxNorthSouth: 16
+      # （可选）子区在南北方向的最小尺寸
+      SubzoneMinNorthSouth: 3
+      # （可选）子区在高度方向的最大尺寸
+      SubzoneMaxUpDown: 320
+      # （可选）子区在高度方向的最小尺寸
+      SubzoneMinUpDown: 3
+      # 是否允许传送到领地
+      CanTeleport: true
+      # 是否允许使用 /res unstuck 指令在被卡住时脱困
+      Unstuck: true
+      # 是否允许使用 /res kick 将玩家踢出领地
+      Kick: False
+      # 是否允许使用 /res select 命令，禁用后只能使用选择工具
+      SelectCommandAccess: true
+      # 是否允许访问自己领地的黑名单/忽略名单
+      ItemListAccess: true
+    # 与进入和离开领地相关的提示设置
+    Messaging:
+      # 玩家是否可以修改这些提示
+      CanChange: true
+      # 创建新领地时默认的进入提示
+      # 若只想显示当前领地名，可使用 %zone；留空则关闭提示
+      DefaultEnter: "你已进入领地: %residence, 拥有者: %owner."
+      # 创建新领地时默认的离开提示
+      # 同样可使用 %zone；留空则关闭提示
+      DefaultLeave: "你已离开领地: %residence."
+    # 与领地经济相关的设置
+    Economy:
+      # 新建领地或扩展区域时，每个方块的花费
+      BuyCost: 1000
+    # 旗帜（权限）检查顺序：
+    # 1：玩家
+    # 2：群组
+    # 3：领地主
+    # 4：若以上都未定义，则使用默认值（通常为 true）
+    # 旗帜权限默认均为 false
+    # 以下设置将覆盖全局配置
+    Flags:
+      # 为该组明确允许或禁止修改特定旗帜
+      Permission:
+      #build: true
+      # 该组玩家创建领地时自动应用的旗帜
+      Default:
+      #build: true
+      # 在领地创建时给予创建者的旗帜
+      CreatorDefault:
+      #build: true
+      # 此领地在创建时赋予其他组的旗帜
+      GroupDefault:
+      #default: #group name
+      #build: false
+      # 当玩家处于任何非领地区域时，对该组生效的旗帜
+      # 这些旗帜会覆盖上方全局部分的设置
+      World:
+        Global: # 这些设置将应用于所有世界
+        #build: false
+        WorldNameHere: # 也可以按单个世界进行设置
+        #build: false
+  NextGroup: # 组名，玩家需拥有 residence.group.nextgroup 权限才能加入
+    Residence:
+      CanCreate: true
+      MaxResidences: 99
+      MaxAreasPerResidence: 2
+      MaxEastWest: 999
+      MaxNorthSouth: 999
+      MaxUpDown: 20
+      MinHeight: -64
+      MaxHeight: 320
+      SubzoneDepth: 3
+      CanTeleport: true
+      Unstuck: true
+      Kick: true
+      SelectCommandAccess: true
+      ItemListAccess: true
+    Messaging:
+      CanChange: true
+      DefaultEnter: "你已进入领地: %residence, 拥有者: %owner."
+      DefaultLeave: "你已离开领地: %residence."
+    Economy:
+      BuyCost: 0.7
+      RenewCost: 0.3
 # 你可以在下方手动指定玩家所属的领地组，将覆盖其权限组
 GroupAssignments:
-     bekvon: default
-     player: default
+  bekvon: default
+  player: default
