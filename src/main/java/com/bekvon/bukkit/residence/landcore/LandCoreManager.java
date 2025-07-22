@@ -4,6 +4,7 @@ import com.bekvon.bukkit.residence.Residence;
 import com.bekvon.bukkit.residence.protection.ClaimedResidence;
 import com.bekvon.bukkit.residence.protection.CuboidArea;
 import com.liuchangking.dreamengine.shop.hook.VaultHook;
+import com.liuchangking.dreamengine.utils.MessageUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -164,7 +165,8 @@ public class LandCoreManager {
         String name = apply(def.getName(), lvl, owner);
         List<String> lore = def.getLore();
         if (lore != null && !lore.isEmpty()) {
-            meta.setLore(lore.stream().map(l -> apply(l, lvl, owner)).toList());
+            String finalOwner = owner;
+            meta.setLore(lore.stream().map(l -> apply(l, lvl, finalOwner)).toList());
         } else {
             meta.setLore(null);
         }
@@ -227,7 +229,7 @@ public class LandCoreManager {
      */
     public boolean placeCore(Player player, Location loc, ItemStack item, int level) {
         if (loc.getBlockY() < config.getMinPlaceY() || loc.getBlockY() > config.getMaxPlaceY()) {
-            player.sendMessage("领地核心只能在Y" + config.getMinPlaceY() + "-" + config.getMaxPlaceY() + "之间使用");
+            MessageUtil.notifyError(player, "放置失败", "领地核心只能在Y" + config.getMinPlaceY() + "-" + config.getMaxPlaceY() + "之间使用");
             return false;
         }
         World world = loc.getWorld();
@@ -244,7 +246,7 @@ public class LandCoreManager {
         Location loc2 = new Location(world, maxX, maxY, maxZ);
         String resName = player.getName() + "的领地" + randomString(4);
         if (!plugin.getResidenceManager().addResidence(player, resName, loc1, loc2, false)) {
-            return; // creation failed
+            return  false; // creation failed
         }
         // floor and border
         int floorY = loc.getBlockY() - 1;
