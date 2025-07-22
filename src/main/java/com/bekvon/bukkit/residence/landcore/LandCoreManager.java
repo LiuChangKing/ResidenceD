@@ -221,7 +221,15 @@ public class LandCoreManager {
         return UUID.randomUUID().toString().replace("-", "").substring(0, len);
     }
 
-    public void placeCore(Player player, Location loc, ItemStack item, int level) {
+    /**
+     * Place a land core if the location is within allowed height.
+     * @return true if placement succeeded
+     */
+    public boolean placeCore(Player player, Location loc, ItemStack item, int level) {
+        if (loc.getBlockY() < config.getMinPlaceY() || loc.getBlockY() > config.getMaxPlaceY()) {
+            player.sendMessage("领地核心只能在Y" + config.getMinPlaceY() + "-" + config.getMaxPlaceY() + "之间使用");
+            return false;
+        }
         World world = loc.getWorld();
         int chunkX = loc.getChunk().getX();
         int chunkZ = loc.getChunk().getZ();
@@ -274,6 +282,7 @@ public class LandCoreManager {
         LandCoreData data = new LandCoreData(level,resName);
         cores.put(key(coreLoc), data);
         save();
+        return true;
     }
 
     private int countMatchingItems(Player player, LandCoreConfig.UpgradeItem req) {

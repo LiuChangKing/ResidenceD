@@ -61,9 +61,10 @@ public class LandCoreListener implements Listener {
         if (!isCoreItem(item)) return;
         event.setCancelled(true);
         int lvl = parseLevel(item);
-        manager.placeCore(event.getPlayer(), event.getBlockPlaced().getLocation(), item, lvl);
-        if (event.getPlayer().getGameMode() != GameMode.CREATIVE) {
-            item.setAmount(item.getAmount()-1);
+        if (manager.placeCore(event.getPlayer(), event.getBlockPlaced().getLocation(), item, lvl)) {
+            if (event.getPlayer().getGameMode() != GameMode.CREATIVE) {
+                item.setAmount(item.getAmount()-1);
+            }
         }
     }
 
