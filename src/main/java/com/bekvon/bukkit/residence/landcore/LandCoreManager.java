@@ -190,7 +190,7 @@ public class LandCoreManager {
 
     private void spawnOrUpdateHologram(Location loc, int level, String ownerName) {
         if (loc == null || loc.getWorld() == null) return;
-        Location holoLoc = loc.clone().add(0.5, 1.2, 0.5);
+        Location holoLoc = loc.clone().add(0.5, 0.5, 0.5);
         String name = apply(config.getItem(level).getName(), level, ownerName == null ? "" : ownerName);
         for (Entity ent : holoLoc.getWorld().getNearbyEntities(holoLoc, 0.5, 0.5, 0.5)) {
             if (ent instanceof ArmorStand stand &&
@@ -220,17 +220,6 @@ public class LandCoreManager {
                     stand.remove();
                 }
             }
-        }
-    }
-
-    /** Apply the custom texture to a skull block. */
-    private void applyTexture(Skull skull) {
-        if (skull == null) return;
-        ItemStack temp = new ItemStack(Material.PLAYER_HEAD);
-        HeadUtil.applyTexture(temp, CORE_TEXTURE);
-        ItemMeta meta = temp.getItemMeta();
-        if (meta instanceof SkullMeta sm && sm.getPlayerProfile() != null) {
-            skull.setPlayerProfile(sm.getPlayerProfile());
         }
     }
 
@@ -300,7 +289,6 @@ public class LandCoreManager {
                     skull.getPersistentDataContainer().set(ownerKey, PersistentDataType.STRING, ownerName);
                 }
             }
-            applyTexture(skull);
             skull.update(true);
         }
         spawnOrUpdateHologram(coreLoc, level, ownerName);
@@ -425,7 +413,6 @@ public class LandCoreManager {
         if (block.getState() instanceof Skull skull) {
             skull.getPersistentDataContainer().set(coreKey, PersistentDataType.INTEGER, newLevel);
             ownerName = skull.getPersistentDataContainer().get(ownerKey, PersistentDataType.STRING);
-            applyTexture(skull);
             skull.update(true);
         }
         spawnOrUpdateHologram(block.getLocation(), newLevel, ownerName);
