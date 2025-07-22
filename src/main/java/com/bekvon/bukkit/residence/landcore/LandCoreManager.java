@@ -125,7 +125,6 @@ public class LandCoreManager {
         Block core = loc.getBlock();
         core.setType(Material.PLAYER_HEAD);
         if (core.getState() instanceof Skull skull && item.getItemMeta() instanceof SkullMeta sm) {
-            skull.setPlayerProfile(sm.getPlayerProfile());
             skull.getPersistentDataContainer().set(coreKey, PersistentDataType.INTEGER, level);
             skull.update(true);
         }
