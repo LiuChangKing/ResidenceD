@@ -314,7 +314,7 @@ public class LandCoreManager {
             // this block is reset by BlockPlaceEvent when cancelled,
             // so delay the slab placement by one tick
             Bukkit.getScheduler().runTask(plugin, () ->
-                world.getBlockAt(px, loc.getBlockY(), pz).setType(Material.STONE_SLAB)
+                    world.getBlockAt(px, loc.getBlockY(), pz).setType(Material.STONE_SLAB)
             );
         }
         int centerX = (minX + maxX) / 2;
