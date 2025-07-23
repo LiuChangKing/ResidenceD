@@ -19,6 +19,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.block.BlockFace;
+import org.bukkit.Chunk;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -232,6 +233,17 @@ public class LandCoreManager {
                         stand.getPersistentDataContainer().has(holoKey, PersistentDataType.INTEGER)) {
                     stand.remove();
                 }
+            }
+        }
+    }
+
+    private void removeHologram(Location loc) {
+        if (loc == null || loc.getWorld() == null) return;
+        Location holoLoc = loc.clone().add(0.5, 1.2, 0.5);
+        for (Entity ent : holoLoc.getWorld().getNearbyEntities(holoLoc, 0.5, 0.5, 0.5)) {
+            if (ent instanceof ArmorStand stand &&
+                    stand.getPersistentDataContainer().has(holoKey, PersistentDataType.INTEGER)) {
+                stand.remove();
             }
         }
     }
@@ -491,5 +503,86 @@ public class LandCoreManager {
         data.setLevel(newLevel);
         save();
         MessageUtil.notifySuccess(player, "升级成功", "已提升至等级" + newLevel);
+    }
+
+    public void withdraw(Player player, Block block) {
+        LandCoreData data = get(block);
+        if (data == null) return;
+
+        MessageUtil.notifySuccess(player, "请稍候", "正在检查领地内的箱子...");
+
+        int level = data.getLevel();
+        World world = block.getWorld();
+        int chunkX = block.getChunk().getX();
+        int chunkZ = block.getChunk().getZ();
+        int radius = level - 1;
+        java.util.List<Chunk> chunks = new java.util.ArrayList<>();
+        for (int x = chunkX - radius; x <= chunkX + radius; x++) {
+            for (int z = chunkZ - radius; z <= chunkZ + radius; z++) {
+                chunks.add(world.getChunkAt(x, z));
+            }
+        }
+        int minY = world.getMinHeight();
+        int maxY = world.getMaxHeight();
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            boolean foundChest = false;
+            outer: for (Chunk c : chunks) {
+                for (int x = 0; x < 16; x++) {
+                    for (int z = 0; z < 16; z++) {
+                        for (int y = minY; y < maxY; y++) {
+                            Material m = c.getBlock(x, y, z).getType();
+                            if (m == Material.CHEST || m == Material.TRAPPED_CHEST) {
+                                foundChest = true;
+                                break outer;
+                            }
+                        }
+                    }
+                }
+            }
+            boolean chestPresent = foundChest;
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                if (chestPresent) {
+                    MessageUtil.notifyError(player, "收回领地失败", "请先拆除领地内的所有箱子");
+                } else {
+                    doWithdraw(player, block);
+                }
+            });
+        });
+    }
+
+    private void doWithdraw(Player player, Block block) {
+        LandCoreData data = get(block);
+        if (data == null) return;
+
+        int level = data.getLevel();
+        String resName = data.getResidenceName();
+
+        ClaimedResidence res = plugin.getResidenceManager().getByName(resName);
+        if (res != null) {
+            plugin.getResidenceManager().removeResidence(res);
+        }
+
+        Location loc = block.getLocation();
+        World world = loc.getWorld();
+        int chunkX = block.getChunk().getX();
+        int chunkZ = block.getChunk().getZ();
+        int radius = level - 1;
+        for (int x = chunkX - radius; x <= chunkX + radius; x++) {
+            for (int z = chunkZ - radius; z <= chunkZ + radius; z++) {
+                Chunk chunk = world.getChunkAt(x, z);
+                world.regenerateChunk(x, z);
+                new com.bekvon.bukkit.residence.landcore.restore.AsyncChunkScanner(plugin, chunk, player)
+                        .runTaskAsynchronously(plugin);
+            }
+        }
+
+        removeHologram(loc);
+        cores.remove(key(loc));
+        config.getConfig().set("cores." + key(loc), null);
+        config.save();
+        block.setType(Material.AIR);
+        player.getInventory().addItem(createCoreItem(level, player));
+        save();
+        MessageUtil.notifySuccess(player, "操作成功", "已收回领地");
     }
 }

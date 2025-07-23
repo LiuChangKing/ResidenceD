@@ -84,6 +84,9 @@ public class LandCoreListener implements Listener {
         menu.title("领地核心");
         menu.buttonAt(0, Material.NETHER_STAR, "领地升级", "领地升级", lore, "upgrade");
         menu.buttonAt(1, Material.BOOK, "领地设置", "领地设置", "set");
+        menu.buttonAt(7, Material.BARRIER, "收回领地", "收回领地",
+                java.util.Collections.singletonList("§7这会删除并清空你的领地"),
+                "withdraw");
         final Block coreBlock = block;
         final java.util.List<String> upgradeLore = lore;
         menu.onClick(ev -> {
@@ -108,6 +111,18 @@ public class LandCoreListener implements Listener {
             } else if ("set".equals(ev.getPayload())) {
                 ev.getPlayer().closeInventory();
                 ev.getPlayer().performCommand("res set " + manager.get(coreBlock).getResidenceName());
+            } else if ("withdraw".equals(ev.getPayload())) {
+                CrossUI.menu(ev.getPlayer(), String.class)
+                        .title("确认收回领地?")
+                        .buttonAt(3, Material.LIME_WOOL, "确定", "yes")
+                        .buttonAt(5, Material.RED_WOOL, "取消", "no")
+                        .onClick(resp -> {
+                            resp.getPlayer().closeInventory();
+                            if ("yes".equals(resp.getPayload())) {
+                                manager.withdraw(resp.getPlayer(), coreBlock);
+                            }
+                        })
+                        .open(ev.getPlayer());
             }
         });
         menu.open(player);
