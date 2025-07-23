@@ -335,6 +335,7 @@ public class LandCoreManager {
         LandCoreData data = new LandCoreData(level,resName);
         cores.put(key(coreLoc), data);
         save();
+        MessageUtil.notifySuccess(player, "领地创建成功", "你可以在领地中央找到领地核心,右键它管理你的领地");
         return true;
     }
 
