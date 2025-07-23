@@ -6,6 +6,7 @@ import com.bekvon.bukkit.residence.protection.CuboidArea;
 import com.liuchangking.dreamengine.shop.hook.VaultHook;
 import com.liuchangking.dreamengine.utils.MessageUtil;
 import com.liuchangking.dreamengine.utils.HeadUtil;
+import com.liuchangking.dreamengine.ui.ConfirmContent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -386,6 +387,35 @@ public class LandCoreManager {
             amount -= take;
         }
         player.getInventory().setContents(contents);
+    }
+
+    /**
+     * Build lore lines describing the cost to upgrade from the given level.
+     */
+    public java.util.List<String> getUpgradeLore(int level) {
+        int next = level + 1;
+        java.util.List<String> lore = new java.util.ArrayList<>();
+        if (next > 5) {
+            lore.add("§c已经到达最大等级");
+            return lore;
+        }
+        LandCoreConfig.UpgradeCost cost = config.getUpgradeCost(next);
+        if (cost.getMoney() > 0) {
+            lore.add("§7费用: §e" + cost.getMoney());
+        }
+        for (LandCoreConfig.UpgradeItem it : cost.getItems()) {
+            String name = it.getLore() == null ? "物品" : it.getLore();
+            lore.add("§7" + name + " x" + it.getAmount());
+        }
+        return lore;
+    }
+
+    /**
+     * Create confirm page content for upgrading from the given level.
+     */
+    public ConfirmContent getUpgradeConfirm(int level) {
+        String content = String.join("\n", getUpgradeLore(level));
+        return new ConfirmContent("升级领地", content, "升级", "取消");
     }
 
     public void upgrade(Player player, Block block) {
