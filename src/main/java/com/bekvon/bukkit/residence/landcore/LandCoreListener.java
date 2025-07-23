@@ -94,6 +94,7 @@ public class LandCoreListener implements Listener {
             }
         });
         menu.onClick(ev -> {
+            ev.getPlayer().closeInventory();
             if ("set".equals(ev.getPayload())) {
                 ev.getPlayer().performCommand("res set " + manager.get(block).getResidenceName());
             } else if ("upgrade".equals(ev.getPayload())) {
