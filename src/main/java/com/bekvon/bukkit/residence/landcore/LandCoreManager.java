@@ -392,12 +392,12 @@ public class LandCoreManager {
         if (data == null) return;
         int level = data.getLevel();
         if (level >= 5) {
-            player.sendMessage("已经到达最大等级");
+            MessageUtil.notifyError(player, "升级失败", "已经到达最大等级");
             return;
         }
         ClaimedResidence res = plugin.getResidenceManager().getByName(data.getResidenceName());
         if (res == null) {
-            player.sendMessage("领地不存在");
+            MessageUtil.notifyError(player, "升级失败", "领地不存在");
             return;
         }
 
@@ -416,7 +416,7 @@ public class LandCoreManager {
                 new Location(world, maxX, maxY, maxZ));
         // check collision before charging player
         if (plugin.getResidenceManager().checkAreaCollision(newArea, res) != null) {
-            player.sendMessage("升级失败, 与其他领地冲突");
+            MessageUtil.notifyError(player, "升级失败", "与其他领地冲突");
             return;
         }
 
@@ -426,12 +426,12 @@ public class LandCoreManager {
         for (LandCoreConfig.UpgradeItem it : cost.getItems()) {
             if (countMatchingItems(player, it) < it.getAmount()) {
                 String name = it.getLore() == null ? "物品" : it.getLore();
-                player.sendMessage("缺少物品: " + name + " x" + it.getAmount());
+                MessageUtil.notifyError(player, "升级失败", "缺少物品: " + name + " x" + it.getAmount());
                 return;
             }
         }
         if (money > 0 && !VaultHook.takeMoney(player, money)) {
-            player.sendMessage("金币不足," + money);
+            MessageUtil.notifyError(player, "升级失败", "金币不足," + money);
             return;
         }
 
@@ -441,7 +441,7 @@ public class LandCoreManager {
             if (money > 0) {
                 VaultHook.giveMoney(player, money);
             }
-            player.sendMessage("升级失败");
+            MessageUtil.notifyError(player, "升级失败");
             return;
         }
 
@@ -458,5 +458,6 @@ public class LandCoreManager {
         spawnOrUpdateHologram(block.getLocation(), newLevel, ownerName);
         data.setLevel(newLevel);
         save();
+        MessageUtil.notifySuccess(player, "升级成功", "已提升至等级" + newLevel);
     }
 }
