@@ -83,8 +83,8 @@ public class LandCoreListener implements Listener {
 
         CrossPlatformMenu<String> menu = CrossUI.stringMenu(player);
         menu.title("领地核心");
-        menu.button("领地升级", String.join("\n", lore), "upgrade");
-        menu.button("领地设置", "set");
+        menu.buttonAt(0, Material.NETHER_STAR, "领地升级", "领地升级", lore, "upgrade");
+        menu.buttonAt(1, Material.BOOK, "领地设置", "领地设置", "set");
         menu.confirmMode(ConfirmMode.BEDROCK_ONLY);
         menu.confirmContentProvider(payload ->
                 "upgrade".equals(payload) ? manager.getUpgradeConfirm(level) : null);
