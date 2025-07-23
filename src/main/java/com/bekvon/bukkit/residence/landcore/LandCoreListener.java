@@ -3,8 +3,7 @@ package com.bekvon.bukkit.residence.landcore;
 import com.bekvon.bukkit.residence.Residence;
 import com.liuchangking.dreamengine.api.CrossPlatformMenu;
 import com.liuchangking.dreamengine.api.CrossUI;
-import com.liuchangking.dreamengine.api.CrossPlatformMenu.ConfirmMode;
-import com.liuchangking.dreamengine.ui.ConfirmContent;
+import com.liuchangking.dreamengine.api.PlatformAPI;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
@@ -85,20 +84,30 @@ public class LandCoreListener implements Listener {
         menu.title("领地核心");
         menu.buttonAt(0, Material.NETHER_STAR, "领地升级", "领地升级", lore, "upgrade");
         menu.buttonAt(1, Material.BOOK, "领地设置", "领地设置", "set");
-        menu.confirmMode(ConfirmMode.BEDROCK_ONLY);
-        menu.confirmContentProvider(payload ->
-                "upgrade".equals(payload) ? manager.getUpgradeConfirm(level) : null);
-        menu.onConfirm(payload -> {
-            if ("upgrade".equals(payload)) {
-                manager.upgrade(player, block);
-            }
-        });
+        final Block coreBlock = block;
+        final java.util.List<String> upgradeLore = lore;
         menu.onClick(ev -> {
-            ev.getPlayer().closeInventory();
-            if ("set".equals(ev.getPayload())) {
-                ev.getPlayer().performCommand("res set " + manager.get(block).getResidenceName());
-            } else if ("upgrade".equals(ev.getPayload())) {
-                manager.upgrade(ev.getPlayer(), block);
+            if ("upgrade".equals(ev.getPayload())) {
+                if (PlatformAPI.isBedrockPlayer(ev.getPlayer())) {
+                    CrossUI.menu(ev.getPlayer(), String.class)
+                            .title("确认升级?")
+                            .content(String.join("\n", upgradeLore))
+                            .buttonAt(3, Material.LIME_WOOL, "升级", "yes")
+                            .buttonAt(5, Material.RED_WOOL, "取消", "no")
+                            .onClick(resp -> {
+                                resp.getPlayer().closeInventory();
+                                if ("yes".equals(resp.getPayload())) {
+                                    manager.upgrade(resp.getPlayer(), coreBlock);
+                                }
+                            })
+                            .open(ev.getPlayer());
+                } else {
+                    ev.getPlayer().closeInventory();
+                    manager.upgrade(ev.getPlayer(), coreBlock);
+                }
+            } else if ("set".equals(ev.getPayload())) {
+                ev.getPlayer().closeInventory();
+                ev.getPlayer().performCommand("res set " + manager.get(coreBlock).getResidenceName());
             }
         });
         menu.open(player);
