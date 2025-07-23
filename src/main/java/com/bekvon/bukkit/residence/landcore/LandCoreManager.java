@@ -417,7 +417,7 @@ public class LandCoreManager {
         // check collision before charging player
         String collisionRes = plugin.getResidenceManager().checkAreaCollision(newArea, res);
         if (collisionRes != null) {
-            MessageUtil.notifyError(player, "升级失败", "与其他领地冲突, 领地名:"+collisionRes);
+            MessageUtil.notifyError(player, "升级失败", "与其他领地冲突, 领地名: "+collisionRes);
             return;
         }
 
@@ -432,7 +432,7 @@ public class LandCoreManager {
             }
         }
         if (money > 0 && !VaultHook.takeMoney(player, money)) {
-            MessageUtil.notifyError(player, "升级失败", "金币不足," + money);
+            MessageUtil.notifyError(player, "升级失败", "金币不足, 需要 " + money);
             return;
         }
 
