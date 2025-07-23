@@ -415,8 +415,9 @@ public class LandCoreManager {
         CuboidArea newArea = new CuboidArea(new Location(world, minX, minY, minZ),
                 new Location(world, maxX, maxY, maxZ));
         // check collision before charging player
-        if (plugin.getResidenceManager().checkAreaCollision(newArea, res) != null) {
-            MessageUtil.notifyError(player, "升级失败", "与其他领地冲突");
+        String collisionRes = plugin.getResidenceManager().checkAreaCollision(newArea, res);
+        if (collisionRes != null) {
+            MessageUtil.notifyError(player, "升级失败", "与其他领地冲突, 领地名:"+collisionRes);
             return;
         }
 
