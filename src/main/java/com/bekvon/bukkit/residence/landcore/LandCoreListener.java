@@ -3,6 +3,8 @@ package com.bekvon.bukkit.residence.landcore;
 import com.bekvon.bukkit.residence.Residence;
 import com.liuchangking.dreamengine.api.CrossPlatformMenu;
 import com.liuchangking.dreamengine.api.CrossUI;
+import com.liuchangking.dreamengine.api.CrossPlatformMenu.ConfirmMode;
+import com.liuchangking.dreamengine.ui.ConfirmContent;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
@@ -75,19 +77,30 @@ public class LandCoreListener implements Listener {
         if (block == null || block.getType() != Material.PLAYER_HEAD) return;
         if (!manager.isCore(block)) return;
         event.setCancelled(true);
-        CrossPlatformMenu<String> menu = CrossUI.stringMenu(event.getPlayer());
+        Player player = event.getPlayer();
+        int level = manager.get(block).getLevel();
+        java.util.List<String> lore = manager.getUpgradeLore(level);
+
+        CrossPlatformMenu<String> menu = CrossUI.stringMenu(player);
         menu.title("领地核心");
-        menu.button("领地升级", "upgrade");
+        menu.button("领地升级", String.join("\n", lore), "upgrade");
         menu.button("领地设置", "set");
-        menu.onClick(ev -> {
-            if ("upgrade".equals(ev.getPayload())) {
-                ev.getPlayer().closeInventory();
-                manager.upgrade(ev.getPlayer(), block);
-            } else if ("set".equals(ev.getPayload())) {
-                ev.getPlayer().performCommand("res set " + manager.get(block).getResidenceName());
+        menu.confirmMode(ConfirmMode.BEDROCK_ONLY);
+        menu.confirmContentProvider(payload ->
+                "upgrade".equals(payload) ? manager.getUpgradeConfirm(level) : null);
+        menu.onConfirm(payload -> {
+            if ("upgrade".equals(payload)) {
+                manager.upgrade(player, block);
             }
         });
-        menu.open(event.getPlayer());
+        menu.onClick(ev -> {
+            if ("set".equals(ev.getPayload())) {
+                ev.getPlayer().performCommand("res set " + manager.get(block).getResidenceName());
+            } else if ("upgrade".equals(ev.getPayload())) {
+                manager.upgrade(ev.getPlayer(), block);
+            }
+        });
+        menu.open(player);
     }
 
 
