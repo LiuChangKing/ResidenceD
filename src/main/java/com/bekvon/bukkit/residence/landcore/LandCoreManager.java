@@ -25,6 +25,7 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.profile.PlayerProfile;
+import com.bekvon.bukkit.residence.landcore.tasks.AreaFillTask;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -227,7 +228,7 @@ public class LandCoreManager {
         for (String k : cores.keySet()) {
             Location loc = parseKey(k);
             if (loc == null || loc.getWorld() == null) continue;
-            Location holoLoc = loc.clone().add(0.5, 1.2, 0.5);
+            Location holoLoc = loc.clone().add(0.5, 0.5, 0.5);
             for (Entity ent : holoLoc.getWorld().getNearbyEntities(holoLoc, 0.5, 0.5, 0.5)) {
                 if (ent instanceof ArmorStand stand &&
                         stand.getPersistentDataContainer().has(holoKey, PersistentDataType.INTEGER)) {
@@ -239,7 +240,7 @@ public class LandCoreManager {
 
     private void removeHologram(Location loc) {
         if (loc == null || loc.getWorld() == null) return;
-        Location holoLoc = loc.clone().add(0.5, 1.2, 0.5);
+        Location holoLoc = loc.clone().add(0.5, 0.5, 0.5);
         for (Entity ent : holoLoc.getWorld().getNearbyEntities(holoLoc, 0.5, 0.5, 0.5)) {
             if (ent instanceof ArmorStand stand &&
                     stand.getPersistentDataContainer().has(holoKey, PersistentDataType.INTEGER)) {
@@ -313,14 +314,8 @@ public class LandCoreManager {
         }
         // floor and border
         int floorY = loc.getBlockY() - 1;
-        for (int x = minX; x <= maxX; x++) {
-            for (int z = minZ; z <= maxZ; z++) {
-                world.getBlockAt(x, floorY, z).setType(Material.OAK_PLANKS);
-                if (x == minX || x == maxX || z == minZ || z == maxZ) {
-                    world.getBlockAt(x, loc.getBlockY(), z).setType(Material.STONE_SLAB);
-                }
-            }
-        }
+        new AreaFillTask(world, minX, maxX, minZ, maxZ, floorY,
+                loc.getBlockY()).runTaskTimer(plugin, 0L, 1L);
         int px = loc.getBlockX();
         int pz = loc.getBlockZ();
         if (px == minX || px == maxX || pz == minZ || pz == maxZ) {
@@ -525,24 +520,26 @@ public class LandCoreManager {
         int minY = world.getMinHeight();
         int maxY = world.getMaxHeight();
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            boolean foundChest = false;
+            Location chestLoc = null;
             outer: for (Chunk c : chunks) {
                 for (int x = 0; x < 16; x++) {
                     for (int z = 0; z < 16; z++) {
                         for (int y = minY; y < maxY; y++) {
                             Material m = c.getBlock(x, y, z).getType();
                             if (m == Material.CHEST || m == Material.TRAPPED_CHEST) {
-                                foundChest = true;
+                                chestLoc = new Location(world,
+                                        c.getX() * 16 + x, y, c.getZ() * 16 + z);
                                 break outer;
                             }
                         }
                     }
                 }
             }
-            boolean chestPresent = foundChest;
+            boolean chestPresent = chestLoc != null;
             Bukkit.getScheduler().runTask(plugin, () -> {
                 if (chestPresent) {
-                    MessageUtil.notifyError(player, "收回领地失败", "请先拆除领地内的所有箱子");
+                    String coords = chestLoc.getBlockX()+", "+chestLoc.getBlockY()+", "+chestLoc.getBlockZ();
+                    MessageUtil.notifyError(player, "收回领地失败", "请先拆除位于" + coords + "的箱子");
                 } else {
                     doWithdraw(player, block);
                 }
