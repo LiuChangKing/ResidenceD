@@ -26,7 +26,6 @@ public enum Flags {
     cake(CMIMaterial.CAKE, FlagMode.Both, "Allows or denys players to eat cake", true),
     canimals(CMIMaterial.SHEEP_SPAWN_EGG, FlagMode.Residence, "Allows or denys custom animal spawns", true),
     chorustp(CMIMaterial.CHORUS_FRUIT, FlagMode.Both, "Allow or disallow teleporting to the residence with chorus fruit", true),
-    chat(CMIMaterial.WRITABLE_BOOK, FlagMode.Both, "Allows to join residence chat room", true),
     cmonsters(CMIMaterial.CREEPER_SPAWN_EGG, FlagMode.Residence, "Allows or denys custom monster spawns", true),
     commandblock(CMIMaterial.COMMAND_BLOCK, FlagMode.Both, "Allows or denys command block interaction", false),
     command(CMIMaterial.COMMAND_BLOCK, FlagMode.Both, "Allows or denys comamnd use in residences", false),

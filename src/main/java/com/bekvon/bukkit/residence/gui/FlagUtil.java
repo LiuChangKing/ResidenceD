@@ -73,6 +73,8 @@ public class FlagUtil {
         flag.recalculate();
 
         PageInfo pi = new PageInfo(45, flag.getButtons().size(), page);
+        pi.setCustomPrev(Residence.getInstance().msg("prevPageGui"));
+        pi.setCustomNext(Residence.getInstance().msg("nextPageGui"));
         openUI(flag, pi, player, Residence.getInstance().msg(lm.Gui_Pset_Title, res.getName(), targetPlayer));
         return;
     }
@@ -82,7 +84,10 @@ public class FlagUtil {
         CMIGui gui = new CMIGui(player) {
             @Override
             public void pageChange(int page) {
-                openUI(flag, new PageInfo(45, flag.getButtons().size(), page), player, title);
+                PageInfo newPi = new PageInfo(45, flag.getButtons().size(), page);
+                newPi.setCustomPrev(Residence.getInstance().msg("prevPageGui"));
+                newPi.setCustomNext(Residence.getInstance().msg("nextPageGui"));
+                openUI(flag, newPi, player, title);
             }
         };
         gui.setTitle(title);
@@ -95,7 +100,11 @@ public class FlagUtil {
                 break;
             gui.addButton(one);
         }
+        pi.setCustomPrev(Residence.getInstance().msg("prevPageGui"));
+        pi.setCustomNext(Residence.getInstance().msg("nextPageGui"));
         gui.addPagination(pi);
+
+        gui.removeButton(49);
 
         gui.fillEmptyButtons();
         gui.open();
@@ -108,6 +117,8 @@ public class FlagUtil {
         setFlagInfo flag = new setFlagInfo(res, player, resadmin);
         flag.recalculate();
         PageInfo pi = new PageInfo(45, flag.getButtons().size(), page);
+        pi.setCustomPrev(Residence.getInstance().msg("prevPageGui"));
+        pi.setCustomNext(Residence.getInstance().msg("nextPageGui"));
         openUI(flag, pi, player, plugin.msg(lm.Gui_Set_Title, res.getName()));
     }
 
