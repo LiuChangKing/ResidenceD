@@ -26,10 +26,15 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.profile.PlayerProfile;
 import com.bekvon.bukkit.residence.landcore.tasks.AreaFillTask;
+import com.bekvon.bukkit.residence.landcore.restore.AsyncChunkScanner;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 /** Manager for land cores. */
@@ -37,6 +42,7 @@ public class LandCoreManager {
     private final Residence plugin;
     private final LandCoreConfig config;
     private final Map<String, LandCoreData> cores = new HashMap<>();
+    private final Set<String> withdrawing = Collections.synchronizedSet(new HashSet<>());
     private final NamespacedKey coreKey;
     private final NamespacedKey ownerKey;
     private final NamespacedKey holoKey;
@@ -399,9 +405,9 @@ public class LandCoreManager {
     /**
      * Build lore lines describing the cost to upgrade from the given level.
      */
-    public java.util.List<String> getUpgradeLore(int level) {
+    public List<String> getUpgradeLore(int level) {
         int next = level + 1;
-        java.util.List<String> lore = new java.util.ArrayList<>();
+        List<String> lore = new ArrayList<>();
         if (next > 5) {
             lore.add("§c已经到达最大等级");
             return lore;
@@ -505,12 +511,18 @@ public class LandCoreManager {
     public void withdraw(Player player, Block block) {
         LandCoreData data = get(block);
         if (data == null) return;
+        String k = key(block.getLocation());
+        if (withdrawing.contains(k)) {
+            MessageUtil.notifyError(player, "正在收回", "领地正在回收中");
+            return;
+        }
+        withdrawing.add(k);
         int level = data.getLevel();
         World world = block.getWorld();
         int chunkX = block.getChunk().getX();
         int chunkZ = block.getChunk().getZ();
         int radius = level - 1;
-        java.util.List<Chunk> chunks = new java.util.ArrayList<>();
+        List<Chunk> chunks = new ArrayList<>();
         for (int x = chunkX - radius; x <= chunkX + radius; x++) {
             for (int z = chunkZ - radius; z <= chunkZ + radius; z++) {
                 chunks.add(world.getChunkAt(x, z));
@@ -540,8 +552,10 @@ public class LandCoreManager {
                 if (chestPresent) {
                     String coords = finalChestLoc.getBlockX()+", "+ finalChestLoc.getBlockY()+", "+ finalChestLoc.getBlockZ();
                     MessageUtil.notifyError(player, "收回领地失败", "请先拆除位于" + coords + "的箱子");
+                    withdrawing.remove(k);
                 } else {
                     doWithdraw(player, block);
+                    withdrawing.remove(k);
                 }
             });
         });
@@ -568,7 +582,7 @@ public class LandCoreManager {
             for (int z = chunkZ - radius; z <= chunkZ + radius; z++) {
                 Chunk chunk = world.getChunkAt(x, z);
                 world.regenerateChunk(x, z);
-                new com.bekvon.bukkit.residence.landcore.restore.AsyncChunkScanner(plugin, chunk, player)
+                new AsyncChunkScanner(plugin, chunk, player)
                         .runTaskAsynchronously(plugin);
             }
         }
