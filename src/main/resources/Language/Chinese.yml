@@ -156,6 +156,7 @@ Language:
     List: ' &e%2 &e- &6%3'
     Near: '&e附近的领地: &7%1'
     TeleportNear: '&e已传送到附近的领地.'
+    SetTeleportLocation: '&e传送点已设置.'
     PermissionsApply: '&e领地权限已设置.'
     NotOwner: '&c你不是该领地的所有者.'
     RemovePlayersResidences: '&e移除所有属于 &6%1 &e的领地.'
@@ -655,6 +656,11 @@ CommandHelp:
               Description: 开启或关闭铁砧损坏
               Info:
               - '&e使用方法: &6/res set <领地名称> anvilbreak true/false/remove=移除'
+            backup:
+              Translated: backup - 恢复区域
+              Description: 设置为 true 时使用 WorldEdit 恢复区域
+              Info:
+              - '&e使用方法: &6/res set <领地名称> backup true/false/remove=移除'
             bed:
               Translated: bed - 使用床(睡觉)
               Description: 允许或禁止使用床(睡觉)
@@ -690,6 +696,11 @@ CommandHelp:
               Description: 开启或关闭怪物燃烧
               Info:
               - '&e使用方法: &6/res set <领地名称> burn true/false/remove=移除'
+            brush:
+              Translated: brush - 方块刷洗
+              Description: 允许或禁止刷洗方块
+              Info:
+              - '&e使用方法: &6/res set <领地名称> brush true/false/remove=移除'
             button:
               Translated: button - 使用按钮
               Description: 允许或禁止使用按钮
@@ -875,6 +886,16 @@ CommandHelp:
               Description: 使玩家进入领地时发光
               Info:
               - '&e使用方法: &6/res set <领地名称> glow true/false/remove=移除'
+            goathorn:
+              Translated: goathorn - 使用山羊号角
+              Description: 允许或禁止使用山羊号角
+              Info:
+              - '&e使用方法: &6/res set/pset <领地名称> goathorn true/false/remove=移除'
+            harvest:
+              Translated: harvest - 收获作物
+              Description: 允许或禁止收获作物
+              Info:
+              - '&e使用方法: &6/res set <领地名称> harvest true/false/remove=移除'
             hotfloor:
               Translated: hotfloor - 岩浆块伤害
               Description: 开启或关闭岩浆块造成的伤害
@@ -1090,11 +1111,21 @@ CommandHelp:
               Description: 允许或禁止方块蔓延
               Info:
               - '&e使用方法: &6/res set <领地名称> spread true/false/remove=移除'
+            skulk:
+              Translated: skulk - 阻止幽匿蔓延
+              Description: 阻止幽匿催发块蔓延
+              Info:
+              - '&e使用方法: &6/res set <领地名称> skulk true/false/remove=移除'
             snowball:
               Translated: snowball - 允许或禁止雪球击退
               Description: 允许或禁止雪球击退
               Info:
               - '&e使用方法: &6/res set <领地名称> snowball true/false/remove=移除'
+            safezone:
+              Translated: safezone - 安全区域
+              Description: 设置为 true 时清除玩家负面效果
+              Info:
+              - '&e使用方法: &6/res set <领地名称> safezone true/false/remove=移除'
             sanimals:
               Translated: sanimals - 刷怪笼或刷怪蛋生成动物
               Description: 允许或禁止刷怪笼或刷怪蛋生成动物

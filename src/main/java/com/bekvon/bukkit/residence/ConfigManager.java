@@ -492,8 +492,7 @@ public class ConfigManager {
                 Flags.leash.toString(),
                 Flags.animalkilling.toString(),
                 Flags.mobkilling.toString(),
-                Flags.shear.toString(),
-                Flags.chat.toString()));
+                Flags.shear.toString()));
             conf.set("Global.GroupedFlags.fire", Arrays.asList(
                 Flags.ignite.toString(),
                 Flags.firespread.toString()));
