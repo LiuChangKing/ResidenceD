@@ -84,9 +84,9 @@ public class LandCoreListener implements Listener {
 
         CrossPlatformMenu<String> menu = CrossUI.stringMenu(player);
         menu.title("领地核心");
-        menu.buttonAt(0, Material.NETHER_STAR, "领地升级", "领地升级", lore, "upgrade");
-        menu.buttonAt(1, Material.BOOK, "公共权限", "set");
-        menu.buttonAt(8, Material.BARRIER, "收回领地", "收回领地",
+        menu.buttonAt(0, Material.NETHER_STAR,"领地升级", lore, "upgrade");
+        menu.buttonAt(1, Material.BOOK,"公共权限", "set");
+        menu.buttonAt(8, Material.BARRIER, "收回领地",
                 Collections.singletonList("§7这会删除并清空你的领地"),
                 "withdraw");
         final Block coreBlock = block;
