@@ -407,8 +407,10 @@ public class LandCoreManager {
             return lore;
         }
         LandCoreConfig.UpgradeCost cost = config.getUpgradeCost(next);
+        lore.add(" ");
+        lore.add("§f升级所需:");
         if (cost.getMoney() > 0) {
-            lore.add("§7费用: §e" + cost.getMoney());
+            lore.add("§7金币: §e" + cost.getMoney());
         }
         for (LandCoreConfig.UpgradeItem it : cost.getItems()) {
             String name = it.getLore() == null ? "物品" : it.getLore();
