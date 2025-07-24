@@ -9,6 +9,7 @@ import net.Zrips.CMILib.FileHandler.ConfigReader;
 import net.Zrips.CMILib.GUI.CMIGui;
 import net.Zrips.CMILib.GUI.CMIGuiButton;
 import net.Zrips.CMILib.GUI.GUIManager.GUIRows;
+import net.Zrips.CMILib.GUI.GUIManager.GUIButtonLocation;
 import net.Zrips.CMILib.Items.CMIAsyncHead;
 import net.Zrips.CMILib.Items.CMIItemStack;
 import net.Zrips.CMILib.Items.CMIMaterial;
@@ -103,6 +104,18 @@ public class FlagUtil {
         pi.setCustomPrev(Residence.getInstance().msg("prevPageGui"));
         pi.setCustomNext(Residence.getInstance().msg("nextPageGui"));
         gui.addPagination(pi);
+
+        // Adjust pagination button names for languages not handled by CMILib
+        Integer prevSlot = gui.getSlot(GUIButtonLocation.bottomLeft);
+        CMIGuiButton prevBtn = gui.getButton(prevSlot);
+        if (prevBtn != null) {
+            prevBtn.setName(Residence.getInstance().msg("prevPageGui"));
+        }
+        Integer nextSlot = gui.getSlot(GUIButtonLocation.bottomRight);
+        CMIGuiButton nextBtn = gui.getButton(nextSlot);
+        if (nextBtn != null) {
+            nextBtn.setName(Residence.getInstance().msg("nextPageGui"));
+        }
 
         gui.removeButton(49);
 
