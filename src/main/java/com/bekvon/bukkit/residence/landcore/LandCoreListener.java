@@ -133,6 +133,7 @@ public class LandCoreListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onBreak(BlockBreakEvent event) {
         if (manager.isCore(event.getBlock())) {
+            MessageUtil.notifyError(event.getPlayer(), "无法破坏", "你可以右键领地核心,点击收回领地即可删除当前的领地");
             event.setCancelled(true);
         }
     }
