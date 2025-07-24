@@ -22,6 +22,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import java.util.Collections;
+import java.util.List;
 
 public class LandCoreListener implements Listener {
     private final Residence plugin;
@@ -78,17 +80,17 @@ public class LandCoreListener implements Listener {
         event.setCancelled(true);
         Player player = event.getPlayer();
         int level = manager.get(block).getLevel();
-        java.util.List<String> lore = manager.getUpgradeLore(level);
+        List<String> lore = manager.getUpgradeLore(level);
 
         CrossPlatformMenu<String> menu = CrossUI.stringMenu(player);
         menu.title("领地核心");
         menu.buttonAt(0, Material.NETHER_STAR, "领地升级", "领地升级", lore, "upgrade");
         menu.buttonAt(1, Material.BOOK, "领地设置", "领地设置", "set");
         menu.buttonAt(8, Material.BARRIER, "收回领地", "收回领地",
-                java.util.Collections.singletonList("§7这会删除并清空你的领地"),
+                Collections.singletonList("§7这会删除并清空你的领地"),
                 "withdraw");
         final Block coreBlock = block;
-        final java.util.List<String> upgradeLore = lore;
+        final List<String> upgradeLore = lore;
         menu.onClick(ev -> {
             if ("upgrade".equals(ev.getPayload())) {
                 if (PlatformAPI.isBedrockPlayer(ev.getPlayer())) {
