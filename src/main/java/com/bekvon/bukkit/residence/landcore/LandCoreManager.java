@@ -503,9 +503,6 @@ public class LandCoreManager {
     public void withdraw(Player player, Block block) {
         LandCoreData data = get(block);
         if (data == null) return;
-
-        MessageUtil.notifySuccess(player, "请稍候", "正在检查领地内的箱子...");
-
         int level = data.getLevel();
         World world = block.getWorld();
         int chunkX = block.getChunk().getX();
@@ -536,9 +533,10 @@ public class LandCoreManager {
                 }
             }
             boolean chestPresent = chestLoc != null;
+            Location finalChestLoc = chestLoc;
             Bukkit.getScheduler().runTask(plugin, () -> {
                 if (chestPresent) {
-                    String coords = chestLoc.getBlockX()+", "+chestLoc.getBlockY()+", "+chestLoc.getBlockZ();
+                    String coords = finalChestLoc.getBlockX()+", "+ finalChestLoc.getBlockY()+", "+ finalChestLoc.getBlockZ();
                     MessageUtil.notifyError(player, "收回领地失败", "请先拆除位于" + coords + "的箱子");
                 } else {
                     doWithdraw(player, block);
@@ -580,6 +578,6 @@ public class LandCoreManager {
         block.setType(Material.AIR);
         player.getInventory().addItem(createCoreItem(level, player));
         save();
-        MessageUtil.notifySuccess(player, "操作成功", "已收回领地");
+        MessageUtil.notifySuccess(player, "已收回领地");
     }
 }

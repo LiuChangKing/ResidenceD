@@ -4,6 +4,7 @@ import com.bekvon.bukkit.residence.Residence;
 import com.liuchangking.dreamengine.api.CrossPlatformMenu;
 import com.liuchangking.dreamengine.api.CrossUI;
 import com.liuchangking.dreamengine.api.PlatformAPI;
+import com.liuchangking.dreamengine.utils.MessageUtil;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
@@ -15,7 +16,6 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.GameMode;
 import org.bukkit.inventory.ItemStack;
@@ -84,7 +84,7 @@ public class LandCoreListener implements Listener {
         menu.title("领地核心");
         menu.buttonAt(0, Material.NETHER_STAR, "领地升级", "领地升级", lore, "upgrade");
         menu.buttonAt(1, Material.BOOK, "领地设置", "领地设置", "set");
-        menu.buttonAt(7, Material.BARRIER, "收回领地", "收回领地",
+        menu.buttonAt(8, Material.BARRIER, "收回领地", "收回领地",
                 java.util.Collections.singletonList("§7这会删除并清空你的领地"),
                 "withdraw");
         final Block coreBlock = block;
@@ -120,6 +120,7 @@ public class LandCoreListener implements Listener {
                             resp.getPlayer().closeInventory();
                             if ("yes".equals(resp.getPayload())) {
                                 manager.withdraw(resp.getPlayer(), coreBlock);
+                                MessageUtil.notifySuccess(player, "正在收回", "领地正在收回中...");
                             }
                         })
                         .open(ev.getPlayer());
