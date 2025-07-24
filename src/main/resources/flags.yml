@@ -46,8 +46,6 @@ Global:
     # Applies to: Residence
     canimals: true
     # Applies to: Both
-    chat: true
-    # Applies to: Both
     chorustp: true
     # Applies to: Residence
     cmonsters: true
@@ -258,7 +256,6 @@ Global:
     button: OAK_BUTTON
     cake: CAKE
     canimals: SHEEP_SPAWN_EGG
-    chat: WRITABLE_BOOK
     chorustp: CHORUS_FRUIT
     cmonsters: CREEPER_SPAWN_EGG
     command: COMMAND_BLOCK
@@ -414,7 +411,6 @@ Global:
     - animalkilling
     - mobkilling
     - shear
-    - chat
     - beacon
     - harvest
     fire:
