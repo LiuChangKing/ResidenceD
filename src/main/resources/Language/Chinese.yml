@@ -240,7 +240,6 @@ Language:
     TpLimit: '&e请等待 &6%1 &e秒后再传送'
     TeleportSuccess: '&e传送到 X:&6%1&e, Y:&6%2&e, Z:&6%3 &e位置'
     IncorrectLocation: '&6无法找到正确的传送位置, 请等待 &e%1 &6秒后重试.'
-    WorldList: '&e可用世界: &6%1'
     Disabled: '&c在这个世界上，随机传送功能被禁用'
     TeleportStarted: '&e传送即将开始, 在 &6%4 &e秒内不要移动.'
     WorldList: '&e可用世界: &6%1'
