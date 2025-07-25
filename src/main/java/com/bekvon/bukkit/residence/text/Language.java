@@ -63,10 +63,14 @@ public class Language {
         if (!key.contains("Language.") && !key.contains("CommandHelp."))
             key = "Language." + key;
         String missing = "Missing locale for " + key;
-        String message = "";
-        if (customlocale == null || !customlocale.contains(key))
-            message = enlocale.contains(key) ? enlocale.getString(key) : missing;
-        message = customlocale.contains(key) ? customlocale.getString(key) : missing;
+        String message;
+        if (customlocale != null && customlocale.contains(key)) {
+            message = customlocale.getString(key);
+        } else if (enlocale.contains(key)) {
+            message = enlocale.getString(key);
+        } else {
+            message = missing;
+        }
         return CMIChatColor.translate(message);
     }
 
@@ -83,10 +87,14 @@ public class Language {
         if (!key.contains("Language.") && !key.contains("CommandHelp."))
             key = "Language." + key;
         String missing = "Missing locale for " + key;
-        String message = "";
-        if (customlocale == null || !customlocale.contains(key))
-            message = enlocale.contains(key) ? enlocale.getString(key) : missing;
-        message = customlocale.contains(key) ? customlocale.getString(key) : missing;
+        String message;
+        if (customlocale != null && customlocale.contains(key)) {
+            message = customlocale.getString(key);
+        } else if (enlocale.contains(key)) {
+            message = enlocale.getString(key);
+        } else {
+            message = missing;
+        }
         for (int i = 1; i <= variables.length; i++) {
             String vr = String.valueOf(variables[i - 1]);
             if (variables[i - 1] instanceof Flags)
