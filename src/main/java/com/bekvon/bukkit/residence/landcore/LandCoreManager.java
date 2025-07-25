@@ -102,8 +102,70 @@ public class LandCoreManager {
         }
     }
 
+    /** Find the core location for the given residence name. */
+    public Location getCoreLocation(String residenceName) {
+        for (Map.Entry<String, LandCoreData> e : cores.entrySet()) {
+            if (e.getValue().getResidenceName().equals(residenceName)) {
+                return parseKey(e.getKey());
+            }
+        }
+        return null;
+    }
+
+    /** Ensure a land core block exists for the given residence. */
+    public void ensureCoreExists(ClaimedResidence res) {
+        if (res == null) return;
+        Location loc = getCoreLocation(res.getName());
+        if (loc == null) return;
+        LandCoreData data = cores.get(key(loc));
+        if (data == null) return;
+        Block block = loc.getBlock();
+        if (block.getType() != Material.PLAYER_HEAD) {
+            block.setType(Material.PLAYER_HEAD);
+            ItemStack item = createCoreItem(data.getLevel());
+            ItemMeta meta = item.getItemMeta();
+            if (meta != null) {
+                meta.getPersistentDataContainer().set(ownerKey, PersistentDataType.STRING, res.getOwner());
+                item.setItemMeta(meta);
+            }
+            if (block.getState() instanceof Skull skull) {
+                applyItemToSkull(skull, item, data.getLevel());
+                skull.update(true);
+            }
+        }
+        spawnOrUpdateHologram(loc, data.getLevel(), res.getOwner());
+    }
+
+    /**
+     * Perform {@link #ensureCoreExists(ClaimedResidence)} asynchronously.
+     * The world check runs off the main thread and reconstruction happens on
+     * the server thread if necessary.
+     */
+    public void ensureCoreExistsAsync(ClaimedResidence res) {
+        if (res == null) return;
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            Location loc = getCoreLocation(res.getName());
+            if (loc == null) return;
+            LandCoreData data = cores.get(key(loc));
+            if (data == null) return;
+            boolean missing = loc.getBlock().getType() != Material.PLAYER_HEAD;
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                if (missing) {
+                    ensureCoreExists(res);
+                } else {
+                    spawnOrUpdateHologram(loc, data.getLevel(), res.getOwner());
+                }
+            });
+        });
+    }
+
     public boolean isCore(Block block) {
         return cores.containsKey(key(block.getLocation()));
+    }
+
+    /** Check if a core is currently being withdrawn. */
+    public boolean isWithdrawing(Block block) {
+        return withdrawing.contains(key(block.getLocation()));
     }
 
     /** Check if the given block or any adjacent block is a land core. */
