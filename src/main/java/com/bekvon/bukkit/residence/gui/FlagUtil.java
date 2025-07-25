@@ -74,8 +74,8 @@ public class FlagUtil {
         flag.recalculate();
 
         PageInfo pi = new PageInfo(45, flag.getButtons().size(), page);
-        String prev = Residence.getInstance().msg("prevPageGui");
-        String next = Residence.getInstance().msg("nextPageGui");
+        String prev = Residence.getInstance().msg("General.prevPageGui");
+        String next = Residence.getInstance().msg("General.nextPageGui");
         plugin.getLogger().info("prevPageGui=" + prev + ", nextPageGui=" + next);
         pi.setCustomPrev(prev);
         pi.setCustomNext(next);
@@ -89,8 +89,8 @@ public class FlagUtil {
             @Override
             public void pageChange(int page) {
                 PageInfo newPi = new PageInfo(45, flag.getButtons().size(), page);
-                newPi.setCustomPrev(Residence.getInstance().msg("prevPageGui"));
-                newPi.setCustomNext(Residence.getInstance().msg("nextPageGui"));
+                newPi.setCustomPrev(Residence.getInstance().msg("General.prevPageGui"));
+                newPi.setCustomNext(Residence.getInstance().msg("General.nextPageGui"));
                 openUI(flag, newPi, player, title);
             }
         };
@@ -104,22 +104,22 @@ public class FlagUtil {
                 break;
             gui.addButton(one);
         }
-        pi.setCustomPrev(Residence.getInstance().msg("prevPageGui"));
-        pi.setCustomNext(Residence.getInstance().msg("nextPageGui"));
-        plugin.getLogger().info("openUI prevPageGui=" + Residence.getInstance().msg("prevPageGui") +
-                ", nextPageGui=" + Residence.getInstance().msg("nextPageGui"));
+        pi.setCustomPrev(Residence.getInstance().msg("General.prevPageGui"));
+        pi.setCustomNext(Residence.getInstance().msg("General.nextPageGui"));
+        plugin.getLogger().info("openUI prevPageGui=" + Residence.getInstance().msg("General.prevPageGui") +
+                ", nextPageGui=" + Residence.getInstance().msg("General.nextPageGui"));
         gui.addPagination(pi);
 
         // Adjust pagination button names for languages not handled by CMILib
         Integer prevSlot = gui.getSlot(GUIButtonLocation.bottomLeft);
         CMIGuiButton prevBtn = gui.getButton(prevSlot);
         if (prevBtn != null) {
-            prevBtn.setName(Residence.getInstance().msg("prevPageGui"));
+            prevBtn.setName(Residence.getInstance().msg("General.prevPageGui"));
         }
         Integer nextSlot = gui.getSlot(GUIButtonLocation.bottomRight);
         CMIGuiButton nextBtn = gui.getButton(nextSlot);
         if (nextBtn != null) {
-            nextBtn.setName(Residence.getInstance().msg("nextPageGui"));
+            nextBtn.setName(Residence.getInstance().msg("General.nextPageGui"));
         }
 
         gui.removeButton(49);
@@ -135,8 +135,8 @@ public class FlagUtil {
         setFlagInfo flag = new setFlagInfo(res, player, resadmin);
         flag.recalculate();
         PageInfo pi = new PageInfo(45, flag.getButtons().size(), page);
-        String prev = Residence.getInstance().msg("prevPageGui");
-        String next = Residence.getInstance().msg("nextPageGui");
+        String prev = Residence.getInstance().msg("General.prevPageGui");
+        String next = Residence.getInstance().msg("General.nextPageGui");
         plugin.getLogger().info("prevPageGui=" + prev + ", nextPageGui=" + next);
         pi.setCustomPrev(prev);
         pi.setCustomNext(next);
