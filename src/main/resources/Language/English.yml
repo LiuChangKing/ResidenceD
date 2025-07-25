@@ -243,6 +243,8 @@ Language:
     Disabled: '&c在这个世界上，随机传送功能被禁用'
     TeleportStarted: '&e传送即将开始, 在 &6%4 &e秒内不要移动.'
     WorldList: '&e可用世界: &6%1'
+  prevPageGui: '&6上一页 '
+  nextPageGui: '&6下一页'
   Permissions:
     variableColor: '&f'
     permissionColor: '&6'
