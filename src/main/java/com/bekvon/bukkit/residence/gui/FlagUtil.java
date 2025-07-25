@@ -76,7 +76,6 @@ public class FlagUtil {
         PageInfo pi = new PageInfo(45, flag.getButtons().size(), page);
         String prev = Residence.getInstance().msg("General.prevPageGui");
         String next = Residence.getInstance().msg("General.nextPageGui");
-        plugin.getLogger().info("prevPageGui=" + prev + ", nextPageGui=" + next);
         pi.setCustomPrev(prev);
         pi.setCustomNext(next);
         openUI(flag, pi, player, Residence.getInstance().msg(lm.Gui_Pset_Title, res.getName(), targetPlayer));
@@ -106,8 +105,6 @@ public class FlagUtil {
         }
         pi.setCustomPrev(Residence.getInstance().msg("General.prevPageGui"));
         pi.setCustomNext(Residence.getInstance().msg("General.nextPageGui"));
-        plugin.getLogger().info("openUI prevPageGui=" + Residence.getInstance().msg("General.prevPageGui") +
-                ", nextPageGui=" + Residence.getInstance().msg("General.nextPageGui"));
         gui.addPagination(pi);
 
         // Adjust pagination button names for languages not handled by CMILib
@@ -137,7 +134,6 @@ public class FlagUtil {
         PageInfo pi = new PageInfo(45, flag.getButtons().size(), page);
         String prev = Residence.getInstance().msg("General.prevPageGui");
         String next = Residence.getInstance().msg("General.nextPageGui");
-        plugin.getLogger().info("prevPageGui=" + prev + ", nextPageGui=" + next);
         pi.setCustomPrev(prev);
         pi.setCustomNext(next);
         openUI(flag, pi, player, plugin.msg(lm.Gui_Set_Title, res.getName()));
