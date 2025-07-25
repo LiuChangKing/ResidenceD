@@ -55,7 +55,6 @@ public class Language {
      * Get the message with the correct key
      * 
      * @param key - the path of the message
-     * @param variables - the variables separated with %
      * @return the message
      */
 
@@ -75,13 +74,6 @@ public class Language {
         return CMIChatColor.translate(message);
     }
 
-    /**
-     * Get the message with the correct key
-     * 
-     * @param key - the path of the message
-     * @param variables - the variables separated with %
-     * @return the message
-     */
 
     public String getMessage(lm lm, Object... variables) {
         String key = lm.getPath();
@@ -134,12 +126,6 @@ public class Language {
         return enlocale.getStringList(key).size() > 0 ? ColorsArray(enlocale.getStringList(key)) : Arrays.asList(missing);
     }
 
-    /**
-     * Get the message with the correct key
-     * 
-     * @param key - the key of the message
-     * @return the message
-     */
     public List<String> getMessageList(lm lm) {
         String key = lm.getPath();
         if (!key.contains("Language.") && !key.contains("CommandHelp."))
