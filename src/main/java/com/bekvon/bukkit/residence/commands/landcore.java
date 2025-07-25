@@ -6,10 +6,13 @@ import com.bekvon.bukkit.residence.containers.CommandAnnotation;
 import com.bekvon.bukkit.residence.containers.cmd;
 import com.bekvon.bukkit.residence.containers.lm;
 import com.bekvon.bukkit.residence.landcore.LandCoreManager;
+import com.bekvon.bukkit.residence.protection.ClaimedResidence;
+import com.liuchangking.dreamengine.utils.MessageUtil;
 import net.Zrips.CMILib.FileHandler.ConfigReader;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
@@ -27,6 +30,29 @@ public class landcore implements cmd {
         }
         if (args.length < 1 || args.length > 2)
             return false;
+
+        LandCoreManager manager = plugin.getLandCoreManager();
+
+        if (args[0].equalsIgnoreCase("remove")) {
+            if (args.length != 1)
+                return false;
+
+            Player player = (Player) sender;
+            ClaimedResidence res = plugin.getResidenceManager().getByLoc(player.getLocation());
+            if (res == null) {
+                plugin.msg(player, lm.Invalid_Residence);
+                return true;
+            }
+            Location coreLoc = manager.getCoreLocation(res.getName());
+            if (coreLoc == null) {
+                plugin.msg(player, "当前领地没有领地核心");
+                return true;
+            }
+            manager.withdraw(player, coreLoc.getBlock());
+            MessageUtil.notifySuccess(player, "正在收回", "领地正在回收中...");
+            return true;
+        }
+
         int level;
         try {
             level = Integer.parseInt(args[0]);
@@ -38,7 +64,6 @@ public class landcore implements cmd {
             plugin.msg(sender, lm.Invalid_Player, args[1]);
             return true;
         }
-        LandCoreManager manager = plugin.getLandCoreManager();
         ItemStack core = manager.createCoreItem(level, target);
         target.getInventory().addItem(core);
         plugin.msg(sender, "已获得等级" + level + "的领地核心");
@@ -50,8 +75,9 @@ public class landcore implements cmd {
     @Override
     public void getLocale() {
         ConfigReader c = Residence.getInstance().getLocaleManager().getLocaleConfig();
-        c.get("Description", "给予领地核心");
-        c.get("Info", Arrays.asList("&eUsage: &6/res landcore <level> [player]"));
+        c.get("Description", "给予或删除领地核心");
+        c.get("Info", Arrays.asList("&eUsage: &6/res landcore <level> [player]", "&eUsage: &6/res landcore remove"));
         LocaleManager.addTabCompleteMain(this, "<level>", "[playername]");
+        LocaleManager.addTabCompleteSub(this, "remove");
     }
 }

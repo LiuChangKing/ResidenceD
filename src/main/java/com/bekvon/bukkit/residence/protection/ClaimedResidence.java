@@ -1136,6 +1136,9 @@ public class ClaimedResidence {
             }
         }
 
+        // Ensure land core exists before teleporting (async check)
+        plugin.getLandCoreManager().ensureCoreExistsAsync(this);
+
         SafeLocationCache old = Residence.getInstance().getTeleportMap().get(targetPlayer.getUniqueId());
 
         if (Bukkit.getWorld(this.getPermissions().getWorldName()) == null)

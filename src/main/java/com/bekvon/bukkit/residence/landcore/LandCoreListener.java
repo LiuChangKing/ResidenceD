@@ -77,6 +77,11 @@ public class LandCoreListener implements Listener {
         Block block = event.getClickedBlock();
         if (block == null || block.getType() != Material.PLAYER_HEAD) return;
         if (!manager.isCore(block)) return;
+        if (manager.isWithdrawing(block)) {
+            event.setCancelled(true);
+            MessageUtil.notifyError(event.getPlayer(), "正在收回", "领地正在回收中");
+            return;
+        }
         event.setCancelled(true);
         Player player = event.getPlayer();
         int level = manager.get(block).getLevel();
