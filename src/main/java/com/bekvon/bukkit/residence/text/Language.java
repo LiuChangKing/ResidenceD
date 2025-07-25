@@ -70,6 +70,7 @@ public class Language {
             message = enlocale.getString(key);
         } else {
             message = missing;
+            plugin.getLogger().warning(missing);
         }
         return CMIChatColor.translate(message);
     }
