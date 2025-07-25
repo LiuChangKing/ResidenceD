@@ -48,6 +48,26 @@ public class landcore implements cmd {
                 plugin.msg(player, "当前领地没有领地核心");
                 return true;
             }
+            manager.forceRemove(player, coreLoc.getBlock());
+            MessageUtil.notifySuccess(player, "已删除领地");
+            return true;
+        }
+
+        if (args[0].equalsIgnoreCase("recycle")) {
+            if (args.length != 1)
+                return false;
+
+            Player player = (Player) sender;
+            ClaimedResidence res = plugin.getResidenceManager().getByLoc(player.getLocation());
+            if (res == null) {
+                plugin.msg(player, lm.Invalid_Residence);
+                return true;
+            }
+            Location coreLoc = manager.getCoreLocation(res.getName());
+            if (coreLoc == null) {
+                plugin.msg(player, "当前领地没有领地核心");
+                return true;
+            }
             manager.withdraw(player, coreLoc.getBlock());
             MessageUtil.notifySuccess(player, "正在收回", "领地正在回收中...");
             return true;
@@ -76,8 +96,12 @@ public class landcore implements cmd {
     public void getLocale() {
         ConfigReader c = Residence.getInstance().getLocaleManager().getLocaleConfig();
         c.get("Description", "给予或删除领地核心");
-        c.get("Info", Arrays.asList("&eUsage: &6/res landcore <level> [player]", "&eUsage: &6/res landcore remove"));
+        c.get("Info", Arrays.asList(
+                "&eUsage: &6/res landcore <level> [player]",
+                "&eUsage: &6/res landcore remove",
+                "&eUsage: &6/res landcore recycle"));
         LocaleManager.addTabCompleteMain(this, "<level>", "[playername]");
         LocaleManager.addTabCompleteSub(this, "remove");
+        LocaleManager.addTabCompleteSub(this, "recycle");
     }
 }
