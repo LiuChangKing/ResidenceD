@@ -658,4 +658,44 @@ public class LandCoreManager {
         save();
         MessageUtil.notifySuccess(player, "已收回领地");
     }
+
+    /**
+     * Force remove a land core and its residence without any checks.
+     * Used by admin command to instantly delete the residence and clean up the area.
+     * No land core item will be returned.
+     */
+    public void forceRemove(Player player, Block block) {
+        LandCoreData data = get(block);
+        if (data == null) return;
+
+        int level = data.getLevel();
+        String resName = data.getResidenceName();
+
+        ClaimedResidence res = plugin.getResidenceManager().getByName(resName);
+        if (res != null) {
+            plugin.getResidenceManager().removeResidence(res);
+        }
+
+        Location loc = block.getLocation();
+        World world = loc.getWorld();
+        int chunkX = block.getChunk().getX();
+        int chunkZ = block.getChunk().getZ();
+        int radius = level - 1;
+        for (int x = chunkX - radius; x <= chunkX + radius; x++) {
+            for (int z = chunkZ - radius; z <= chunkZ + radius; z++) {
+                Chunk chunk = world.getChunkAt(x, z);
+                world.regenerateChunk(x, z);
+                new AsyncChunkScanner(plugin, chunk, player)
+                        .runTaskAsynchronously(plugin);
+            }
+        }
+
+        removeHologram(loc);
+        cores.remove(key(loc));
+        config.getConfig().set("cores." + key(loc), null);
+        config.save();
+        block.setType(Material.AIR);
+        save();
+        MessageUtil.notifySuccess(player, "已删除领地");
+    }
 }
